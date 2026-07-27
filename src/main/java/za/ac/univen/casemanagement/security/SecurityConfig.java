@@ -21,6 +21,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * Security Configuration - ADMIN-ONLY PHASE
+ *
+ * Currently in admin-only build phase. All secured endpoints require ADMIN role.
+ * Once routing and role-based access is fully defined, this will be expanded
+ * to include LEGAL_OFFICER and VIEWER permissions.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -46,14 +53,13 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**", "/h2-console/**", "/error").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/cases/**").hasAnyRole("ADMIN", "LEGAL_OFFICER", "VIEWER")
-                .requestMatchers(HttpMethod.POST, "/api/v1/cases/**").hasAnyRole("ADMIN", "LEGAL_OFFICER")
-                .requestMatchers(HttpMethod.PUT, "/api/v1/cases/**").hasAnyRole("ADMIN", "LEGAL_OFFICER")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/cases/**").hasRole("ADMIN")
-                .requestMatchers("/api/v1/reports/**").hasAnyRole("ADMIN", "LEGAL_OFFICER", "VIEWER")
-                .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
+                // Public endpoints: login only
+                .requestMatchers("/api/v1/auth/login").permitAll()
+                .requestMatchers("/error").permitAll()
+
+                // Admin-only phase: ALL other API endpoints restricted to ADMIN role only
+                // TODO: Expand per-role permissions after routing is completed
+                .anyRequest().hasRole("ADMIN")
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
