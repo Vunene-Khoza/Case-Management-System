@@ -1,0 +1,55 @@
+<div class="login-page">
+  <div class="glass-card login-card">
+    <div class="logo-container">
+      <!-- Stylized Mock Logo for University of Venda -->
+      <div class="univen-logo-mock">
+        <div class="shield">
+          <span class="gold-star">★</span>
+        </div>
+        <div class="logo-text">
+          <span class="univen-title">UNIVERSITY OF VENDA</span>
+          <span class="system-subtitle">Legal Case Management</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="card-title">Authorized Staff Login</h2>
+    <p class="card-desc">Enter your credentials to manage legal and labour cases.</p>
+
+    <form (ngSubmit)="onLogin()">
+      <div class="form-group">
+        <label class="form-label" for="username">Username / Email</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          class="form-input" 
+          placeholder="e.g. user@univen.ac.za" 
+          [(ngModel)]="username" 
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          class="form-input" 
+          placeholder="••••••••••••" 
+          [(ngModel)]="password" 
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        Sign In
+      </button>
+      
+      <div class="login-footer">
+        <a href="javascript:void(0)" class="forgot-pass" (click)="forgotPassword()">Forgot Password?</a>
+      </div>
+    </form>
+  </div>
+</div>

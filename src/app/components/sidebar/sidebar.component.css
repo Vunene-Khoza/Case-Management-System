@@ -1,0 +1,177 @@
+.sidebar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 230px; /* Reduced from 260px */
+  background-color: var(--bg-tertiary);
+  border-right: 1px solid var(--border-glass);
+  z-index: 100;
+  overflow-y: hidden;
+}
+
+.section-1 {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 12px; /* Tightened from 20px 16px */
+  height: 100%;
+  position: relative;
+}
+
+/* Logo Area */
+.univen-logo-1 {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.logo-image {
+  max-width: 110px; /* Reduced from 130px */
+  max-height: 46px; /* Reduced from 55px */
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.15));
+}
+
+.case-management {
+  font-family: var(--font-family-title);
+  font-weight: 800;
+  font-size: 12px; /* Reduced from 13px */
+  color: var(--text-primary);
+  text-align: center;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px; /* Reduced from 20px */
+}
+
+/* Frames / Sections */
+.frame-2, .frame-3, .frame-4 {
+  display: flex;
+  flex-direction: column;
+  gap: 3px; /* Reduced from 4px */
+  margin-bottom: 12px; /* Reduced from 16px */
+}
+
+.main, .insights, .admin {
+  font-family: var(--font-family-title);
+  font-size: 9px; /* Reduced from 10px */
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  padding: 0 8px;
+  margin-bottom: 3px;
+  text-transform: uppercase;
+}
+
+/* Menu item link */
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Reduced from 10px */
+  padding: 7px 10px; /* Reduced from 8px 12px */
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: var(--transition-fast);
+  cursor: pointer;
+}
+
+.menu-icon {
+  width: 14px; /* Reduced from 16px */
+  height: 14px;
+  opacity: 0.6;
+  transition: var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.menu-item:hover {
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.menu-item:hover .menu-icon {
+  opacity: 1;
+  transform: scale(1.05);
+  color: var(--accent-blue);
+}
+
+.menu-item.active {
+  color: var(--text-primary);
+  background-color: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+.menu-item.active .menu-icon {
+  opacity: 1;
+  color: var(--accent-blue);
+}
+
+.disabled-link {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.disabled-link:hover {
+  background: none;
+  color: var(--text-secondary);
+}
+
+.disabled-link:hover .menu-icon {
+  opacity: 0.6;
+  transform: none;
+  color: currentColor;
+}
+
+/* Labels */
+.bashboard, .cases, .new-case, .case-detail, 
+.reports, .activity-log, .user-management, .settings2 {
+  font-size: 12.5px; /* Sized down for narrower bar */
+  font-weight: 500;
+}
+
+/* Profile Section Footer */
+.profile-section {
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.line-1 {
+  height: 1px;
+  background-color: var(--border-glass);
+  margin-bottom: 10px;
+}
+
+.profile-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px;
+}
+
+.profile {
+  width: 32px; /* Reduced from 38px */
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border-glass);
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.r-e-mukosi {
+  font-size: 12px; /* Reduced from 13px */
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.administator {
+  font-size: 9.5px; /* Reduced from 10px */
+  color: var(--accent-gold);
+  font-weight: 500;
+}

@@ -1,0 +1,153 @@
+<div class="user-management-page">
+  <!-- Role security fallback check -->
+  <ng-container *ngIf="isAdmin; else accessDenied">
+    <!-- Header -->
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">User Account Management</h1>
+        <p class="page-subtitle">Add new authorized personnel, configure system roles, and audit access statuses.</p>
+      </div>
+      <div class="header-actions">
+        <button (click)="openAddModal()" class="btn btn-primary">
+          <svg lucidePlus class="btn-icon"></svg>
+          <span>Add User Account</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- User Accounts Table Grid -->
+    <section class="users-table-section glass-card">
+      <div class="table-container">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>User Name</th>
+              <th>Email Address</th>
+              <th>System Role</th>
+              <th>Account Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users">
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar-sm">{{ getInitials(user.name) }}</div>
+                  <span class="user-name">{{ user.name }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="email-cell">
+                  <svg lucideMail class="inline-icon"></svg>
+                  <span>{{ user.email }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+                  {{ getRoleLabel(user.role) }}
+                </span>
+              </td>
+              <td>
+                <span class="status-indicator">
+                  <span class="status-dot bg-success"></span>
+                  <span class="status-label">Active</span>
+                </span>
+              </td>
+              <td>
+                <div class="actions-cell" *ngIf="user.userId !== currentUserId">
+                  <button (click)="deleteUser(user)" class="action-btn delete-btn" title="Delete User">
+                    <svg lucideTrash2 class="action-icon"></svg>
+                  </button>
+                </div>
+                <span class="current-user-tag" *ngIf="user.userId === currentUserId">(You)</span>
+              </td>
+            </tr>
+            <tr *ngIf="users.length === 0">
+              <td colspan="5" class="empty-row">No users registered in the database.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Add User Modal Overlay -->
+    <div class="modal-overlay" *ngIf="showAddModal">
+      <div class="modal-content glass-card">
+        <div class="modal-header">
+          <h3>Create User Account</h3>
+          <button class="close-modal-btn" (click)="closeAddModal()">
+            <svg lucideX class="close-icon"></svg>
+          </button>
+        </div>
+        <form (ngSubmit)="submitUserForm()">
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label" for="userName">Full Name *</label>
+              <input 
+                type="text" 
+                id="userName" 
+                class="form-input" 
+                placeholder="e.g. Professor Baloyi"
+                [(ngModel)]="formData.name" 
+                name="userName"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="userEmail">Email Address *</label>
+              <input 
+                type="email" 
+                id="userEmail" 
+                class="form-input" 
+                placeholder="e.g. baloyi@univen.ac.za"
+                [(ngModel)]="formData.email" 
+                name="userEmail"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="userRole">System Authorization Role *</label>
+              <select 
+                id="userRole" 
+                class="form-select" 
+                [(ngModel)]="formData.role" 
+                name="userRole"
+                required
+              >
+                <option [value]="UserRole.ADMIN">System Administrator</option>
+                <option [value]="UserRole.LEGAL_OFFICER">Legal / Labour Officer</option>
+                <option [value]="UserRole.VIEWER">Viewer (Read-Only Reports)</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeAddModal()">Cancel</button>
+            <button 
+              type="submit" 
+              class="btn btn-primary" 
+              [disabled]="!formData.name || !formData.email || !formData.role"
+            >
+              Create Account
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Access Denied Card -->
+  <ng-template #accessDenied>
+    <section class="glass-card access-denied-card">
+      <svg lucideShieldAlert class="denied-icon"></svg>
+      <h2 class="denied-title">Administrative Clearance Required</h2>
+      <p class="denied-desc">
+        Your current account credentials (Viewer / Legal Officer) do not possess administrative permissions to access the User Directory configuration.
+      </p>
+      <button (click)="goBack()" class="btn btn-primary">
+        Return to Dashboard
+      </button>
+    </section>
+  </ng-template>
+</div>

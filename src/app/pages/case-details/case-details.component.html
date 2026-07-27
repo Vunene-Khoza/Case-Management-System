@@ -1,0 +1,314 @@
+<div class="case-details-page">
+  <!-- Back Header -->
+  <header class="details-header">
+    <a routerLink="/cases" class="back-link">
+      <svg lucideArrowLeft class="back-icon"></svg>
+      <span>Back to Ledger</span>
+    </a>
+    <div class="header-actions" *ngIf="!loading && activeCase">
+      <!-- Only Admin can delete cases -->
+      <button *ngIf="isAdmin" (click)="deleteCase()" class="btn btn-danger btn-sm">
+        <svg lucideTrash2 class="btn-icon"></svg>
+        <span>Delete Case</span>
+      </button>
+      
+      <a [routerLink]="['/cases', activeCase.caseId, 'edit']" class="btn btn-secondary btn-sm" *ngIf="activeCase.status !== CaseStatus.CLOSED">
+        <svg lucideEdit2 class="btn-icon"></svg>
+        <span>Edit Details</span>
+      </a>
+
+      <button 
+        *ngIf="activeCase.status !== CaseStatus.CLOSED" 
+        (click)="openCloseModal()" 
+        class="btn btn-primary btn-sm"
+      >
+        <svg lucideCheckSquare class="btn-icon"></svg>
+        <span>Close Case Matter</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Skeleton Loading State -->
+  <ng-container *ngIf="loading; else detailsContent">
+    <div class="details-layout">
+      <!-- Left Column Skeleton -->
+      <div class="details-main-col">
+        <div class="glass-card" style="display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="skeleton" style="width: 25%; height: 28px;"></div>
+            <div class="skeleton" style="width: 15%; height: 22px; border-radius: 999px;"></div>
+          </div>
+          <div class="skeleton" style="width: 90%; height: 16px;"></div>
+          <div class="skeleton" style="width: 80%; height: 16px;"></div>
+          <div class="skeleton" style="width: 40%; height: 14px; margin-top: 10px;"></div>
+          
+          <div style="height: 1px; background: var(--border-glass); margin: 10px 0;"></div>
+          
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+            <div *ngFor="let field of [1, 2, 3, 4]" style="display: flex; flex-direction: column; gap: 8px;">
+              <div class="skeleton" style="width: 40%; height: 10px;"></div>
+              <div class="skeleton" style="width: 80%; height: 16px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column Skeleton -->
+      <div class="details-side-col">
+        <div class="glass-card" style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="skeleton" style="width: 50%; height: 18px;"></div>
+          <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 10px;">
+            <div *ngFor="let note of [1, 2, 3]" style="display: flex; gap: 12px;">
+              <div class="skeleton" style="width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;"></div>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                <div class="skeleton" style="width: 80%; height: 12px;"></div>
+                <div class="skeleton" style="width: 50%; height: 10px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Actual Case Profile Detail Content -->
+  <ng-template #detailsContent>
+    <div class="details-layout" *ngIf="activeCase; else notFound">
+      
+      <!-- Left Main Pane: Case Summary & Core details -->
+      <div class="details-main-col">
+        <article class="case-profile-card glass-card">
+          <header class="profile-card-header">
+            <div>
+              <span class="case-id-tag">{{ activeCase.caseId }}</span>
+              <h2 class="profile-card-title">{{ activeCase.employeeName }}</h2>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <span class="badge" [ngClass]="getCaseTypeClass(activeCase.caseType)">
+                {{ activeCase.caseType }}
+              </span>
+              <span class="badge" [ngClass]="getStatusClass(activeCase.status)">
+                {{ formatStatusLabel(activeCase.status) }}
+              </span>
+            </div>
+          </header>
+
+          <div class="case-description-block">
+            <h4 class="block-title">Subject Matter / Dispute Details</h4>
+            <p class="description-text">{{ activeCase.description }}</p>
+          </div>
+
+          <hr class="card-separator" />
+
+          <div class="details-metadata-grid">
+            <div class="meta-item">
+              <span class="meta-label">Employee ID / Code</span>
+              <span class="meta-value font-mono">{{ activeCase.employeeNumber }}</span>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-label">Matter Classification</span>
+              <span class="meta-value">{{ activeCase.classification }}</span>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-label">Total Costing Allocation</span>
+              <span class="meta-value cost-value">
+                {{ activeCase.costing ? 'R ' + formatCost(activeCase.costing) : 'R 0.00' }}
+              </span>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-label">Trial or Proceeding Date</span>
+              <span class="meta-value">
+                <svg lucideCalendar class="inline-icon"></svg>
+                <span>{{ activeCase.trialDate || 'Not Scheduled' }}</span>
+              </span>
+            </div>
+
+            <div class="meta-item" *ngIf="activeCase.status === CaseStatus.CLOSED">
+              <span class="meta-label">Resolution / Closure Date</span>
+              <span class="meta-value">
+                <svg lucideClock class="inline-icon text-success"></svg>
+                <span>{{ activeCase.closureDate || 'N/A' }}</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Case Reminders Calendar Section -->
+          <div class="reminders-section" *ngIf="activeCase.reminderDates && activeCase.reminderDates.length > 0">
+            <h4 class="block-title">Important Deadline & Reminder Schedule</h4>
+            <div class="reminders-timeline">
+              <div class="reminder-card" *ngFor="let date of activeCase.reminderDates">
+                <div class="reminder-icon-wrapper">
+                  <svg lucideCalendar class="reminder-icon"></svg>
+                </div>
+                <div class="reminder-details">
+                  <span class="reminder-date">{{ date }}</span>
+                  <p class="reminder-desc">Reminder Date Scheduled</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Closure summary block if closed -->
+          <div class="closure-summary-block" *ngIf="activeCase.status === CaseStatus.CLOSED">
+            <div class="closure-badge">
+              <svg lucideLock class="lock-icon"></svg>
+              <span>Resolved & Closed Matter Summary</span>
+            </div>
+            <p class="closure-text">{{ activeCase.finalNotes || 'No summary registered.' }}</p>
+          </div>
+        </article>
+      </div>
+
+      <!-- Right Side Pane: Notes / Activity Log Feed -->
+      <div class="details-side-col">
+        <section class="notes-feed-card glass-card">
+          <header class="notes-header">
+            <h3>Case History & Notes</h3>
+            <button 
+              (click)="openNoteModal()" 
+              class="btn btn-secondary btn-sm"
+              [disabled]="activeCase.status === CaseStatus.CLOSED"
+            >
+              <svg lucidePlus class="btn-icon"></svg>
+              <span>Add Note</span>
+            </button>
+          </header>
+
+          <div class="notes-list-container">
+            <div class="note-card" *ngFor="let note of notes">
+              <header class="note-card-meta">
+                <div class="note-author">
+                  <div class="author-avatar">{{ getInitials(note.authorName) }}</div>
+                  <span class="author-name">{{ note.authorName }}</span>
+                </div>
+                <span class="note-date">{{ note.createdAt }}</span>
+              </header>
+              <p class="note-content">{{ note.content }}</p>
+            </div>
+
+            <div class="empty-notes" *ngIf="!notes || notes.length === 0">
+              <svg lucideMessageSquare class="empty-icon"></svg>
+              <p>No logged notes or case activities recorded for this matter yet.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+  </ng-template>
+
+  <!-- Case Closure Modal Overlay -->
+  <div class="modal-overlay" *ngIf="showCloseModal">
+    <div class="modal-content glass-card">
+      <header class="modal-header">
+        <h3>Close Case Matter</h3>
+        <button class="close-modal-btn" (click)="closeCloseModal()">
+          <svg lucideX class="close-icon"></svg>
+        </button>
+      </header>
+      <form (ngSubmit)="submitCloseCase()">
+        <div class="modal-body">
+          <p class="modal-instruction">
+            Please register the final costing metrics and closure resolution notes to audit-log and lock this dispute.
+          </p>
+          
+          <div class="form-group">
+            <label class="form-label" for="closureDate">Resolution / Closure Date *</label>
+            <input 
+              type="date" 
+              id="closureDate" 
+              class="form-input" 
+              [(ngModel)]="closeFormData.date" 
+              name="closureDate"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="finalCost">Final Costing Allocation (ZAR) *</label>
+            <div class="cost-input-wrapper">
+              <span class="currency-indicator">R</span>
+              <input 
+                type="number" 
+                id="finalCost" 
+                class="form-input padding-currency" 
+                placeholder="0.00"
+                [(ngModel)]="closeFormData.cost" 
+                name="finalCost"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="closureSummary">Closure & Resolution Summary *</label>
+            <textarea 
+              id="closureSummary" 
+              class="form-textarea" 
+              rows="4" 
+              placeholder="Summarize the final outcome, settlement details, or ruling..."
+              [(ngModel)]="closeFormData.summary"
+              name="closureSummary"
+              required
+            ></textarea>
+          </div>
+        </div>
+        <footer class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeCloseModal()">Cancel</button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="!closeFormData.date || !closeFormData.summary || closeFormData.cost === null"
+          >
+            Close Case
+          </button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Note Modal Overlay -->
+  <div class="modal-overlay" *ngIf="showNoteModal">
+    <div class="modal-content glass-card">
+      <header class="modal-header">
+        <h3>Add Case Progress Note</h3>
+        <button class="close-modal-btn" (click)="closeNoteModal()">
+          <svg lucideX class="close-icon"></svg>
+        </button>
+      </header>
+      <form (ngSubmit)="submitNote()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="noteContent">Progress Entry Details *</label>
+            <textarea 
+              id="noteContent" 
+              class="form-textarea" 
+              rows="5" 
+              placeholder="Record discussions, hearings outcomes, correspondence updates, or legal insights..."
+              [(ngModel)]="noteContent"
+              name="noteContent"
+              required
+            ></textarea>
+          </div>
+        </div>
+        <footer class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeNoteModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="!noteContent.trim()">
+            Save Entry
+          </button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <ng-template #notFound>
+    <div class="glass-card error-card">
+      <h2>Case Record Not Found</h2>
+      <p>The case record requested does not exist in our database ledger.</p>
+      <a routerLink="/cases" class="btn btn-primary">Return to Ledger</a>
+    </div>
+  </ng-template>
+</div>

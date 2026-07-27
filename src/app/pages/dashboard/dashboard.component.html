@@ -1,0 +1,191 @@
+<div class="dashboard-page">
+  <!-- Header Area -->
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">University of Venda Legal System</h1>
+      <p class="page-subtitle">Welcome back, {{ currentUserName }}. Here is a summary of active legal & labour matters.</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/cases/create" class="btn btn-primary">
+        <span>+ Create New Case</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Skeleton Loading State -->
+  <ng-container *ngIf="loading; else dashboardContent">
+    <!-- Summary Grid Skeleton -->
+    <section class="summary-grid">
+      <div class="glass-card stat-card" *ngFor="let i of [1, 2, 3, 4]">
+        <div class="skeleton" style="width: 54px; height: 54px; border-radius: var(--radius-sm);"></div>
+        <div class="stat-data" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+          <div class="skeleton" style="width: 60%; height: 12px;"></div>
+          <div class="skeleton" style="width: 40%; height: 24px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Split Grid Skeleton -->
+    <div class="dashboard-content-split">
+      <!-- Left Table Skeleton -->
+      <div class="glass-card">
+        <div class="skeleton" style="width: 150px; height: 20px; margin-bottom: 24px;"></div>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div *ngFor="let r of [1, 2, 3, 4, 5]" style="display: flex; gap: 16px; align-items: center;">
+            <div class="skeleton" style="width: 60px; height: 16px;"></div>
+            <div class="skeleton" style="flex: 2; height: 16px;"></div>
+            <div class="skeleton" style="flex: 1; height: 16px;"></div>
+            <div class="skeleton" style="flex: 1; height: 16px;"></div>
+            <div class="skeleton" style="width: 80px; height: 28px; border-radius: var(--radius-sm);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Alerts Skeleton -->
+      <div class="glass-card">
+        <div class="skeleton" style="width: 180px; height: 20px; margin-bottom: 24px;"></div>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div *ngFor="let a of [1, 2, 3]" style="display: flex; gap: 12px;">
+            <div class="skeleton" style="width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0;"></div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+              <div class="skeleton" style="width: 90%; height: 12px;"></div>
+              <div class="skeleton" style="width: 70%; height: 12px;"></div>
+              <div class="skeleton" style="width: 30%; height: 10px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Actual Dashboard Content -->
+  <ng-template #dashboardContent>
+    <!-- Summary Grid Cards -->
+    <section class="summary-grid">
+      <div class="glass-card stat-card card-total">
+        <div class="stat-icon-wrapper">
+          <svg lucideBriefcase class="stat-icon"></svg>
+        </div>
+        <div class="stat-data">
+          <span class="stat-label">Total Cases</span>
+          <h2 class="stat-value">{{ metrics.totalCases }}</h2>
+        </div>
+      </div>
+
+      <div class="glass-card stat-card card-open">
+        <div class="stat-icon-wrapper">
+          <svg lucideAlertCircle class="stat-icon"></svg>
+        </div>
+        <div class="stat-data">
+          <span class="stat-label">Open / In Progress</span>
+          <h2 class="stat-value">{{ metrics.openCases }}</h2>
+        </div>
+      </div>
+
+      <div class="glass-card stat-card card-closed">
+        <div class="stat-icon-wrapper">
+          <svg lucideCheckCircle class="stat-icon"></svg>
+        </div>
+        <div class="stat-data">
+          <span class="stat-label">Closed Cases</span>
+          <h2 class="stat-value">{{ metrics.closedCases }}</h2>
+        </div>
+      </div>
+
+      <div class="glass-card stat-card card-cost">
+        <div class="stat-icon-wrapper">
+          <svg lucideDollarSign class="stat-icon"></svg>
+        </div>
+        <div class="stat-data">
+          <span class="stat-label">Total Costing (ZAR)</span>
+          <h2 class="stat-value">R {{ formatCost(metrics.totalCost) }}</h2>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Dashboard Content (Split Layout) -->
+    <div class="dashboard-content-split">
+      
+      <!-- Left: Recent Cases Table -->
+      <section class="dashboard-left glass-card">
+        <div class="section-header">
+          <h3 class="section-title">Recent Cases</h3>
+          <a routerLink="/cases" class="view-all-link">
+            <span>View All</span>
+            <svg lucideArrowRight class="link-icon"></svg>
+          </a>
+        </div>
+
+        <div class="table-container">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Case ID</th>
+                <th>Employee</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Trial Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let case of metrics.recentCases">
+                <td class="font-mono text-accent">{{ case.caseId }}</td>
+                <td>
+                  <div class="emp-cell">
+                    <span class="emp-name">{{ case.employeeName }}</span>
+                    <span class="emp-no">No: {{ case.employeeNumber }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="getCaseTypeClass(case.caseType)">
+                    {{ case.caseType }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="getStatusClass(case.status)">
+                    {{ formatStatusLabel(case.status) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="date-cell">
+                    <svg lucideCalendar class="inline-icon"></svg>
+                    <span>{{ case.trialDate || 'Not Scheduled' }}</span>
+                  </div>
+                </td>
+                <td>
+                  <a [routerLink]="['/cases', case.caseId]" class="action-btn-view" title="View Case Details">
+                    <svg lucideEye class="action-icon"></svg>
+                    <span>View</span>
+                  </a>
+                </td>
+              </tr>
+              <tr *ngIf="metrics.recentCases.length === 0">
+                <td colspan="6" class="empty-row">No recent cases found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Right: Notifications & Reminders -->
+      <section class="dashboard-right glass-card">
+        <div class="section-header">
+          <h3 class="section-title">System Alerts & Reminders</h3>
+          <span class="notification-badge">{{ metrics.notifications.length }}</span>
+        </div>
+
+        <div class="notifications-list">
+          <div class="notification-item" *ngFor="let note of metrics.notifications">
+            <div class="notif-bullet"></div>
+            <div class="notif-content">
+              <p class="notif-text">{{ note }}</p>
+              <span class="notif-time">Real-time alert</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </ng-template>
+</div>

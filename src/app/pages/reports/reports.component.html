@@ -1,0 +1,206 @@
+<div class="reports-page">
+  <!-- Header -->
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Reports & Analytics</h1>
+      <p class="page-subtitle">Generate summaries, filter case trends, and evaluate financial metrics.</p>
+    </div>
+  </header>
+
+  <!-- Filter Controls -->
+  <section class="filters-card glass-card">
+    <h3 class="section-title-small">
+      <svg lucideFilter class="header-icon"></svg>
+      <span>Report Configuration</span>
+    </h3>
+    
+    <div class="filters-grid">
+      <div class="form-group">
+        <label class="form-label">Date Opened Range (From)</label>
+        <input type="date" class="form-input" [(ngModel)]="startDate" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Date Opened Range (To)</label>
+        <input type="date" class="form-input" [(ngModel)]="endDate" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Case Type</label>
+        <select class="form-select" [(ngModel)]="caseType">
+          <option value="ALL">All Types</option>
+          <option value="LEGAL">Legal Cases</option>
+          <option value="LABOUR">Labour Cases</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" [(ngModel)]="status">
+          <option value="ALL">All Statuses</option>
+          <option value="OPEN">Open</option>
+          <option value="IN_PROGRESS">In Progress</option>
+          <option value="CLOSED">Closed</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filter-actions mt-12">
+      <button (click)="generateReport()" class="btn btn-primary">
+        <span>Generate Report</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Results Grid -->
+  <div class="reports-results" *ngIf="summaryData">
+    
+    <!-- Summary metrics bar -->
+    <section class="summary-metrics-grid">
+      <div class="glass-card metric-box">
+        <span class="metric-label">Total Cases</span>
+        <span class="metric-value">{{ summaryData.totalCases }}</span>
+      </div>
+      <div class="glass-card metric-box">
+        <span class="metric-label">Open Cases</span>
+        <span class="metric-value text-info">{{ summaryData.openCases }}</span>
+      </div>
+      <div class="glass-card metric-box">
+        <span class="metric-label">Closed Cases</span>
+        <span class="metric-value text-success">{{ summaryData.closedCases }}</span>
+      </div>
+      <div class="glass-card metric-box">
+        <span class="metric-label">Total Costs Incurred</span>
+        <span class="metric-value text-gold">R {{ formatCost(summaryData.totalCost) }}</span>
+      </div>
+    </section>
+
+    <!-- Dynamic Visual Charts using Native SVGs for 100% compilation safety and rich aesthetics -->
+    <section class="charts-container-grid">
+      
+      <!-- Chart 1: Case Type Pie Chart (SVG Donut) -->
+      <div class="glass-card chart-card">
+        <h4 class="chart-title">
+          <svg lucidePieChart class="chart-title-icon"></svg>
+          <span>Case Types Distribution</span>
+        </h4>
+        
+        <div class="donut-chart-container">
+          <!-- SVG Donut Chart -->
+          <svg width="200" height="200" viewBox="0 0 200 200" class="donut-svg">
+            <!-- Outer Glow and Gradients definitions -->
+            <defs>
+              <radialGradient id="blueGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="60%" stop-color="#3b82f6" stop-opacity="1" />
+                <stop offset="100%" stop-color="#1d4ed8" stop-opacity="1" />
+              </radialGradient>
+              <radialGradient id="goldGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="60%" stop-color="#fbbf24" stop-opacity="1" />
+                <stop offset="100%" stop-color="#d97706" stop-opacity="1" />
+              </radialGradient>
+            </defs>
+
+            <!-- Background ring -->
+            <circle cx="100" cy="100" r="70" fill="transparent" stroke="rgba(255,255,255,0.03)" stroke-width="20" />
+            
+            <!-- Legal Sector (Blue) -->
+            <circle 
+              cx="100" 
+              cy="100" 
+              r="70" 
+              fill="transparent" 
+              stroke="url(#blueGlow)" 
+              stroke-width="20" 
+              [attr.stroke-dasharray]="getPieCircumference()"
+              [attr.stroke-dashoffset]="getPieOffset(0)"
+              stroke-linecap="round"
+              class="chart-segment"
+            />
+
+            <!-- Labour Sector (Gold) -->
+            <circle 
+              cx="100" 
+              cy="100" 
+              r="70" 
+              fill="transparent" 
+              stroke="url(#goldGlow)" 
+              stroke-width="20" 
+              [attr.stroke-dasharray]="getPieCircumference()"
+              [attr.stroke-dashoffset]="getPieOffset(1)"
+              stroke-linecap="round"
+              class="chart-segment"
+            />
+
+            <!-- Center Text -->
+            <text x="100" y="95" text-anchor="middle" class="donut-center-num">{{ summaryData.totalCases }}</text>
+            <text x="100" y="115" text-anchor="middle" class="donut-center-lbl">MATTERS</text>
+          </svg>
+
+          <!-- Legend -->
+          <div class="chart-legend">
+            <div class="legend-item" *ngFor="let item of summaryData.caseTypesChart; let i = index">
+              <span class="legend-dot" [ngClass]="i === 0 ? 'bg-blue' : 'bg-gold'"></span>
+              <div class="legend-meta">
+                <span class="legend-name">{{ item.label }}</span>
+                <span class="legend-val">{{ item.value }} cases ({{ getPercentage(item.value) }}%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart 2: Monthly Cases Bar Chart (SVG Columns) -->
+      <div class="glass-card chart-card">
+        <h4 class="chart-title">
+          <svg lucideBarChart3 class="chart-title-icon"></svg>
+          <span>Monthly Volume Trends</span>
+        </h4>
+        
+        <div class="bar-chart-container">
+          <div class="bar-chart-y-axis">
+            <span>{{ getMaxCount() }}</span>
+            <span>{{ Math.round(getMaxCount() / 2) }}</span>
+            <span>0</span>
+          </div>
+          
+          <div class="bar-chart-visual">
+            <div class="bar-column" *ngFor="let bar of summaryData.monthlyCasesChart">
+              <div class="bar-fill-wrapper">
+                <!-- Actual bar representation -->
+                <div 
+                  class="bar-fill" 
+                  [style.height.%]="getBarHeightPercentage(bar.count)"
+                  [attr.data-count]="bar.count"
+                  [title]="bar.count + ' cases opened in ' + bar.month"
+                >
+                  <span class="bar-tooltip">{{ bar.count }} cases</span>
+                </div>
+              </div>
+              <span class="bar-label">{{ formatMonthLabel(bar.month) }}</span>
+            </div>
+
+            <div class="empty-chart" *ngIf="summaryData.monthlyCasesChart.length === 0">
+              No date ranges found in results.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Export Actions (Footer) -->
+    <footer class="export-section glass-card">
+      <h4 class="export-title">Export Options</h4>
+      <p class="export-desc">Download detailed analytical files containing case records and cost matrices.</p>
+      <div class="export-buttons">
+        <button (click)="exportPDF()" class="btn btn-secondary">
+          <svg lucideFileText class="btn-icon text-danger"></svg>
+          <span>Export PDF Document</span>
+        </button>
+        <button (click)="exportExcel()" class="btn btn-secondary">
+          <svg lucideDownload class="btn-icon text-success"></svg>
+          <span>Export Excel Ledger</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>

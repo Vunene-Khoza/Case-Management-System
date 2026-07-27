@@ -1,0 +1,223 @@
+<div class="frame-18">
+  <h1 class="create-new-case">{{ isEditMode ? 'Modify Case - ' + caseId : 'Create New Case' }}</h1>
+  <p class="fill-in-the-details-below-to-register-a-new-case">
+    Fill in the details below to register a new case
+  </p>
+  
+  <div class="line-42"></div>
+
+  <form (ngSubmit)="saveCase()" class="figma-form-container">
+    <!-- Left Column: 3 Blocks -->
+    <div class="figma-column-left">
+      <!-- Frame 20: Employee Information -->
+      <div class="frame-20">
+        <div class="rectangle-22"></div>
+        <div class="employee-information">Employee Information</div>
+        <div class="line-8"></div>
+        
+        <div class="employee-number">EMPLOYEE NUMBER</div>
+        <input 
+          type="text" 
+          id="employeeNumber" 
+          name="employeeNumber"
+          class="rectangle-28" 
+          placeholder="e.g 12345" 
+          [(ngModel)]="formData.employeeNumber" 
+          (ngModelChange)="onEmployeeNumberChange()"
+          required
+        />
+        <div class="enter-staff-id-to-auto-populate-name">
+          Enter staff ID to auto-populate name
+        </div>
+
+        <div class="employee-name">EMPLOYEE NAME</div>
+        <input 
+          type="text" 
+          id="employeeName" 
+          name="employeeName"
+          class="rectangle-29" 
+          placeholder="Auto-populated" 
+          [(ngModel)]="formData.employeeName" 
+          required
+          readonly
+        />
+      </div>
+
+      <!-- Frame 21: Case Information -->
+      <div class="frame-21">
+        <div class="rectangle-25"></div>
+        <div class="case-information">Case Information</div>
+        <div class="line-9"></div>
+        
+        <div class="case-type">CASE TYPE</div>
+        <div class="select-wrapper select-type-wrapper">
+          <select 
+            id="caseType" 
+            name="caseType"
+            class="rectangle-30" 
+            [(ngModel)]="formData.caseType" 
+            required
+          >
+            <option [value]="CaseType.LEGAL">Legal Case</option>
+            <option [value]="CaseType.LABOUR">Labour Case</option>
+          </select>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="sort-down2" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+          </svg>
+        </div>
+
+        <div class="classification">CLASSIFICATION</div>
+        <div class="select-wrapper select-classification-wrapper">
+          <select 
+            id="classification" 
+            name="classification"
+            class="rectangle-282" 
+            [(ngModel)]="formData.classification" 
+            required
+          >
+            <option *ngFor="let class of classifications" [value]="class">
+              {{ formatClassificationLabel(class) }}
+            </option>
+          </select>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="sort-down" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+          </svg>
+        </div>
+
+        <div class="case-description">CASE DESCRIPTION</div>
+        <textarea 
+          id="description" 
+          name="description"
+          class="rectangle-283" 
+          placeholder="Provide a detailed description of the case..." 
+          [(ngModel)]="formData.description" 
+          required
+        ></textarea>
+      </div>
+
+      <!-- Frame 22: Dates -->
+      <div class="frame-22">
+        <div class="rectangle-24"></div>
+        <div class="dates">Dates</div>
+        <div class="line-10"></div>
+        
+        <div class="date-opened">DATE OPENED</div>
+        <div class="date-input-container date-opened-container">
+          <input 
+            type="date" 
+            id="dateOpened" 
+            name="dateOpened"
+            class="rectangle-322" 
+            [(ngModel)]="formData.dateOpened" 
+            required
+          />
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="calendar" viewBox="0 0 16 16">
+            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+          </svg>
+        </div>
+
+        <div class="trial-date">TRIAL DATE</div>
+        <div class="date-input-container trial-date-container">
+          <input 
+            type="date" 
+            id="trialDate" 
+            name="trialDate"
+            class="rectangle-313" 
+            [(ngModel)]="formData.trialDate" 
+          />
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="calendar2" viewBox="0 0 16 16">
+            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+          </svg>
+        </div>
+
+        <div class="reminder-dates">REMINDER DATES</div>
+        
+        <!-- Render existing reminder list chips inside Dates section -->
+        <div class="reminder-dates-list" *ngIf="formData.reminderDates && formData.reminderDates.length > 0">
+          <div class="reminder-chip" *ngFor="let rem of formData.reminderDates; let i = index">
+            <span>{{ rem }}</span>
+            <button type="button" class="remove-rem-btn" (click)="removeReminder(i)">×</button>
+          </div>
+        </div>
+
+        <div class="add-reminder-container">
+          <input 
+            type="date" 
+            class="rectangle-33" 
+            [(ngModel)]="newReminderDate"
+            name="newReminderInput"
+          />
+          <button type="button" class="add-reminder-action" (click)="addReminder()" [disabled]="!newReminderDate">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="plus-math" viewBox="0 0 16 16">
+              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+            </svg>
+            <span class="add-reminder-date">Add Reminder Date</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: 3 Blocks -->
+    <div class="figma-column-right">
+      <!-- Frame 24: Costing -->
+      <div class="frame-24">
+        <div class="rectangle-23"></div>
+        <div class="costing">Costing</div>
+        <div class="line-12"></div>
+        
+        <div class="estimated-cost">ESTIMATED COST</div>
+        <div class="cost-input-wrapper">
+          <span class="r-0-00">R</span>
+          <input 
+            type="number" 
+            id="costing" 
+            name="costing"
+            class="rectangle-31" 
+            placeholder="0.00" 
+            step="0.01"
+            min="0"
+            [(ngModel)]="formData.costing" 
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Frame 23: Additional Notes -->
+      <div class="frame-23" *ngIf="!isEditMode">
+        <div class="rectangle-27"></div>
+        <div class="additional-notes">Additional Notes</div>
+        <div class="line-11"></div>
+        
+        <textarea 
+          id="initialNote" 
+          name="initialNote"
+          class="rectangle-272" 
+          placeholder="Enter any initial notes or observations..." 
+          [(ngModel)]="initialNote"
+        ></textarea>
+      </div>
+
+      <!-- Frame 25: Save/Cancel actions -->
+      <div class="frame-25">
+        <div class="rectangle-26"></div>
+        <div class="info-icon-container">
+          <!-- Translucent Info SVG -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+          </svg>
+        </div>
+        <div class="a-unique-case-id-will-be-automatically-assigned-upon-saving">
+          A unique Case ID will be automatically assigned upon saving
+        </div>
+
+        <button type="submit" class="rectangle-312" [disabled]="!formData.employeeNumber || !formData.employeeName || !formData.description">
+          <span class="save-case">{{ isEditMode ? 'Save Changes' : 'Save Case' }}</span>
+        </button>
+
+        <button type="button" class="rectangle-32" (click)="goBack()">
+          <span class="cancel">Cancel</span>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

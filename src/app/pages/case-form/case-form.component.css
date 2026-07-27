@@ -1,0 +1,464 @@
+/* Page Container styling */
+.frame-18 {
+  background: var(--bg-primary);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  padding: 10px 0;
+}
+
+.create-new-case {
+  color: var(--text-primary);
+  text-align: left;
+  font-family: var(--font-family-title);
+  font-size: 26px; /* Slightly smaller title */
+  font-weight: 700;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+.fill-in-the-details-below-to-register-a-new-case {
+  color: var(--text-secondary);
+  text-align: left;
+  font-family: var(--font-family-body);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.line-42 {
+  border-bottom: 1px solid var(--border-glass);
+  width: 100%;
+  height: 0px;
+  margin-bottom: 20px;
+}
+
+/* Two-column Layout Wrapper with even smaller widths */
+.figma-form-container {
+  display: grid;
+  grid-template-columns: minmax(0, 600px) minmax(0, 280px); /* Sized down from 680px/300px */
+  gap: 20px;
+  align-items: start;
+}
+
+/* Base Card structure */
+.frame-20, .frame-21, .frame-22, .frame-23, .frame-24, .frame-25 {
+  position: relative;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-glass);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+
+/* Sized down card dimensions */
+.frame-20 { width: 600px; height: 230px; }
+.frame-21 { width: 600px; height: 380px; }
+.frame-22 { width: 600px; height: 350px; }
+
+.frame-24 { width: 280px; height: 188px; }
+.frame-23 { width: 280px; height: 280px; }
+.frame-25 { width: 280px; height: 279px; }
+
+/* Card Titles */
+.employee-information, .case-information, .dates, .costing, .additional-notes {
+  color: var(--text-primary);
+  text-align: left;
+  font-family: var(--font-family-title);
+  font-size: 15px;
+  font-weight: 600;
+  position: absolute;
+  left: 16px;
+  top: 16px;
+}
+
+/* Horizontal Line separators in cards */
+.line-8, .line-9, .line-10, .line-11, .line-12 {
+  border-top: 1px solid var(--border-glass);
+  width: 100%;
+  height: 0px;
+  position: absolute;
+  left: 0px;
+  top: 48px;
+}
+
+/* Form Labels */
+.employee-number, .employee-name, .case-type, .classification, .case-description, .date-opened, .trial-date, .reminder-dates, .estimated-cost {
+  color: var(--text-muted);
+  text-align: left;
+  font-family: var(--font-family-title);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  position: absolute;
+}
+
+/* Coordinates scaled down for 600px and 280px cards */
+.employee-number { left: 16px; top: 68px; }
+.employee-name { left: 292px; top: 68px; }
+.case-type { left: 16px; top: 68px; }
+.classification { left: 292px; top: 68px; }
+.case-description { left: 16px; top: 180px; }
+.date-opened { left: 16px; top: 68px; }
+.trial-date { left: 292px; top: 68px; }
+.reminder-dates { left: 16px; top: 180px; }
+.estimated-cost { left: 16px; top: 68px; }
+
+/* Input Field styling */
+.rectangle-28, .rectangle-29, .rectangle-30, .rectangle-282, .rectangle-283, .rectangle-322, .rectangle-313, .rectangle-33, .rectangle-31, .rectangle-272 {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: var(--font-family-body);
+  font-size: 13px;
+  padding: 0 12px;
+  outline: none;
+  position: absolute;
+  transition: var(--transition-fast);
+}
+
+.rectangle-28:focus, .rectangle-30:focus, .rectangle-282:focus, .rectangle-283:focus, .rectangle-322:focus, .rectangle-313:focus, .rectangle-33:focus, .rectangle-31:focus, .rectangle-272:focus {
+  border-color: var(--accent-blue);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.rectangle-283, .rectangle-272 {
+  padding: 10px 12px;
+}
+
+/* Sized down dimensions and coordinates to guarantee fit */
+.rectangle-28 { left: 16px; top: 92px; width: 260px; height: 42px; }
+.rectangle-29 { left: 292px; top: 92px; width: 292px; height: 42px; cursor: not-allowed; background: rgba(255, 255, 255, 0.01); color: var(--text-secondary); }
+.rectangle-30 { left: 16px; top: 92px; width: 260px; height: 42px; appearance: none; }
+.rectangle-282 { left: 292px; top: 92px; width: 292px; height: 42px; appearance: none; }
+.rectangle-283 { left: 16px; top: 206px; width: 568px; height: 146px; resize: none; }
+
+.rectangle-322 { left: 16px; top: 92px; width: 260px; height: 42px; }
+.rectangle-313 { left: 292px; top: 92px; width: 292px; height: 42px; }
+.rectangle-33 { left: 16px; top: 206px; width: 260px; height: 42px; }
+
+.rectangle-31 { left: 0px; top: 0px; width: 248px; height: 42px; padding-left: 24px; }
+.rectangle-272 { left: 16px; top: 74px; width: 248px; height: 182px; resize: none; }
+
+/* Subtext prompts */
+.enter-staff-id-to-auto-populate-name {
+  color: var(--text-muted);
+  font-family: var(--font-family-body);
+  font-size: 11px;
+  position: absolute;
+  left: 16px;
+  top: 144px;
+}
+
+/* Dropdown Chevron SVGs */
+.sort-down, .sort-down2 {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  color: var(--text-secondary);
+  pointer-events: none;
+  z-index: 2;
+}
+.sort-down2 { left: 258px; top: 107px; }
+.sort-down { left: 564px; top: 107px; }
+
+/* Calendar icons */
+.calendar, .calendar2 {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  color: var(--text-secondary);
+  pointer-events: none;
+  z-index: 2;
+}
+.calendar { left: 258px; top: 107px; }
+.calendar2 { left: 564px; top: 107px; }
+
+/* Reminders Section inside Dates Card */
+.add-reminder-container {
+  position: absolute;
+  left: 16px;
+  top: 206px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.add-reminder-container .rectangle-33 {
+  position: static;
+}
+
+.add-reminder-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary);
+  padding: 0 12px;
+  height: 42px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.add-reminder-action:hover:not([disabled]) {
+  background-color: var(--accent-blue);
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+}
+
+.add-reminder-action[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.plus-math {
+  width: 12px;
+  height: 12px;
+}
+
+.reminder-dates-list {
+  position: absolute;
+  left: 16px;
+  top: 266px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 568px;
+}
+
+.reminder-chip {
+  background-color: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  color: var(--text-primary);
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.remove-rem-btn {
+  background: none;
+  border: none;
+  color: var(--color-danger);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Cost prefix wrapper */
+.cost-input-wrapper {
+  position: absolute;
+  left: 16px;
+  top: 92px;
+  width: 248px;
+  height: 42px;
+}
+
+.r-0-00 {
+  position: absolute;
+  left: 12px;
+  top: 11px;
+  z-index: 2;
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+/* Alert Info Box */
+.rectangle-26 {
+  background: rgba(251, 191, 36, 0.06);
+  border: 1px solid rgba(251, 191, 36, 0.15);
+  border-radius: 8px;
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  width: 248px;
+  height: 94px;
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.info-icon-container {
+  color: var(--accent-gold);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.a-unique-case-id-will-be-automatically-assigned-upon-saving {
+  color: var(--text-secondary);
+  font-family: var(--font-family-body);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+/* Save / Cancel buttons in Column Right */
+.rectangle-312 {
+  position: absolute;
+  left: 16px;
+  top: 124px;
+  width: 248px;
+  height: 42px;
+  background-color: var(--accent-blue);
+  border: 1px solid var(--accent-blue);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: var(--transition-fast);
+}
+
+.rectangle-312:hover:not([disabled]) {
+  background-color: var(--accent-blue-hover);
+  border-color: var(--accent-blue-hover);
+  transform: translateY(-2px);
+}
+
+.rectangle-312[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rectangle-32 {
+  position: absolute;
+  left: 16px;
+  top: 182px;
+  width: 248px;
+  height: 42px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: var(--transition-fast);
+}
+
+.rectangle-32:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  transform: translateY(-2px);
+}
+
+.save-case {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cancel {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Responsive Stack styling overrides */
+@media (max-width: 992px) {
+  .figma-form-container {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .frame-20, .frame-21, .frame-22, .frame-23, .frame-24, .frame-25 {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 16px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .frame-20 *, .frame-21 *, .frame-22 *, .frame-23 *, .frame-24 *, .frame-25 * {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .rectangle-28, .rectangle-29, .rectangle-30, .rectangle-282, .rectangle-283, .rectangle-322, .rectangle-313, .rectangle-33, .rectangle-31, .rectangle-272 {
+    height: 40px !important;
+    padding: 0 12px !important;
+    display: block !important;
+  }
+  
+  .rectangle-283, .rectangle-272 {
+    height: 100px !important;
+    padding: 8px 12px !important;
+  }
+
+  .employee-information, .case-information, .dates, .costing, .additional-notes {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    margin-bottom: 4px !important;
+  }
+
+  .employee-number, .employee-name, .case-type, .classification, .case-description, .date-opened, .trial-date, .reminder-dates, .estimated-cost {
+    margin-bottom: 2px !important;
+    font-size: 9px !important;
+  }
+
+  .line-8, .line-9, .line-10, .line-11, .line-12 {
+    display: none !important;
+  }
+
+  .sort-down, .sort-down2, .calendar, .calendar2 {
+    display: none !important;
+  }
+
+  .cost-input-wrapper {
+    width: 100% !important;
+  }
+
+  .r-0-00 {
+    display: none !important;
+  }
+
+  .cost-input {
+    padding-left: 12px !important;
+  }
+
+  .add-reminder-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .add-reminder-action {
+    height: 40px !important;
+    justify-content: center;
+  }
+
+  .reminder-dates-list {
+    margin-top: 10px !important;
+  }
+
+  .rectangle-26 {
+    height: auto !important;
+    padding: 12px !important;
+    flex-direction: row !important;
+    gap: 6px !important;
+  }
+
+  .action-buttons-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .rectangle-312, .rectangle-32 {
+    height: 40px !important;
+  }
+}
