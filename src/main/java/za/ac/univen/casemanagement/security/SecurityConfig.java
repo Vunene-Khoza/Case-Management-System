@@ -57,9 +57,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/login").permitAll()
                 .requestMatchers("/error").permitAll()
 
-                // Admin-only phase: ALL other API endpoints restricted to ADMIN role only
-                // TODO: Expand per-role permissions after routing is completed
-                .anyRequest().hasRole("ADMIN")
+                // Restrict user creation and deletion to ADMIN role
+                .requestMatchers(HttpMethod.POST, "/api/v1/users").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasRole("ADMIN")
+
+                // All other endpoints require the user to be logged in (authenticated)
+                .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
