@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CaseService } from '../../services/case.service';
-import { Case, CaseStatus, CaseType } from '../../models/case.model';
+import { Case, CaseStatus, CaseType, CaseClassification } from '../../models/case.model';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { 
@@ -47,9 +47,13 @@ export class CasesListComponent implements OnInit {
   searchQuery = '';
   selectedType = '';
   selectedStatus = '';
+  selectedClassification = '';
 
   CaseType = CaseType;
   CaseStatus = CaseStatus;
+  CaseClassification = CaseClassification;
+
+  classifications = Object.values(CaseClassification);
 
   private searchSubject = new Subject<string>();
 
@@ -74,7 +78,8 @@ export class CasesListComponent implements OnInit {
       limit: this.pageSize,
       search: this.searchQuery,
       caseType: this.selectedType as CaseType || undefined,
-      status: this.selectedStatus as CaseStatus || undefined
+      status: this.selectedStatus as CaseStatus || undefined,
+      classification: this.selectedClassification as CaseClassification || undefined
     }).subscribe({
       next: (response) => {
         this.cases = response.items;
@@ -95,6 +100,20 @@ export class CasesListComponent implements OnInit {
   applyFilters() {
     this.currentPage = 1;
     this.loadCases();
+  }
+
+  clearFilters() {
+    this.searchQuery = '';
+    this.selectedType = '';
+    this.selectedStatus = '';
+    this.selectedClassification = '';
+    this.currentPage = 1;
+    this.loadCases();
+  }
+
+  formatClassificationLabel(val: string): string {
+    if (!val) return '';
+    return val.charAt(0) + val.slice(1).toLowerCase();
   }
 
   goToPage(page: number) {

@@ -46,7 +46,7 @@ export class CaseService {
       employeeNumber: '11223',
       employeeName: 'David Baloyi',
       caseType: CaseType.LABOUR,
-      classification: CaseClassification.GRIEVANCE,
+      classification: CaseClassification.DISPUTE,
       description: 'Unfair treatment allegation filed against departmental head concerning workspace allocation.',
       dateOpened: '2026-05-10',
       trialDate: '2026-07-28',
@@ -205,12 +205,14 @@ export class CaseService {
     search?: string;
     caseType?: CaseType | 'ALL';
     status?: CaseStatus | 'ALL';
+    classification?: CaseClassification | 'ALL';
   } = {}): Observable<{ items: Case[]; totalItems: number; totalPages: number }> {
     const page = filters.page || 1;
     const limit = filters.limit || 10;
     const search = filters.search ? filters.search.toLowerCase() : '';
     const caseType = filters.caseType || 'ALL';
     const status = filters.status || 'ALL';
+    const classification = filters.classification || 'ALL';
 
     return of(null).pipe(
       delay(300), // Simulating API response delay
@@ -225,6 +227,11 @@ export class CaseService {
         // Filter by Case Status
         if (status !== 'ALL') {
           filtered = filtered.filter(c => c.status === status);
+        }
+
+        // Filter by Classification
+        if (classification !== 'ALL') {
+          filtered = filtered.filter(c => c.classification === classification);
         }
 
         // Search text (employee name, employee number, case id)

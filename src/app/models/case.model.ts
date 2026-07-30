@@ -6,9 +6,7 @@ export enum CaseType {
 export enum CaseClassification {
   DISCIPLINARY = "DISCIPLINARY",
   DISPUTE = "DISPUTE",
-  LITIGATION = "LITIGATION",
-  GRIEVANCE = "GRIEVANCE",
-  ARBITRATION = "ARBITRATION"
+  LITIGATION = "LITIGATION"
 }
 
 export enum CaseStatus {

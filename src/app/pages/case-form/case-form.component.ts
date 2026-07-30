@@ -39,8 +39,8 @@ export class CaseFormComponent implements OnInit {
   formData = {
     employeeNumber: '',
     employeeName: '',
-    caseType: CaseType.LEGAL,
-    classification: CaseClassification.DISCIPLINARY,
+    caseType: '' as any,
+    classification: '' as any,
     description: '',
     dateOpened: '',
     trialDate: '',

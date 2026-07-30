@@ -1,4 +1,16 @@
 <div class="frame-18">
+  <div class="section-11">
+    <div class="case-new-case">Case New Case</div>
+    <div class="register-a-new-legal-or-labour-case">
+      Register a new legal or labour case
+    </div>
+    <button type="button" class="logout" (click)="goBack()" title="Back to Dashboard">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="logout-icon">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+      </svg>
+    </button>
+  </div>
+
   <h1 class="create-new-case">{{ isEditMode ? 'Modify Case - ' + caseId : 'Create New Case' }}</h1>
   <p class="fill-in-the-details-below-to-register-a-new-case">
     Fill in the details below to register a new case
@@ -58,6 +70,7 @@
             [(ngModel)]="formData.caseType" 
             required
           >
+            <option value="" disabled selected>Select Case Type</option>
             <option [value]="CaseType.LEGAL">Legal Case</option>
             <option [value]="CaseType.LABOUR">Labour Case</option>
           </select>
@@ -75,6 +88,7 @@
             [(ngModel)]="formData.classification" 
             required
           >
+            <option value="" disabled selected>Select Classification</option>
             <option *ngFor="let class of classifications" [value]="class">
               {{ formatClassificationLabel(class) }}
             </option>
@@ -199,18 +213,19 @@
 
       <!-- Frame 25: Save/Cancel actions -->
       <div class="frame-25">
-        <div class="rectangle-26"></div>
-        <div class="info-icon-container">
-          <!-- Translucent Info SVG -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
-          </svg>
-        </div>
-        <div class="a-unique-case-id-will-be-automatically-assigned-upon-saving">
-          A unique Case ID will be automatically assigned upon saving
+        <div class="rectangle-26">
+          <div class="info-icon-container">
+            <!-- Translucent Info SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+            </svg>
+          </div>
+          <div class="a-unique-case-id-will-be-automatically-assigned-upon-saving">
+            A unique Case ID will be automatically assigned upon saving
+          </div>
         </div>
 
-        <button type="submit" class="rectangle-312" [disabled]="!formData.employeeNumber || !formData.employeeName || !formData.description">
+        <button type="submit" class="rectangle-312" [disabled]="!formData.employeeNumber || !formData.employeeName || !formData.description || !formData.caseType || !formData.classification">
           <span class="save-case">{{ isEditMode ? 'Save Changes' : 'Save Case' }}</span>
         </button>
 
