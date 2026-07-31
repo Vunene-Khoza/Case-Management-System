@@ -35,6 +35,8 @@ export interface Case {
   closureDate?: string | null;
   finalNotes?: string | null;
   costing: number;
+  assignedOfficer?: string;
+  assignedRole?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -195,6 +195,15 @@
             </div>
           </div>
         </section>
+
+        <!-- Assigned Officer Card -->
+        <div class="frame-25" *ngIf="activeCase">
+          <div class="rectangle-27"></div>
+          <div class="assigned-officer">Assigned Officer</div>
+          <div class="line-11"></div>
+          <div class="david-blundin">{{ activeCase.assignedOfficer || 'David Blundin' }}</div>
+          <div class="legal-officer">{{ activeCase.assignedRole || 'Legal Officer' }}</div>
+        </div>
       </div>
 
     </div>
