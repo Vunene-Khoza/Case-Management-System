@@ -1,7 +1,25 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
 .case-details-page {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  background: #f3f4f6; /* Grey background */
+  min-height: 100vh;
+  margin: -32px;
+  padding: 32px;
+  width: calc(100% + 64px);
+}
+
+@media (max-width: 992px) {
+  .case-details-page {
+    margin: -16px;
+    padding: 16px;
+    width: calc(100% + 32px);
+  }
 }
 
 .details-header {
@@ -14,7 +32,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--text-secondary);
+  color: #475569;
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -22,7 +40,7 @@
 }
 
 .back-link:hover {
-  color: var(--text-primary);
+  color: #0f172a;
 }
 
 .back-icon {
@@ -59,17 +77,25 @@
   }
 }
 
+/* Main Profile Card - White Block */
 .case-profile-card {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 24px;
 }
 
 .profile-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  border-bottom: 1px solid var(--border-glass);
+  border-bottom: 1px solid #e2e8f0;
   padding-bottom: 16px;
 }
 
@@ -77,7 +103,7 @@
   font-family: monospace;
   font-size: 12px;
   font-weight: bold;
-  color: var(--accent-blue);
+  color: #2563eb !important;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -85,6 +111,7 @@
 .profile-card-title {
   font-size: 24px;
   font-weight: 700;
+  color: #0f172a !important;
   margin-top: 4px;
 }
 
@@ -97,7 +124,7 @@
 .block-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: #475569 !important;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -105,13 +132,13 @@
 .description-text {
   font-size: 14px;
   line-height: 1.6;
-  color: var(--text-secondary);
+  color: #334155 !important;
 }
 
 .card-separator {
   border: 0;
   height: 1px;
-  background-color: var(--border-glass);
+  background-color: #e2e8f0;
 }
 
 /* Metadata Grid */
@@ -136,7 +163,7 @@
 .meta-label {
   font-size: 11px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: #64748b !important;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -144,7 +171,7 @@
 .meta-value {
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-primary);
+  color: #1e293b !important;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -153,29 +180,29 @@
 .font-mono {
   font-family: monospace;
   font-weight: bold;
-  color: var(--accent-blue);
+  color: #2563eb !important;
 }
 
 .cost-value {
   font-size: 16px;
   font-weight: 600;
-  color: var(--accent-gold);
+  color: #d97706 !important;
 }
 
 .inline-icon {
   width: 14px;
   height: 14px;
-  color: var(--text-muted);
+  color: #64748b !important;
 }
 
-/* Reminders Section */
+/* Reminders Section - Light Grey nested box */
 .reminders-section {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-top: 10px;
-  background-color: rgba(255, 255, 255, 0.01);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
   padding: 20px;
   border-radius: var(--radius-md);
 }
@@ -192,8 +219,8 @@
   align-items: center;
   padding: 12px 16px;
   border-radius: var(--radius-sm);
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-glass);
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
 }
 
 .reminder-icon-wrapper {
@@ -205,7 +232,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--accent-gold);
+  color: #d97706;
   flex-shrink: 0;
 }
 
@@ -223,18 +250,18 @@
 .reminder-date {
   font-size: 12px;
   font-weight: 700;
-  color: var(--accent-gold);
+  color: #d97706;
 }
 
 .reminder-desc {
   font-size: 13px;
-  color: var(--text-primary);
+  color: #1e293b !important;
 }
 
-/* Closure summary block */
+/* Closure summary block - Soft Green nested box */
 .closure-summary-block {
-  background-color: rgba(16, 185, 129, 0.05);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
   padding: 20px;
   border-radius: var(--radius-sm);
   display: flex;
@@ -246,7 +273,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-success);
+  color: #166534 !important;
   font-size: 13px;
   font-weight: 600;
 }
@@ -258,29 +285,37 @@
 
 .closure-text {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: #1e293b !important;
   line-height: 1.5;
 }
 
-/* Notes Feed Side Pane */
+/* Notes Feed Side Pane - White Block */
 .notes-feed-card {
   display: flex;
   flex-direction: column;
   gap: 20px;
   max-height: 650px;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 24px;
 }
 
 .notes-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border-glass);
+  border-bottom: 1px solid #e2e8f0;
   padding-bottom: 12px;
 }
 
 .notes-header h3 {
   font-size: 16px;
   font-weight: 600;
+  color: #0f172a !important;
 }
 
 .notes-list-container {
@@ -292,8 +327,8 @@
 }
 
 .note-card {
-  background-color: rgba(255, 255, 255, 0.01);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
   padding: 14px;
   border-radius: var(--radius-sm);
   display: flex;
@@ -317,9 +352,9 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-glass);
-  color: var(--text-primary);
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a !important;
   font-size: 10px;
   font-weight: bold;
   display: flex;
@@ -330,24 +365,24 @@
 .author-name {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: #0f172a !important;
 }
 
 .note-date {
   font-size: 11px;
-  color: var(--text-muted);
+  color: #64748b !important;
 }
 
 .note-content {
   font-size: 13px;
-  color: var(--text-primary);
+  color: #334155 !important;
   line-height: 1.5;
 }
 
 .empty-notes {
   text-align: center;
   padding: 40px 20px;
-  color: var(--text-muted);
+  color: #64748b !important;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -357,7 +392,7 @@
 .empty-icon {
   width: 32px;
   height: 32px;
-  color: var(--text-muted);
+  color: #94a3b8 !important;
   opacity: 0.6;
 }
 
@@ -367,31 +402,66 @@
 }
 
 /* Modal Layouts */
+.modal-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 500px;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  backdrop-filter: none !important;
+  padding: 24px !important;
+  border-radius: 10px;
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border-glass);
+  border-bottom: 1px solid #e2e8f0;
   padding-bottom: 12px;
   margin-bottom: 16px;
+}
+
+.modal-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .close-modal-btn {
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: #64748b;
   cursor: pointer;
   display: flex;
   align-items: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: var(--transition-fast);
 }
 
 .close-modal-btn:hover {
-  color: var(--color-danger);
+  background-color: #f1f5f9;
+  color: #0f172a;
 }
 
 .close-icon {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
 }
 
 .modal-body {
@@ -403,7 +473,7 @@
 
 .modal-instruction {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: #475569;
   line-height: 1.5;
 }
 
@@ -417,7 +487,7 @@
   position: absolute;
   left: 16px;
   font-weight: bold;
-  color: var(--text-muted);
+  color: #64748b;
 }
 
 .padding-currency {
@@ -428,7 +498,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  border-top: 1px solid var(--border-glass);
+  border-top: 1px solid #e2e8f0;
   padding-top: 16px;
 }
 
@@ -441,6 +511,9 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px;
 }
 
 /* Assigned Officer Card styling */
