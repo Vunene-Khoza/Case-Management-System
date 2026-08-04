@@ -1,55 +1,179 @@
 <div class="login-page">
-  <div class="glass-card login-card">
-    <div class="logo-container">
-      <!-- Stylized Mock Logo for University of Venda -->
-      <div class="univen-logo-mock">
-        <div class="shield">
-          <span class="gold-star">★</span>
-        </div>
-        <div class="logo-text">
-          <span class="univen-title">UNIVERSITY OF VENDA</span>
-          <span class="system-subtitle">Legal Case Management</span>
+  <!-- decorative blobs -->
+  <div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- main wrapper -->
+  <div class="integrated-auth-wrapper">
+    <!-- left: branding section + watery-overlay -->
+    <div class="branding-section">
+      <div class="watery-overlay"></div>
+      <div class="branding-content">
+        <!-- LOGO: Using Univen logo asset -->
+        <img src="assets/univen-logo.webp" 
+             alt="University of Venda Logo" 
+             class="brand-logo"
+             onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23fbbf24%22/%3E%3Ctext x=%2218%22 y=%2268%22 font-family=%22Arial%22 font-weight=%22bold%22 font-size=%2240%22 fill=%22%230b2b4a%22%3EUniV%3C/text%3E%3C/svg%3E';">
+        <h1 class="brand-title">University of Venda</h1>
+        <p class="brand-slogan">Legal Case Management</p>
+        <!-- welcome-back image (hanging) -->
+        <div class="mt-4 d-none d-md-block">
+          <svg viewBox="0 0 200 120" class="hanging-logo">
+            <rect width="200" height="120" rx="10" fill="rgba(255, 255, 255, 0.08)" />
+            <text x="20" y="70" font-family="'Inter', sans-serif" font-weight="600" font-size="28" fill="white" opacity="0.85">👋 Welcome</text>
+          </svg>
         </div>
       </div>
     </div>
 
-    <h2 class="card-title">Authorized Staff Login</h2>
-    <p class="card-desc">Enter your credentials to manage legal and labour cases.</p>
+    <!-- right: form container -->
+    <div class="form-container">
+      <h2 class="form-title">Welcome Back!</h2>
+      <p class="form-subtitle">Please sign in to your account</p>
 
-    <form (ngSubmit)="onLogin()">
-      <div class="form-group">
-        <label class="form-label" for="username">Username / Email</label>
-        <input 
-          type="text" 
-          id="username" 
-          name="username" 
-          class="form-input" 
-          placeholder="e.g. user@univen.ac.za" 
-          [(ngModel)]="username" 
-          required
-        />
-      </div>
+      <form #loginForm="ngForm" (ngSubmit)="onLogin()">
+        <!-- username / email field -->
+        <div class="mb-3">
+          <label for="loginUsername" class="form-label">Email, Username, or Staff Number</label>
+          <div class="input-group">
+            <span class="input-group-text">
+              <svg lucideUser class="field-icon"></svg>
+            </span>
+            <input type="text" id="loginUsername" name="loginUsername" 
+                   placeholder="Enter your identity" required 
+                   [(ngModel)]="username"
+                   class="form-control">
+          </div>
+        </div>
 
-      <div class="form-group">
-        <label class="form-label" for="password">Password</label>
-        <input 
-          type="password" 
-          id="password" 
-          name="password" 
-          class="form-input" 
-          placeholder="••••••••••••" 
-          [(ngModel)]="password" 
-          required
-        />
-      </div>
+        <!-- password field -->
+        <div class="mb-4">
+          <div class="password-label-row">
+            <label for="loginPassword" class="form-label">Password</label>
+            <a href="javascript:void(0)" class="forgot-pass-link" (click)="openResetPasswordModal()">Forgot Password?</a>
+          </div>
+          <div class="input-group">
+            <span class="input-group-text">
+              <svg lucideLock class="field-icon"></svg>
+            </span>
+            <input id="loginPassword" name="loginPassword" 
+                   placeholder="••••••••" required 
+                   [(ngModel)]="password"
+                   class="form-control" 
+                   [type]="showPassword ? 'text' : 'password'">
+            <button type="button" tabindex="-1" class="password-toggle" (click)="togglePassword()">
+              <svg [lucide]="showPassword ? 'eye-off' : 'eye'" class="field-icon"></svg>
+            </button>
+          </div>
+        </div>
 
-      <button type="submit" class="btn btn-primary btn-block">
-        Sign In
-      </button>
-      
-      <div class="login-footer">
-        <a href="javascript:void(0)" class="forgot-pass" (click)="forgotPassword()">Forgot Password?</a>
+        <!-- sign in button (disabled if form invalid) -->
+        <div class="d-grid mb-4">
+          <button type="submit" class="btn btn-navy py-2" [disabled]="!loginForm.valid">
+            Sign In
+          </button>
+        </div>
+
+        <!-- create account link -->
+        <div class="text-center">
+          <span class="text-muted small">Don't have an account?</span>
+          <a href="javascript:void(0)" class="create-account-link" (click)="createAccount()">Create an Account</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- floating help widget -->
+  <div class="floating-help-widget">
+    <div class="help-trigger shadow-lg" (click)="openHelpModal()">
+      <svg lucideHelpCircle class="help-icon"></svg>
+      <div class="pulse-ring"></div>
+    </div>
+  </div>
+
+  <!-- HELP MODAL -->
+  <div class="modal-overlay" *ngIf="showHelpModal" (click)="closeHelpModal()">
+    <div class="modal-content-custom" (click)="$event.stopPropagation()">
+      <div class="modal-header-custom">
+        <div class="header-left">
+          <div class="help-icon-badge">
+            <svg lucideInfo class="modal-info-icon"></svg>
+          </div>
+          <div>
+            <h6 class="mb-0 fw-bold">System Help</h6>
+            <small class="opacity-75">Univen Case Management</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close-white" (click)="closeHelpModal()">
+          <svg lucideX class="modal-close-icon"></svg>
+        </button>
       </div>
-    </form>
+      <div class="modal-body-custom">
+        <div class="help-section mb-3">
+          <p class="help-text">The University of Venda Legal & Labour Case Management System is a modern platform designed to streamline case management and legal audit trails.</p>
+        </div>
+        <div class="help-divider mb-3"></div>
+        <div class="help-section mb-3">
+          <h6 class="help-header mb-2 fw-bold">
+            <svg lucideZap class="quick-icon text-warning"></svg>Quick Start
+          </h6>
+          <div class="quick-steps">
+            <div class="quick-step"><span class="step-badge">1</span><span class="text-secondary small">Login with your staff number or email credentials</span></div>
+            <div class="quick-step"><span class="step-badge">2</span><span class="text-secondary small">Access the Case Ledger for active case statuses</span></div>
+            <div class="quick-step"><span class="step-badge">3</span><span class="text-secondary small">Authorized officers can register or modify case details</span></div>
+          </div>
+        </div>
+        <div class="help-divider mb-3"></div>
+        <div class="help-section">
+          <h6 class="help-header mb-2 fw-bold">
+            <svg lucidePhoneCall class="quick-icon text-primary"></svg>Contact Support
+          </h6>
+          <div class="contact-rows">
+            <div class="help-contact-row">
+              <svg lucidePhone class="contact-icon"></svg>
+              <div class="contact-details"><span class="label">Call</span><span class="value">+27 15 962 8000</span></div>
+            </div>
+            <div class="help-contact-row">
+              <svg lucideMail class="contact-icon"></svg>
+              <div class="contact-details"><span class="label">Email</span><span class="value">support@univen.ac.za</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer-custom">
+        <button type="button" class="btn-navy-footer" (click)="viewUserGuide()">
+          <svg lucideBookOpen class="book-icon"></svg> View Full User Guide
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESET PASSWORD MODAL -->
+  <div class="modal-overlay" *ngIf="showResetPasswordModal" (click)="closeResetPasswordModal()">
+    <div class="modal-content-custom reset-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header-custom text-white">
+        <h5 class="modal-title fw-semibold">Reset Password</h5>
+        <button type="button" class="btn-close-white" (click)="closeResetPasswordModal()">
+          <svg lucideX class="modal-close-icon"></svg>
+        </button>
+      </div>
+      <div class="modal-body-custom">
+        <form #resetForm="ngForm" (ngSubmit)="submitResetPassword()">
+          <div class="mb-3">
+            <label for="resetEmail" class="form-label text-dark fw-medium"> Email Address <span class="text-danger">*</span></label>
+            <input type="email" id="resetEmail" name="resetEmail" placeholder="yourname@univen.ac.za" 
+                   [(ngModel)]="resetEmailAddress" required email
+                   class="form-control input-reset">
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-navy w-100 fw-bold" [disabled]="!resetForm.valid">Send Verification Code</button>
+            <button type="button" class="btn btn-outline-secondary w-100 mt-2" (click)="closeResetPasswordModal()"> Cancel </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
