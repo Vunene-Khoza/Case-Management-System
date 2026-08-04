@@ -1,7 +1,7 @@
 # University of Venda - Legal & Labour Case Management System
 ## Component Refactoring & Sidebar Asset Integration Walkthrough
 
-I have successfully refactored the standalone component suite into a standard multi-file structure, integrated your custom branding assets, updated the Case Form UI to match your Figma layout contract, and refined the Case List dashboard.
+I have successfully refactored the standalone component suite into a standard multi-file structure, integrated your custom branding assets, updated the Case Form UI to match your Figma layout contract, refined the Case List dashboard, and implemented a premium split-panel Login layout.
 
 ---
 
@@ -37,12 +37,19 @@ To keep the codebase modular and professional, I refactored every standalone pag
 * **Structured Columns:** Reorganized the cases list table to display exactly the columns requested (`CASE ID`, `EMPLOYEE`, `EMPLOYEE NO`, `TYPE`, `CLASSIFICATION`, `STATUS`, `DATE OPENED`, `TRIAL DATE`, `ACTION`) and hid all other data fields.
 * **Compact Table Presentation:** Reduced cell padding from `14px 16px` to `8px 12px` and shrank text fonts, badge paddings, and button dimensions to render a data-dense layout.
 
+### 🔐 Refined Split-Panel Login Layout
+* **Watery Branding Panel (Left):** Integrated Univen logo, brand title, and slogan overlaying a custom navy-gradient wave wallpaper (`.watery-overlay`).
+* **Credentials Form Container (Right):** Implemented input groups styled with Lucide icons (`lucideUser`, `lucideLock`), a visibility eye-slash toggle to read input password text, and dynamic validation disabling the login button until valid inputs are detected.
+* **Floating System Help Widget:** Placed a bottom-right question badge with a looping wave animation (`.pulse-ring`) triggering a modular overlay window detailing quick-start guidelines and contact support cards.
+* **Reset Password Modal:** Added a dedicated modal dialog popping from the header password recovery link.
+* **Self-Contained Styling:** Handled all Bootstrap CDN declarations in vanilla CSS to preserve type safety and ensure the project remains compilation-independent of external CDN bundles.
+
 ---
 
 ## 2. Compilation Verification Results
 - **Command Executed:** `npm run build`
 - **Build Status:** ✅ **SUCCESS**
-- **Main Bundle Size:** `504.04 kB` (Compiles with zero errors under budget settings).
+- **Main Bundle Size:** `506.66 kB` (Compiles with zero errors under budget settings).
 
 ---
 
