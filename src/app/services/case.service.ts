@@ -17,16 +17,6 @@ export interface ApiResponse<T> {
 export class CaseService {
   private apiUrl = 'http://localhost:8080/api/v1';
 
-  // Fallback currentUser if no session exists (for safety)
-  private defaultCurrentUser: User = {
-    userId: 'U001',
-    name: 'Admin A',
-    email: 'admin@univen.ac.za',
-    role: UserRole.ADMIN,
-    status: 'ACTIVE',
-    createdAt: ''
-  };
-
   constructor(private http: HttpClient) {}
 
   // Get current logged-in user dynamically from localStorage
@@ -44,7 +34,14 @@ export class CaseService {
         createdAt: ''
       };
     }
-    return this.defaultCurrentUser;
+    return {
+      userId: '',
+      name: '',
+      email: '',
+      role: UserRole.VIEWER,
+      status: 'INACTIVE',
+      createdAt: ''
+    };
   }
 
   // Legacy switcher (kept for compatibility, though session handles role now)
