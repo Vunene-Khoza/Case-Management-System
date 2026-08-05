@@ -1,19 +1,22 @@
 import { Routes } from '@angular/router';
+import { LoginComponent } from './pages/login/login.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { CasesListComponent } from './pages/cases-list/cases-list.component';
 import { CaseFormComponent } from './pages/case-form/case-form.component';
 import { CaseDetailsComponent } from './pages/case-details/case-details.component';
 import { ReportsComponent } from './pages/reports/reports.component';
 import { UserManagementComponent } from './pages/user-management/user-management.component';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardComponent },
-  { path: 'cases', component: CasesListComponent },
-  { path: 'cases/create', component: CaseFormComponent },
-  { path: 'cases/:id', component: CaseDetailsComponent },
-  { path: 'cases/:id/edit', component: CaseFormComponent },
-  { path: 'reports', component: ReportsComponent },
-  { path: 'users', component: UserManagementComponent },
-  { path: '**', redirectTo: 'dashboard' }
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'cases', component: CasesListComponent, canActivate: [authGuard] },
+  { path: 'cases/create', component: CaseFormComponent, canActivate: [authGuard] },
+  { path: 'cases/:id', component: CaseDetailsComponent, canActivate: [authGuard] },
+  { path: 'cases/:id/edit', component: CaseFormComponent, canActivate: [authGuard] },
+  { path: 'reports', component: ReportsComponent, canActivate: [authGuard] },
+  { path: 'users', component: UserManagementComponent, canActivate: [authGuard] },
+  { path: '**', redirectTo: 'login' }
 ];

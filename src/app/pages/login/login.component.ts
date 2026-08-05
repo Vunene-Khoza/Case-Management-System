@@ -17,6 +17,8 @@ import {
   LucideBookOpen
 } from '@lucide/angular';
 
+import { AuthService } from '../../services/auth.service';
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -43,6 +45,7 @@ export class LoginComponent {
   username = '';
   password = '';
   showPassword = false;
+  errorMessage = '';
 
   // Modals Visibility Controls
   showHelpModal = false;
@@ -51,10 +54,26 @@ export class LoginComponent {
   // Form binds
   resetEmailAddress = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   onLogin() {
-    this.router.navigate(['/dashboard']);
+    this.errorMessage = '';
+    this.authService.login(this.username, this.password).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.router.navigate(['/dashboard']);
+        } else {
+          this.errorMessage = response.message || 'Login failed. Please check credentials.';
+        }
+      },
+      error: (err) => {
+        console.error('Login error:', err);
+        this.errorMessage = err.error?.message || 'Connection to the authentication server failed.';
+      }
+    });
   }
 
   togglePassword() {

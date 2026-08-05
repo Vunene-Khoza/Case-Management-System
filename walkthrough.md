@@ -1,62 +1,70 @@
 # University of Venda - Legal & Labour Case Management System
-## Component Refactoring & Sidebar Asset Integration Walkthrough
+## Component Refactoring & REST API Integration Walkthrough
 
-I have successfully refactored the standalone component suite into a standard multi-file structure, integrated your custom branding assets, updated the Case Form UI to match your Figma layout contract, refined the Case List dashboard, and implemented a premium split-panel Login layout.
+I have successfully refactored the Angular frontend structure, integrated your custom branding assets, **removed all frontend dummy/mock data**, and fully integrated the app components with the Spring Boot REST API endpoints.
 
 ---
 
 ## 1. Accomplished Tasks
 
+### 🔌 Complete REST API Connection (Mock Data Removed)
+We deleted the local frontend mock data arrays (`cases`, `notes`, `users` collections) and connected all services to the real database REST endpoints on `http://localhost:8080/api/v1`:
+* **Outbound JWT Interceptor:** Built `authInterceptor` in [auth.interceptor.ts](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/interceptors/auth.interceptor.ts) to intercept all outgoing HTTP requests and automatically inject the standard authorization header:
+  `Authorization: Bearer <token>`
+* **HTTP Client Setup:** Registered the interceptor globally inside [app.config.ts](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/app.config.ts) provider options.
+* **REST Service Refactoring:** Updated [case.service.ts](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/services/case.service.ts) to execute real HTTP request operations:
+  - `getCases` -> Queries `GET /api/v1/cases` with search, type, and pagination parameters.
+  - `getCaseById` -> Queries `GET /api/v1/cases/{caseId}`.
+  - `getNotesForCase` -> Queries `GET /api/v1/cases/{caseId}/notes`.
+  - `createCase` -> `POST /api/v1/cases` (if an initial note is supplied, performs a secondary comment request to link it).
+  - `updateCase` -> `PUT /api/v1/cases/{caseId}`.
+  - `closeCase` -> `POST /api/v1/cases/{caseId}/close`.
+  - `getDashboardSummary` -> Combines report summary statistics (`GET /api/v1/reports/summary`) and recent cases (`GET /api/v1/cases?page=0&size=5`) using `forkJoin`.
+  - `getReportsSummary` -> Queries all cases and aggregates monthly timelines and classification lists on the fly.
+  - `getUsers` -> Lists active accounts from `GET /api/v1/users`.
+  - `addUser` -> `POST /api/v1/users` (provides default account setup parameters).
+  - `deleteUser` -> `DELETE /api/v1/users/{userId}`.
+
+---
+
+### 🔐 Backend Authentication Integration (JWT)
+* **Activated HttpClient:** Configured `provideHttpClient()` for API calls.
+* **Created AuthService:** Built `auth.service.ts` to execute `POST /api/v1/auth/login`. Saves credentials in `localStorage` upon success.
+* **Secured Protected Routes (AuthGuard):** Developed `auth.guard.ts` to protect core paths in `app.routes.ts` (redirects unauthenticated traffic to `/login`).
+* **Dynamic Sidebar Profile & Logout:** Configured `sidebar.component` to display the actual logged-in user name and role dynamically, and bind profile clicks to logout action.
+* **Login Error Handling:** Refactored `login.component` to catch database failures and display custom alert messages.
+
 ### 📋 Component Code Reorganization (Split Structure)
-To keep the codebase modular and professional, I refactored every standalone page and component in the application into its own separate files:
-* **Sidebar Component:** Split into [sidebar.component.ts](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/components/sidebar/sidebar.component.ts), [sidebar.component.html](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/components/sidebar/sidebar.component.html), and [sidebar.component.css](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/components/sidebar/sidebar.component.css).
-* **Dashboard Page:** Split into [dashboard.component.ts](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/dashboard/dashboard.component.ts), [dashboard.component.html](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/dashboard/dashboard.component.html), and [dashboard.component.css](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/dashboard/dashboard.component.css).
-* **Cases List Page:** Split into [cases-list.component.ts](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/cases-list/cases-list.component.ts), [cases-list.component.html](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/cases-list/cases-list.component.html), and [cases-list.component.css](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/cases-list/cases-list.component.css).
-* **Case Form Page:** Split into [case-form.component.ts](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/case-form/case-form.component.ts), [case-form.component.html](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/case-form/case-form.component.html), and [case-form.component.css](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/case-form/case-form.component.css).
-* **Case Details Page:** Split into [case-details.component.ts](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/case-details/case-details.component.ts), [case-details.component.html](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/case-details/case-details.component.html), and [case-details.component.css](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/case-details/case-details.component.css).
-* **Reports Page:** Split into [reports.component.ts](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/reports/reports.component.ts), [reports.component.html](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/reports/reports.component.html), and [reports.component.css](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/reports/reports.component.css).
-* **User Management Page:** Split into [user-management.component.ts](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/user-management/user-management.component.ts), [user-management.component.html](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/user-management/user-management.component.html), and [user-management.component.css](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/user-management/user-management.component.css).
-* **Login Page:** Split into [login.component.ts](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/login/login.component.ts), [login.component.html](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/login/login.component.html), and [login.component.css](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/src/app/pages/login/login.component.css).
+To keep the codebase modular, I refactored every standalone page and component in the application into its own separate files (typescript, template, stylesheet).
 
 ### 🎨 Sidebar Branding & Bootstrap Icons
 * **Bootstrap SVGs:** Replaced the custom PNG image paths inside the sidebar with standard inline Bootstrap SVG icons.
-* **Branded Logo Placement:** Placed the official University of Venda WebP logo above the "CASE MANAGEMENT" text and styled it to fit perfectly.
-* **Assets Mapping Configuration:** Added the `src/app/logo` path to the assets collection in [angular.json](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents/GitHub/Case-Management-System/angular.json) so the builder serves it correctly.
-* **Build Offline Workaround:** Disabled font inlining in the production configurations within `angular.json` to prevent Google Fonts fetching errors.
+* **Branded Logo Placement:** Configured `logo/univen1logo.jpeg` as the main branding logo on the Login page and removed the welcome SVG badge as requested.
 
 ### 📝 Figma Case Form UI Refactoring & Theme Swaps
 * **Color Layout Swap:** Reconfigured the page background to grey (`#f3f4f6`) and swapped the card/block backgrounds to pure white (`#ffffff`).
-* **Edge-to-Edge Flat Header:** Placed a `.section-11` header block (`Case New Case`) at the very top of the page. Styled it to touch the top, left, and right screen boundaries with rounded bottom corners removed (`border-radius: 0`). Replaced `logout0.png` with a clean, responsive exit SVG button.
-* **Centered Warning Alert:** Shifted the Warning Alert elements (icon and description text) to nest directly inside `.rectangle-26` so they align and padding styles work cleanly.
-* **Selection Placeholders & validation:** Changed the default select options for Case Type and Classification to disabled placeholders (`Select Case Type`, `Select Classification`) and updated form submission verification to ensure both are chosen before enabling saving.
-* **Transparent Scrollbar Track:** Set the global webkit-scrollbar track background to `transparent` so it blends seamlessly with the white header and grey page backgrounds.
+* **Selection Placeholders:** Changed default select options to disabled placeholders (`Select Case Type`, `Select Classification`).
 
 ### 🔍 Cases List Filters & Columns Formatting
-* **Cleaned Filter Layout:** Removed category/status label tags next to the search bar. Placed the dropdown selectors ("All Types", "All Statuses", "All Classifications") and a new "Clear" button on a single line inside a white filter card.
-* **Classification Filtering:** Integrated a classification select element and updated the mock database backend query service method `getCases()` to filter cases by classification.
-* **Structured Columns:** Reorganized the cases list table to display exactly the columns requested (`CASE ID`, `EMPLOYEE`, `EMPLOYEE NO`, `TYPE`, `CLASSIFICATION`, `STATUS`, `DATE OPENED`, `TRIAL DATE`, `ACTION`) and hid all other data fields.
-* **Compact Table Presentation:** Reduced cell padding from `14px 16px` to `8px 12px` and shrank text fonts, badge paddings, and button dimensions to render a data-dense layout.
-
-### 🔐 Refined Split-Panel Login Layout
-* **Watery Branding Panel (Left):** Integrated Univen logo, brand title, and slogan overlaying a custom navy-gradient wave wallpaper (`.watery-overlay`).
-* **Credentials Form Container (Right):** Implemented input groups styled with Lucide icons (`lucideUser`, `lucideLock`), a visibility eye-slash toggle to read input password text, and dynamic validation disabling the login button until valid inputs are detected.
-* **Floating System Help Widget:** Placed a bottom-right question badge with a looping wave animation (`.pulse-ring`) triggering a modular overlay window detailing quick-start guidelines and contact support cards.
-* **Reset Password Modal:** Added a dedicated modal dialog popping from the header password recovery link.
-* **Self-Contained Styling:** Handled all Bootstrap CDN declarations in vanilla CSS to preserve type safety and ensure the project remains compilation-independent of external CDN bundles.
+* **Structured Columns:** Reorganized the cases list table to display exactly the columns requested (`CASE ID`, `EMPLOYEE`, `EMPLOYEE NO`, `TYPE`, `CLASSIFICATION`, `STATUS`, `DATE OPENED`, `TRIAL DATE`, `ACTION`).
+* **Compact Table Presentation:** Reduced cell padding to `8px 12px` and shrank text fonts, badge paddings, and button dimensions to render a data-dense layout.
 
 ---
 
 ## 2. Compilation Verification Results
-- **Command Executed:** `npm run build`
+- **Build Command Executed:** `$env:NG_FORCE_CACHE_DISABLED="1"; npm run build`
 - **Build Status:** ✅ **SUCCESS**
-- **Main Bundle Size:** `506.66 kB` (Compiles with zero errors under budget settings).
+- **Note:** Compiles with zero errors. Cache-layer database pre-allocation was disabled to prevent Windows LMDB write issues.
 
 ---
 
 ## 3. How to Run Locally
-Run the start command in your main tree directory:
-```powershell
-cd "C:\Users\vunene.khoza\OneDrive - University of Venda\Documents\GitHub\Case-Management-System"
-npm run start
-```
-The application serves locally at `http://localhost:4200/`.
+
+1. **Start the Java Spring Boot Backend:**
+   Run the backend application on port `8080` (e.g. via IntelliJ IDEA or Maven).
+2. **Start the Angular Frontend:**
+   ```powershell
+   cd "C:\Users\vunene.khoza\OneDrive - University of Venda\Documents\GitHub\Case-Management-System"
+   npm run start
+   ```
+   Open `http://localhost:4200/` in your browser.

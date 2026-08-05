@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { CaseService } from '../../services/case.service';
+import { AuthService } from '../../services/auth.service';
+import { User } from '../../models/case.model';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,6 +13,20 @@ import { CommonModule } from '@angular/common';
   styleUrl: './sidebar.component.css'
 })
 export class SidebarComponent implements OnInit {
-  constructor() {}
-  ngOnInit() {}
+  currentUser!: User;
+
+  constructor(
+    private caseService: CaseService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.currentUser = this.caseService.getCurrentUser();
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

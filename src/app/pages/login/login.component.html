@@ -12,20 +12,12 @@
     <div class="branding-section">
       <div class="watery-overlay"></div>
       <div class="branding-content">
-        <!-- LOGO: Using Univen logo asset -->
-        <img src="assets/univen-logo.webp" 
+        <img src="logo/univen1logo.jpeg" 
              alt="University of Venda Logo" 
              class="brand-logo"
              onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23fbbf24%22/%3E%3Ctext x=%2218%22 y=%2268%22 font-family=%22Arial%22 font-weight=%22bold%22 font-size=%2240%22 fill=%22%230b2b4a%22%3EUniV%3C/text%3E%3C/svg%3E';">
         <h1 class="brand-title">University of Venda</h1>
         <p class="brand-slogan">Legal Case Management</p>
-        <!-- welcome-back image (hanging) -->
-        <div class="mt-4 d-none d-md-block">
-          <svg viewBox="0 0 200 120" class="hanging-logo">
-            <rect width="200" height="120" rx="10" fill="rgba(255, 255, 255, 0.08)" />
-            <text x="20" y="70" font-family="'Inter', sans-serif" font-weight="600" font-size="28" fill="white" opacity="0.85">👋 Welcome</text>
-          </svg>
-        </div>
       </div>
     </div>
 
@@ -35,6 +27,11 @@
       <p class="form-subtitle">Please sign in to your account</p>
 
       <form #loginForm="ngForm" (ngSubmit)="onLogin()">
+        <!-- error message banner -->
+        <div class="alert alert-danger" *ngIf="errorMessage" style="color: #ef4444; background: #fef2f2; border: 1px solid #fee2e2; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 16px;">
+          {{ errorMessage }}
+        </div>
+
         <!-- username / email field -->
         <div class="mb-3">
           <label for="loginUsername" class="form-label">Email, Username, or Staff Number</label>
@@ -65,7 +62,8 @@
                    class="form-control" 
                    [type]="showPassword ? 'text' : 'password'">
             <button type="button" tabindex="-1" class="password-toggle" (click)="togglePassword()">
-              <svg [lucide]="showPassword ? 'eye-off' : 'eye'" class="field-icon"></svg>
+              <svg lucideEyeOff class="field-icon" *ngIf="showPassword"></svg>
+              <svg lucideEye class="field-icon" *ngIf="!showPassword"></svg>
             </button>
           </div>
         </div>
@@ -138,7 +136,7 @@
             </div>
             <div class="help-contact-row">
               <svg lucideMail class="contact-icon"></svg>
-              <div class="contact-details"><span class="label">Email</span><span class="value">support@univen.ac.za</span></div>
+              <div class="contact-details"><span class="label">Email</span><span class="value">support&#64;univen.ac.za</span></div>
             </div>
           </div>
         </div>
@@ -164,7 +162,7 @@
         <form #resetForm="ngForm" (ngSubmit)="submitResetPassword()">
           <div class="mb-3">
             <label for="resetEmail" class="form-label text-dark fw-medium"> Email Address <span class="text-danger">*</span></label>
-            <input type="email" id="resetEmail" name="resetEmail" placeholder="yourname@univen.ac.za" 
+            <input type="email" id="resetEmail" name="resetEmail" placeholder="yourname&#64;univen.ac.za" 
                    [(ngModel)]="resetEmailAddress" required email
                    class="form-control input-reset">
           </div>

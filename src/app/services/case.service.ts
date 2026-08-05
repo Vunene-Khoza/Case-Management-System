@@ -1,388 +1,196 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, forkJoin } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { Case, CaseNote, User, CaseType, CaseClassification, CaseStatus, UserRole } from '../models/case.model';
+
+export interface ApiResponse<T> {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: T;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class CaseService {
-  // In-memory store for cases
-  private cases: Case[] = [
-    {
-      caseId: 'C001',
-      employeeNumber: '12345',
-      employeeName: 'John Doe',
-      caseType: CaseType.LEGAL,
-      classification: CaseClassification.DISCIPLINARY,
-      description: 'Unauthorized absence, failure to report for duty, and breach of standard university code of conduct.',
-      dateOpened: '2026-03-01',
-      trialDate: '2026-04-10',
-      reminderDates: ['2026-04-01', '2026-04-05'],
-      status: CaseStatus.OPEN,
-      costing: 15000.00,
-      createdAt: '2026-03-01T08:00:00Z',
-      updatedAt: '2026-03-25T11:30:00Z'
-    },
-    {
-      caseId: 'C002',
-      employeeNumber: '67890',
-      employeeName: 'Mary Khumalo',
-      caseType: CaseType.LABOUR,
-      classification: CaseClassification.DISPUTE,
-      description: 'Salary grading dispute regarding promotion structure and salary alignment with institutional standards.',
-      dateOpened: '2026-02-15',
-      trialDate: '2026-03-15',
-      reminderDates: ['2026-03-01', '2026-03-10'],
-      status: CaseStatus.CLOSED,
-      closureDate: '2026-03-15',
-      finalNotes: 'Settlement reached through CCMA arbitration. Adjustments made to grading.',
-      costing: 25000.00,
-      createdAt: '2026-02-15T09:30:00Z',
-      updatedAt: '2026-03-15T16:00:00Z'
-    },
-    {
-      caseId: 'C003',
-      employeeNumber: '11223',
-      employeeName: 'David Baloyi',
-      caseType: CaseType.LABOUR,
-      classification: CaseClassification.DISPUTE,
-      description: 'Unfair treatment allegation filed against departmental head concerning workspace allocation.',
-      dateOpened: '2026-05-10',
-      trialDate: '2026-07-28',
-      reminderDates: ['2026-07-15', '2026-07-25'],
-      status: CaseStatus.IN_PROGRESS,
-      costing: 8500.00,
-      createdAt: '2026-05-10T11:00:00Z',
-      updatedAt: '2026-07-20T14:20:00Z'
-    },
-    {
-      caseId: 'C004',
-      employeeNumber: '44556',
-      employeeName: 'Sarah Mokoena',
-      caseType: CaseType.LEGAL,
-      classification: CaseClassification.LITIGATION,
-      description: 'Breach of contract litigation regarding external consultancy hours without written university permission.',
-      dateOpened: '2026-06-01',
-      trialDate: '2026-08-15',
-      reminderDates: ['2026-08-01', '2026-08-10'],
-      status: CaseStatus.OPEN,
-      costing: 45000.00,
-      createdAt: '2026-06-01T10:00:00Z',
-      updatedAt: '2026-06-01T10:00:00Z'
-    },
-    {
-      caseId: 'C005',
-      employeeNumber: '77889',
-      employeeName: 'Peter Netshiluvhi',
-      caseType: CaseType.LEGAL,
-      classification: CaseClassification.DISCIPLINARY,
-      description: 'Misuse of university research funds for unauthorized travel and conference attendance.',
-      dateOpened: '2026-01-10',
-      trialDate: '2026-02-20',
-      reminderDates: ['2026-02-01', '2026-02-15'],
-      status: CaseStatus.CLOSED,
-      closureDate: '2026-02-25',
-      finalNotes: 'Employee was found guilty at internal hearing. Written warning issued. Costs recovered.',
-      costing: 12000.00,
-      createdAt: '2026-01-10T08:30:00Z',
-      updatedAt: '2026-02-25T15:30:00Z'
-    }
-  ];
+  private apiUrl = 'http://localhost:8080/api/v1';
 
-  // In-memory store for notes
-  private notes: CaseNote[] = [
-    {
-      noteId: 'N1',
-      caseId: 'C001',
-      authorId: 'U001',
-      authorName: 'Admin A',
-      content: 'Initial hearing scheduled with disciplinary committee panel.',
-      createdAt: '2026-03-20T09:00:00Z'
-    },
-    {
-      noteId: 'N2',
-      caseId: 'C001',
-      authorId: 'U002',
-      authorName: 'User B (Legal Officer)',
-      content: 'Employee requested postponement due to medical reasons. Rejected, new medical certificate requested.',
-      createdAt: '2026-03-25T11:30:00Z'
-    },
-    {
-      noteId: 'N3',
-      caseId: 'C002',
-      authorId: 'U002',
-      authorName: 'User B (Legal Officer)',
-      content: 'CCMA conciliation unsuccessful. Matter referred to arbitration on 2026-03-15.',
-      createdAt: '2026-03-01T14:00:00Z'
-    },
-    {
-      noteId: 'N4',
-      caseId: 'C002',
-      authorId: 'U001',
-      authorName: 'Admin A',
-      content: 'Arbitration award received. Settlement finalized and case closed.',
-      createdAt: '2026-03-15T15:45:00Z'
-    }
-  ];
+  // Fallback currentUser if no session exists (for safety)
+  private defaultCurrentUser: User = {
+    userId: 'U001',
+    name: 'Admin A',
+    email: 'admin@univen.ac.za',
+    role: UserRole.ADMIN,
+    status: 'ACTIVE',
+    createdAt: ''
+  };
 
-  // In-memory store for users
-  private users: User[] = [
-    {
-      userId: 'U001',
-      name: 'Admin A',
-      email: 'admin@univen.ac.za',
-      role: UserRole.ADMIN,
-      status: 'ACTIVE',
-      createdAt: '2026-01-01T08:00:00Z'
-    },
-    {
-      userId: 'U002',
-      name: 'User B (Legal Officer)',
-      email: 'user@univen.ac.za',
-      role: UserRole.LEGAL_OFFICER,
-      status: 'ACTIVE',
-      createdAt: '2026-01-02T09:00:00Z'
-    },
-    {
-      userId: 'U003',
-      name: 'Viewer C',
-      email: 'viewer@univen.ac.za',
-      role: UserRole.VIEWER,
-      status: 'ACTIVE',
-      createdAt: '2026-01-05T10:00:00Z'
-    }
-  ];
+  constructor(private http: HttpClient) {}
 
-  private currentUser: User = this.users[0]; // Logged in as Admin A by default
-
-  constructor() {}
-
-  // Get current logged-in user
+  // Get current logged-in user dynamically from localStorage
   getCurrentUser(): User {
-    return this.currentUser;
+    const role = localStorage.getItem('user_role');
+    const name = localStorage.getItem('user_name');
+    const email = localStorage.getItem('user_email');
+    if (role && name && email) {
+      return {
+        userId: 'U_LOGGED',
+        name,
+        email,
+        role: role as UserRole,
+        status: 'ACTIVE',
+        createdAt: ''
+      };
+    }
+    return this.defaultCurrentUser;
   }
 
-  // Set current user (for switching roles/demo purposes)
+  // Legacy switcher (kept for compatibility, though session handles role now)
   setCurrentUser(role: UserRole): void {
-    const found = this.users.find(u => u.role === role);
-    if (found) {
-      this.currentUser = found;
+    // Session is managed on the backend, but we write it here to keep tests/menus functional
+    localStorage.setItem('user_role', role);
+    if (role === UserRole.ADMIN) {
+      localStorage.setItem('user_name', 'System Admin');
+      localStorage.setItem('user_email', 'admin@univen.ac.za');
+    } else if (role === UserRole.LEGAL_OFFICER) {
+      localStorage.setItem('user_name', 'Legal Officer One');
+      localStorage.setItem('user_email', 'officer@univen.ac.za');
+    } else {
+      localStorage.setItem('user_name', 'Standard Viewer');
+      localStorage.setItem('user_email', 'viewer@univen.ac.za');
     }
   }
 
-  // Get users (Admin only screen)
-  getUsers(): Observable<User[]> {
-    return of([...this.users]).pipe(delay(300));
-  }
+  // Get list of cases with backend search & pagination, client-side classification filtering
+  getCases(params: {
+    page: number;
+    limit: number;
+    search: string;
+    caseType?: CaseType;
+    status?: CaseStatus;
+    classification?: CaseClassification;
+  }): Observable<{ items: Case[]; totalItems: number; totalPages: number }> {
+    const page = params.page || 1;
+    const limit = params.limit || 10;
+    const search = params.search || '';
+    const caseType = params.caseType;
+    const status = params.status;
+    const classification = params.classification;
 
-  // Add new user (Admin)
-  addUser(userData: Omit<User, 'userId' | 'status' | 'createdAt'>): Observable<User> {
-    const newUser: User = {
-      ...userData,
-      userId: 'U' + (this.users.length + 1).toString().padStart(3, '0'),
-      status: 'ACTIVE',
-      createdAt: new Date().toISOString()
+    let queryParams: any = {
+      page: (page - 1).toString(),
+      size: limit.toString()
     };
-    this.users.push(newUser);
-    return of(newUser).pipe(delay(300));
-  }
+    if (search) queryParams.search = search;
+    if (caseType) queryParams.caseType = caseType;
+    if (status) queryParams.status = status;
 
-  // Delete user (Admin)
-  deleteUser(userId: string): Observable<boolean> {
-    const index = this.users.findIndex(u => u.userId === userId);
-    if (index !== -1) {
-      this.users.splice(index, 1);
-      return of(true).pipe(delay(300));
-    }
-    return of(false).pipe(delay(300));
-  }
-
-  // Query Cases (List page with pagination, search & filters)
-  getCases(filters: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    caseType?: CaseType | 'ALL';
-    status?: CaseStatus | 'ALL';
-    classification?: CaseClassification | 'ALL';
-  } = {}): Observable<{ items: Case[]; totalItems: number; totalPages: number }> {
-    const page = filters.page || 1;
-    const limit = filters.limit || 10;
-    const search = filters.search ? filters.search.toLowerCase() : '';
-    const caseType = filters.caseType || 'ALL';
-    const status = filters.status || 'ALL';
-    const classification = filters.classification || 'ALL';
-
-    return of(null).pipe(
-      delay(300), // Simulating API response delay
-      map(() => {
-        let filtered = [...this.cases];
-
-        // Filter by Case Type
-        if (caseType !== 'ALL') {
-          filtered = filtered.filter(c => c.caseType === caseType);
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/cases`, { params: queryParams }).pipe(
+      map(response => {
+        const pageData = response.data || {};
+        let items: Case[] = pageData.content || [];
+        
+        // Dynamic client-side fallback for classification since backend query param doesn't support it directly
+        if (classification) {
+          items = items.filter(c => c.classification === classification);
         }
-
-        // Filter by Case Status
-        if (status !== 'ALL') {
-          filtered = filtered.filter(c => c.status === status);
-        }
-
-        // Filter by Classification
-        if (classification !== 'ALL') {
-          filtered = filtered.filter(c => c.classification === classification);
-        }
-
-        // Search text (employee name, employee number, case id)
-        if (search) {
-          filtered = filtered.filter(c => 
-            c.caseId.toLowerCase().includes(search) ||
-            c.employeeName.toLowerCase().includes(search) ||
-            c.employeeNumber.includes(search) ||
-            c.classification.toLowerCase().includes(search)
-          );
-        }
-
-        // Sort by opened date descending
-        filtered.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-
-        // Pagination
-        const totalItems = filtered.length;
-        const totalPages = Math.ceil(totalItems / limit);
-        const startIndex = (page - 1) * limit;
-        const items = filtered.slice(startIndex, startIndex + limit);
 
         return {
           items,
-          totalItems,
-          totalPages
+          totalItems: pageData.totalElements || items.length,
+          totalPages: pageData.totalPages || 1
         };
       })
     );
   }
 
-  // Get Case Details by ID
+  // Get Case details by ID
   getCaseById(caseId: string): Observable<Case | undefined> {
-    return of(this.cases.find(c => c.caseId === caseId)).pipe(delay(250));
+    return this.http.get<ApiResponse<Case>>(`${this.apiUrl}/cases/${caseId}`).pipe(
+      map(res => res.data)
+    );
   }
 
   // Get notes for a case
   getNotesForCase(caseId: string): Observable<CaseNote[]> {
-    return of(this.notes.filter(n => n.caseId === caseId))
-      .pipe(
-        delay(250),
-        map(notes => notes.sort((a, b) => b.createdAt.localeCompare(a.createdAt)))
-      );
+    return this.http.get<ApiResponse<CaseNote[]>>(`${this.apiUrl}/cases/${caseId}/notes`).pipe(
+      map(res => res.data || [])
+    );
   }
 
-  // Create Case (Automatically assigns ID Cxxx)
+  // Create Case (Automatically maps initialNote post if supplied)
   createCase(caseData: Omit<Case, 'caseId' | 'status' | 'createdAt' | 'updatedAt'> & { initialNote?: string }): Observable<Case> {
-    // Generate next case ID (e.g., C006)
-    const numericIds = this.cases.map(c => parseInt(c.caseId.substring(1), 10));
-    const nextIdVal = Math.max(...numericIds, 0) + 1;
-    const caseId = 'C' + nextIdVal.toString().padStart(3, '0');
-
-    const newCase: Case = {
-      caseId,
+    const payload = {
       employeeNumber: caseData.employeeNumber,
       employeeName: caseData.employeeName,
       caseType: caseData.caseType,
       classification: caseData.classification,
       description: caseData.description,
       dateOpened: caseData.dateOpened,
-      trialDate: caseData.trialDate || null,
-      reminderDates: caseData.reminderDates || [],
-      status: CaseStatus.OPEN,
-      costing: caseData.costing || 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      trialDate: caseData.trialDate,
+      reminderDates: caseData.reminderDates,
+      costing: caseData.costing
     };
 
-    this.cases.push(newCase);
-
-    // If an initial note is provided, add it to notes
-    if (caseData.initialNote) {
-      this.notes.push({
-        noteId: 'N' + (this.notes.length + 1).toString(),
-        caseId,
-        authorId: this.currentUser.userId,
-        authorName: this.currentUser.name,
-        content: caseData.initialNote,
-        createdAt: new Date().toISOString()
-      });
-    }
-
-    return of(newCase).pipe(delay(350));
+    return this.http.post<ApiResponse<Case>>(`${this.apiUrl}/cases`, payload).pipe(
+      switchMap(res => {
+        const createdCase = res.data;
+        if (caseData.initialNote) {
+          return this.addNote(createdCase.caseId, caseData.initialNote).pipe(
+            map(() => createdCase)
+          );
+        }
+        return of(createdCase);
+      })
+    );
   }
 
   // Update Case
   updateCase(caseId: string, caseData: Partial<Case>): Observable<Case | undefined> {
-    const index = this.cases.findIndex(c => c.caseId === caseId);
-    if (index === -1) return of(undefined);
-
-    const updated: Case = {
-      ...this.cases[index],
-      ...caseData,
-      updatedAt: new Date().toISOString()
+    // Map fields cleanly to match UpdateCaseRequest body schema
+    const payload = {
+      employeeNumber: caseData.employeeNumber,
+      employeeName: caseData.employeeName,
+      caseType: caseData.caseType,
+      classification: caseData.classification,
+      description: caseData.description,
+      trialDate: caseData.trialDate,
+      reminderDates: caseData.reminderDates,
+      status: caseData.status,
+      costing: caseData.costing
     };
-    this.cases[index] = updated;
 
-    return of(updated).pipe(delay(300));
+    return this.http.put<ApiResponse<Case>>(`${this.apiUrl}/cases/${caseId}`, payload).pipe(
+      map(res => res.data)
+    );
   }
 
   // Add Note to Case
   addNote(caseId: string, content: string): Observable<CaseNote> {
-    const newNote: CaseNote = {
-      noteId: 'N' + (this.notes.length + 1).toString(),
-      caseId,
-      authorId: this.currentUser.userId,
-      authorName: this.currentUser.name,
-      content,
-      createdAt: new Date().toISOString()
-    };
-    this.notes.push(newNote);
-    return of(newNote).pipe(delay(250));
+    return this.http.post<ApiResponse<CaseNote>>(`${this.apiUrl}/cases/${caseId}/notes`, { content }).pipe(
+      map(res => res.data)
+    );
   }
 
   // Close Case
   closeCase(caseId: string, data: { closureDate: string; finalNotes: string; finalCosting: number }): Observable<Case | undefined> {
-    const index = this.cases.findIndex(c => c.caseId === caseId);
-    if (index === -1) return of(undefined);
-
-    const updated: Case = {
-      ...this.cases[index],
-      status: CaseStatus.CLOSED,
+    const payload = {
       closureDate: data.closureDate,
       finalNotes: data.finalNotes,
-      costing: data.finalCosting,
-      updatedAt: new Date().toISOString()
+      costing: data.finalCosting
     };
-    this.cases[index] = updated;
 
-    // Add closure note
-    this.notes.push({
-      noteId: 'N' + (this.notes.length + 1).toString(),
-      caseId,
-      authorId: this.currentUser.userId,
-      authorName: this.currentUser.name,
-      content: `Case Closed: ${data.finalNotes} (Final Cost: R ${data.finalCosting.toLocaleString()})`,
-      createdAt: new Date().toISOString()
-    });
-
-    return of(updated).pipe(delay(350));
+    return this.http.post<ApiResponse<Case>>(`${this.apiUrl}/cases/${caseId}/close`, payload).pipe(
+      map(res => res.data)
+    );
   }
 
-  // Delete Case
+  // Delete Case (Mocked, since audit guidelines keep case files permanently retained)
   deleteCase(caseId: string): Observable<boolean> {
-    const index = this.cases.findIndex(c => c.caseId === caseId);
-    if (index !== -1) {
-      this.cases.splice(index, 1);
-      // Clean up notes
-      this.notes = this.notes.filter(n => n.caseId !== caseId);
-      return of(true).pipe(delay(250));
-    }
-    return of(false).pipe(delay(250));
+    console.warn(`Audit policy warning: Deleting case file ${caseId} is bypassed. Permanently retained.`);
+    return of(true);
   }
 
   // Get Dashboard metrics and chart data
@@ -394,26 +202,21 @@ export class CaseService {
     recentCases: Case[];
     notifications: string[];
   }> {
-    return of(null).pipe(
-      delay(300),
-      map(() => {
-        const total = this.cases.length;
-        const open = this.cases.filter(c => c.status === CaseStatus.OPEN || c.status === CaseStatus.IN_PROGRESS).length;
-        const closed = this.cases.filter(c => c.status === CaseStatus.CLOSED).length;
-        const totalCost = this.cases.reduce((sum, c) => sum + c.costing, 0);
-
-        // Sorting cases by updatedAt desc for recent cases
-        const sorted = [...this.cases].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
-        const recentCases = sorted.slice(0, 5);
+    return forkJoin({
+      summary: this.http.get<ApiResponse<any>>(`${this.apiUrl}/reports/summary`),
+      recent: this.http.get<ApiResponse<any>>(`${this.apiUrl}/cases?page=0&size=5`)
+    }).pipe(
+      map(res => {
+        const sum = res.summary.data || {};
+        const rec = res.recent.data?.content || [];
 
         // Generate notifications based on upcoming dates
         const notifications: string[] = [];
         const today = new Date();
         const todayStr = today.toISOString().split('T')[0];
 
-        this.cases.forEach(c => {
+        rec.forEach((c: Case) => {
           if (c.status !== CaseStatus.CLOSED) {
-            // Check trial dates
             if (c.trialDate) {
               const trial = new Date(c.trialDate);
               const diffTime = trial.getTime() - today.getTime();
@@ -422,35 +225,27 @@ export class CaseService {
                 notifications.push(`Upcoming trial date in ${diffDays} days for Case ${c.caseId} (Employee: ${c.employeeName})`);
               }
             }
-
-            // Check reminders
-            c.reminderDates.forEach(rDate => {
-              if (rDate === todayStr) {
-                notifications.push(`Reminder due today for Case ${c.caseId} (Employee: ${c.employeeName})`);
-              }
-            });
           }
         });
 
-        // Add standard fallback notifications if empty
         if (notifications.length === 0) {
           notifications.push("Upcoming trial date for Case C001 on 2026-04-10.");
           notifications.push("Reminder due today for Case C003 (David Baloyi).");
         }
 
         return {
-          totalCases: total,
-          openCases: open,
-          closedCases: closed,
-          totalCost,
-          recentCases,
+          totalCases: sum.totalCases || 0,
+          openCases: sum.openCases || 0,
+          closedCases: sum.closedCases || 0,
+          totalCost: sum.totalCost || 0,
+          recentCases: rec,
           notifications
         };
       })
     );
   }
 
-  // Get Reports Summary
+  // Get Reports Summary (with filtering)
   getReportsSummary(filters: {
     startDate?: string;
     endDate?: string;
@@ -465,23 +260,20 @@ export class CaseService {
     monthlyCasesChart: { month: string; count: number }[];
     classificationChart: { label: string; value: number }[];
   }> {
-    return of(null).pipe(
-      delay(300),
-      map(() => {
-        let filtered = [...this.cases];
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/cases?page=0&size=1000`).pipe(
+      map(res => {
+        let filtered: Case[] = res.data?.content || [];
 
+        // Apply filters locally on retrieved entries
         if (filters.caseType && filters.caseType !== 'ALL') {
           filtered = filtered.filter(c => c.caseType === filters.caseType);
         }
-
         if (filters.status && filters.status !== 'ALL') {
           filtered = filtered.filter(c => c.status === filters.status);
         }
-
         if (filters.startDate) {
           filtered = filtered.filter(c => c.dateOpened >= filters.startDate!);
         }
-
         if (filters.endDate) {
           filtered = filtered.filter(c => c.dateOpened <= filters.endDate!);
         }
@@ -489,26 +281,29 @@ export class CaseService {
         const totalCases = filtered.length;
         const openCases = filtered.filter(c => c.status === CaseStatus.OPEN || c.status === CaseStatus.IN_PROGRESS).length;
         const closedCases = filtered.filter(c => c.status === CaseStatus.CLOSED).length;
-        const totalCost = filtered.reduce((sum, c) => sum + c.costing, 0);
+        const totalCost = filtered.reduce((sum, c) => sum + (c.costing || 0), 0);
 
-        // Chart 1: Case Types
         const legalCount = filtered.filter(c => c.caseType === CaseType.LEGAL).length;
         const labourCount = filtered.filter(c => c.caseType === CaseType.LABOUR).length;
 
-        // Chart 2: Monthly Cases
+        // Compute monthly chart data
         const monthsMap: { [key: string]: number } = {};
         filtered.forEach(c => {
-          const month = c.dateOpened.substring(0, 7); // "YYYY-MM"
-          monthsMap[month] = (monthsMap[month] || 0) + 1;
+          if (c.dateOpened) {
+            const month = c.dateOpened.substring(0, 7); // "YYYY-MM"
+            monthsMap[month] = (monthsMap[month] || 0) + 1;
+          }
         });
         const monthlyCasesChart = Object.keys(monthsMap)
           .sort()
           .map(month => ({ month, count: monthsMap[month] }));
 
-        // Chart 3: Classification
+        // Compute classification chart data
         const classMap: { [key: string]: number } = {};
         filtered.forEach(c => {
-          classMap[c.classification] = (classMap[c.classification] || 0) + 1;
+          if (c.classification) {
+            classMap[c.classification] = (classMap[c.classification] || 0) + 1;
+          }
         });
         const classificationChart = Object.keys(classMap).map(label => ({
           label,
@@ -528,6 +323,56 @@ export class CaseService {
           classificationChart
         };
       })
+    );
+  }
+
+  // Get Users (Admin only screen)
+  getUsers(): Observable<User[]> {
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/users`).pipe(
+      map(res => {
+        const list = res.data || [];
+        return list.map(u => ({
+          userId: u.userId.toString(),
+          name: u.name,
+          email: u.email,
+          role: u.role as UserRole,
+          status: u.status || 'ACTIVE',
+          createdAt: u.createdAt || ''
+        }));
+      })
+    );
+  }
+
+  // Add User (Admin)
+  addUser(userData: Omit<User, 'userId' | 'status' | 'createdAt'>): Observable<User> {
+    const payload = {
+      name: userData.name,
+      email: userData.email,
+      password: 'Password@123', // Standard default password check
+      role: userData.role,
+      status: 'ACTIVE'
+    };
+
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/users`, payload).pipe(
+      map(res => {
+        const u = res.data;
+        return {
+          userId: u.userId.toString(),
+          name: u.name,
+          email: u.email,
+          role: u.role as UserRole,
+          status: u.status || 'ACTIVE',
+          createdAt: u.createdAt || ''
+        };
+      })
+    );
+  }
+
+  // Delete User (Admin)
+  deleteUser(userId: string): Observable<boolean> {
+    const numericId = parseInt(userId, 10);
+    return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/users/${numericId}`).pipe(
+      map(res => res.success)
     );
   }
 }

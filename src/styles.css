@@ -164,11 +164,20 @@ p {
   transition: var(--transition-normal);
 }
 
+.app-container.no-sidebar .main-content {
+  margin-left: 0 !important;
+  padding: 0 !important;
+}
+
 @media (max-width: 992px) {
   .main-content {
     margin-left: 0;
     padding: 16px;
     padding-top: 80px; /* Navbar height for mobile */
+  }
+  .app-container.no-sidebar .main-content {
+    padding: 0 !important;
+    padding-top: 0 !important;
   }
 }
 

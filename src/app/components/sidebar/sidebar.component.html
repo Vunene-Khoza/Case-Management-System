@@ -84,11 +84,11 @@
     <!-- Profile block at the bottom -->
     <div class="profile-section">
       <div class="line-1"></div>
-      <div class="profile-box">
+      <div class="profile-box" (click)="logout()" title="Click to logout" style="cursor: pointer;">
         <img class="profile" src="profile0.png" alt="Profile" />
         <div class="profile-info">
-          <div class="r-e-mukosi">R.E. Mukosi</div>
-          <div class="administator">Administator</div>
+          <div class="r-e-mukosi">{{ currentUser.name }}</div>
+          <div class="administator">{{ currentUser.role }}</div>
         </div>
       </div>
     </div>
