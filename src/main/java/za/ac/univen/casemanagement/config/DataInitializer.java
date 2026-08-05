@@ -25,8 +25,9 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedUserIfNotFound(String email, String name, String rawPassword, UserRole role) {
-        if (!userRepository.existsByEmail(email)) {
-            UserEntity user = UserEntity.builder()
+        UserEntity user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            user = UserEntity.builder()
                     .name(name)
                     .email(email)
                     .password(passwordEncoder.encode(rawPassword))
@@ -35,6 +36,10 @@ public class DataInitializer implements CommandLineRunner {
                     .build();
             userRepository.save(user);
             log.info("Seeded initial user: {} with role {}", email, role);
+        } else {
+            user.setPassword(passwordEncoder.encode(rawPassword));
+            userRepository.save(user);
+            log.info("Updated password for seeded user: {}", email);
         }
     }
 }
