@@ -41,6 +41,11 @@ To keep the codebase modular, I refactored every standalone page and component i
 * **Bootstrap SVGs:** Replaced the custom PNG image paths inside the sidebar with standard inline Bootstrap SVG icons.
 * **Branded Logo Placement:** Configured `logo/univen1logo.jpeg` as the main branding logo on the Login page and removed the welcome SVG badge as requested.
 
+### 🔐 Single-Card Login Revamp
+* **Removed Split Layout:** Deleted the left-side branding panel, restructuring the form wrapper to be a clean, centralized card of `max-width: 600px`.
+* **Integrated Header Bar:** Added a dark blue (`#0b2b4a`) banner at the top of the form, displaying the University logo and the welcome texts side-by-side.
+* **Preserved System Help & Actions:** Maintained full compatibility with the existing help drawer widgets, reset password overlays, error alerts, and backend API login logic.
+
 ### 📝 Figma Case Form UI Refactoring & Theme Swaps
 * **Color Layout Swap:** Reconfigured the page background to grey (`#f3f4f6`) and swapped the card/block backgrounds to pure white (`#ffffff`).
 * **Selection Placeholders:** Changed default select options to disabled placeholders (`Select Case Type`, `Select Classification`).
