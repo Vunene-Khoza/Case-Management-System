@@ -130,7 +130,6 @@ p {
 
 .glass-card:hover {
   border-color: rgba(255, 255, 255, 0.12);
-  transform: translateY(-2px); /* Subtle hover lift max 2px */
 }
 
 /* Skeleton Pulse System */

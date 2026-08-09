@@ -20,7 +20,7 @@
       <input 
         type="text" 
         class="search-input" 
-        placeholder="Search by Case ID, employee name, or details..."
+        placeholder="Search by CASE ID EMPLOYEE/NO"
         [(ngModel)]="searchQuery"
         (ngModelChange)="onSearchChange($event)"
         [disabled]="loading"
@@ -125,7 +125,7 @@
                 </span>
               </td>
               <td>
-                <span class="badge badge-classification">
+                <span class="badge badge-classification" [ngClass]="'badge-' + case.classification.toLowerCase()">
                   {{ formatClassificationLabel(case.classification) }}
                 </span>
               </td>
