@@ -41,6 +41,11 @@ To keep the codebase modular, I refactored every standalone page and component i
 * **Bootstrap SVGs:** Replaced the custom PNG image paths inside the sidebar with standard inline Bootstrap SVG icons.
 * **Branded Logo Placement:** Configured `logo/univen1logo.jpeg` as the main branding logo on the Login page and removed the welcome SVG badge as requested.
 
+### 📁 Role-Based Dynamic Sidebars & User Profiles
+* **Dynamic Menu Injection:** Swapped hardcoded sidebars to render links based on user role (`ADMIN` vs `LEGAL_OFFICER`).
+* **Active Session Binding:** bound user profile cards dynamically to `{{ currentUser.name }}` and `{{ currentUser.role }}` parsed from active database-supported JWT sessions.
+* **Flexible Seeding Schema:** Ensured backend updates automatic profile parameters (e.g. `D. Blundin` for `officer@univen.ac.za` or any newly registered user).
+
 ### 🔐 Single-Card Login Revamp
 * **Removed Split Layout:** Deleted the left-side branding panel, restructuring the form wrapper to be a clean, centralized card of `max-width: 600px`.
 * **Integrated Header Bar:** Added a dark blue (`#0b2b4a`) banner at the top of the form, displaying the University logo and the welcome texts side-by-side.
