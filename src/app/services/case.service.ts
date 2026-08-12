@@ -52,7 +52,7 @@ export class CaseService {
       localStorage.setItem('user_name', 'System Admin');
       localStorage.setItem('user_email', 'admin@univen.ac.za');
     } else if (role === UserRole.LEGAL_OFFICER) {
-      localStorage.setItem('user_name', 'Legal Officer One');
+      localStorage.setItem('user_name', 'D. Blundin');
       localStorage.setItem('user_email', 'officer@univen.ac.za');
     } else {
       localStorage.setItem('user_name', 'Standard Viewer');
