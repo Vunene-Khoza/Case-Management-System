@@ -21,7 +21,7 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
         seedUserIfNotFound("superadmin@univen.ac.za", "System Super Admin", "Super@123", UserRole.SUPER_ADMIN);
         seedUserIfNotFound("admin@univen.ac.za", "System Admin", "Admin@123", UserRole.ADMIN);
-        seedUserIfNotFound("officer@univen.ac.za", "Legal Officer One", "Officer@123", UserRole.LEGAL_OFFICER);
+        seedUserIfNotFound("officer@univen.ac.za", "D. Blundin", "Officer@123", UserRole.LEGAL_OFFICER);
         seedUserIfNotFound("viewer@univen.ac.za", "Standard Viewer", "Viewer@123", UserRole.VIEWER);
     }
 
