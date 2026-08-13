@@ -6,6 +6,8 @@ import { CaseFormComponent } from './pages/case-form/case-form.component';
 import { CaseDetailsComponent } from './pages/case-details/case-details.component';
 import { ReportsComponent } from './pages/reports/reports.component';
 import { UserManagementComponent } from './pages/user-management/user-management.component';
+import { ActivityLogComponent } from './pages/activity-log/activity-log.component';
+import { SettingsComponent } from './pages/settings/settings.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -18,5 +20,8 @@ export const routes: Routes = [
   { path: 'cases/:id/edit', component: CaseFormComponent, canActivate: [authGuard] },
   { path: 'reports', component: ReportsComponent, canActivate: [authGuard] },
   { path: 'users', component: UserManagementComponent, canActivate: [authGuard] },
+  { path: 'activity-log', component: ActivityLogComponent, canActivate: [authGuard] },
+  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: 'login' }
 ];
+

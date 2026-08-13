@@ -1,0 +1,589 @@
+<div class="settings-page">
+  <!-- Top Toast Alert Notification -->
+  <div *ngIf="toastMessage" class="toast-alert" [ngClass]="'toast-' + toastType">
+    <div class="toast-content">
+      <svg *ngIf="toastType === 'success'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <svg *ngIf="toastType === 'error'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+      </svg>
+      <svg *ngIf="toastType === 'info'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      <span>{{ toastMessage }}</span>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Settings & Configuration</h1>
+      <p class="page-subtitle">Manage account preferences, notifications, system rules, and security controls.</p>
+    </div>
+  </header>
+
+  <!-- Settings Grid Layout -->
+  <div class="settings-layout">
+    <!-- Tabs Navigation Card -->
+    <nav class="settings-tabs-card glass-card">
+      <button 
+        class="tab-button" 
+        [class.active]="activeTab === 'profile'" 
+        (click)="setTab('profile')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>Profile & Account</span>
+      </button>
+
+      <button 
+        class="tab-button" 
+        [class.active]="activeTab === 'notifications'" 
+        (click)="setTab('notifications')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span>Notifications</span>
+      </button>
+
+      <button 
+        class="tab-button" 
+        [class.active]="activeTab === 'appearance'" 
+        (click)="setTab('appearance')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+        </svg>
+        <span>Appearance</span>
+      </button>
+
+      <button 
+        class="tab-button" 
+        [class.active]="activeTab === 'security'" 
+        (click)="setTab('security')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>Security & Access</span>
+      </button>
+
+      <button 
+        *ngIf="isAdmin"
+        class="tab-button" 
+        [class.active]="activeTab === 'system'" 
+        (click)="setTab('system')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>System & Case Rules</span>
+      </button>
+    </nav>
+
+    <!-- Main Content Panels Container -->
+    <main class="settings-content">
+
+      <!-- TAB 1: PROFILE & ACCOUNT -->
+      <section *ngIf="activeTab === 'profile'" class="glass-card panel-card">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Personal Profile & Account</h2>
+            <p class="panel-subtitle">Update your personal details, contact information, and public profile.</p>
+          </div>
+          <span class="user-badge" [ngClass]="isAdmin ? 'badge-admin' : 'badge-officer'">
+            {{ isAdmin ? 'Administrator' : 'Legal Officer' }}
+          </span>
+        </div>
+
+        <!-- Avatar Block -->
+        <div class="profile-avatar-row">
+          <div class="avatar-large">
+            <img src="profile0.png" alt="User Profile" class="avatar-img" />
+          </div>
+          <div class="avatar-info">
+            <h3 class="avatar-name">{{ profileData.name }}</h3>
+            <p class="avatar-email">{{ profileData.email }}</p>
+            <div class="avatar-actions">
+              <button type="button" class="btn btn-secondary btn-sm" (click)="showToast('Avatar updated from system defaults.')">
+                Upload New Avatar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <form (ngSubmit)="saveProfile()" class="settings-form mt-24">
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-input" [(ngModel)]="profileData.name" name="name" required />
+            </div>
+
+            <div class="form-group flex-1">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-input" [(ngModel)]="profileData.email" name="email" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label class="form-label">Official Job Title</label>
+              <input type="text" class="form-input" [(ngModel)]="profileData.title" name="title" />
+            </div>
+
+            <div class="form-group flex-1">
+              <label class="form-label">Department / Unit</label>
+              <input type="text" class="form-input" [(ngModel)]="profileData.department" name="department" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Contact Phone Number</label>
+            <input type="text" class="form-input" [(ngModel)]="profileData.phone" name="phone" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Role Bio / Notes</label>
+            <textarea class="form-textarea" rows="3" [(ngModel)]="profileData.bio" name="bio"></textarea>
+          </div>
+
+          <div class="form-actions mt-24">
+            <button type="submit" class="btn btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              <span>Save Profile Changes</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- TAB 2: NOTIFICATIONS -->
+      <section *ngIf="activeTab === 'notifications'" class="glass-card panel-card">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Notification Preferences</h2>
+            <p class="panel-subtitle">Choose when and how you receive alerts, email notifications, and trial date reminders.</p>
+          </div>
+        </div>
+
+        <form (ngSubmit)="saveNotifications()" class="settings-form mt-20">
+          <div class="section-divider">
+            <h3>Email Alerts</h3>
+            <p>Select event notifications sent to <strong>{{ profileData.email }}</strong></p>
+          </div>
+
+          <div class="toggle-list">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <span class="toggle-title">New Case Assignments</span>
+                <span class="toggle-desc">Receive an email when a new case is assigned to your queue.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" [(ngModel)]="notificationData.emailNewCases" name="emailNewCases" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <span class="toggle-title">Trial & Hearing Reminders</span>
+                <span class="toggle-desc">Automated alerts before scheduled trial or arbitration dates.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" [(ngModel)]="notificationData.emailTrialReminders" name="emailTrialReminders" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <span class="toggle-title">Case Status Changes</span>
+                <span class="toggle-desc">Notifications when a case status changes to Open, In Progress, or Closed.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" [(ngModel)]="notificationData.emailStatusUpdates" name="emailStatusUpdates" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <span class="toggle-title">Case Note Additions</span>
+                <span class="toggle-desc">Receive an instant email copy whenever a colleague adds a case note.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" [(ngModel)]="notificationData.emailCaseNotes" name="emailCaseNotes" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="section-divider mt-32">
+            <h3>Reminder Schedule</h3>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label class="form-label">Trial Advance Notice Threshold</label>
+              <select class="form-select" [(ngModel)]="notificationData.reminderThresholdDays" name="reminderThresholdDays">
+                <option [ngValue]="14">14 days prior</option>
+                <option [ngValue]="7">7 days prior (Recommended)</option>
+                <option [ngValue]="3">3 days prior</option>
+                <option [ngValue]="1">1 day prior</option>
+              </select>
+            </div>
+
+            <div class="form-group flex-1">
+              <label class="form-label">Digest Frequency</label>
+              <select class="form-select" [(ngModel)]="notificationData.digestFrequency" name="digestFrequency">
+                <option value="realtime">Real-time alerts</option>
+                <option value="daily">Daily summary digest</option>
+                <option value="weekly">Weekly summary digest</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions mt-24">
+            <button type="submit" class="btn btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              <span>Save Notification Preferences</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- TAB 3: APPEARANCE -->
+      <section *ngIf="activeTab === 'appearance'" class="glass-card panel-card">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Appearance & Display</h2>
+            <p class="panel-subtitle">Customize application color themes, layout density, and default views.</p>
+          </div>
+        </div>
+
+        <form (ngSubmit)="saveAppearance()" class="settings-form mt-20">
+          <div class="section-divider">
+            <h3>Theme Mode</h3>
+            <p>Select your visual theme preference for the portal.</p>
+          </div>
+
+          <div class="theme-grid">
+            <div 
+              class="theme-card" 
+              [class.selected]="appearanceData.theme === 'dark'"
+              (click)="appearanceData.theme = 'dark'">
+              <div class="theme-preview theme-dark-preview">
+                <div class="preview-bar"></div>
+                <div class="preview-content"></div>
+              </div>
+              <div class="theme-label">
+                <span>Deep Indigo (Dark)</span>
+                <span *ngIf="appearanceData.theme === 'dark'" class="check-icon">✓</span>
+              </div>
+            </div>
+
+            <div 
+              class="theme-card" 
+              [class.selected]="appearanceData.theme === 'light'"
+              (click)="appearanceData.theme = 'light'">
+              <div class="theme-preview theme-light-preview">
+                <div class="preview-bar"></div>
+                <div class="preview-content"></div>
+              </div>
+              <div class="theme-label">
+                <span>Classic Light</span>
+                <span *ngIf="appearanceData.theme === 'light'" class="check-icon">✓</span>
+              </div>
+            </div>
+
+            <div 
+              class="theme-card" 
+              [class.selected]="appearanceData.theme === 'system'"
+              (click)="appearanceData.theme = 'system'">
+              <div class="theme-preview theme-system-preview">
+                <div class="preview-bar"></div>
+                <div class="preview-content"></div>
+              </div>
+              <div class="theme-label">
+                <span>System Default</span>
+                <span *ngIf="appearanceData.theme === 'system'" class="check-icon">✓</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-divider mt-32">
+            <h3>Display Layout & Navigation</h3>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label class="form-label">Default Home Landing Page</label>
+              <select class="form-select" [(ngModel)]="appearanceData.defaultLanding" name="defaultLanding">
+                <option value="/dashboard">Dashboard Overview</option>
+                <option value="/cases">Cases List</option>
+                <option value="/reports">Reports & Analytics</option>
+              </select>
+            </div>
+
+            <div class="form-group flex-1">
+              <label class="form-label">Table & Form Density</label>
+              <select class="form-select" [(ngModel)]="appearanceData.density" name="density">
+                <option value="comfortable">Comfortable (Default)</option>
+                <option value="compact">Compact (Higher Data Density)</option>
+                <option value="spacious">Spacious</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions mt-24">
+            <button type="submit" class="btn btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              <span>Save Appearance Settings</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- TAB 4: SECURITY -->
+      <section *ngIf="activeTab === 'security'" class="glass-card panel-card">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Security & Access Controls</h2>
+            <p class="panel-subtitle">Update password credentials, manage 2FA, and configure session security.</p>
+          </div>
+        </div>
+
+        <form (ngSubmit)="changePassword()" class="settings-form mt-20">
+          <div class="section-divider">
+            <h3>Change Password</h3>
+            <p>Ensure your account uses a strong, complex password.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Current Password</label>
+            <div class="password-input-wrap">
+              <input 
+                [type]="showCurrentPassword ? 'text' : 'password'" 
+                class="form-input" 
+                [(ngModel)]="securityData.currentPassword" 
+                name="currentPassword" 
+                placeholder="••••••••••••" />
+              <button 
+                type="button" 
+                class="pwd-toggle" 
+                (click)="showCurrentPassword = !showCurrentPassword">
+                {{ showCurrentPassword ? 'Hide' : 'Show' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label class="form-label">New Password</label>
+              <div class="password-input-wrap">
+                <input 
+                  [type]="showNewPassword ? 'text' : 'password'" 
+                  class="form-input" 
+                  [(ngModel)]="securityData.newPassword" 
+                  name="newPassword" 
+                  placeholder="Min. 8 characters" />
+                <button 
+                  type="button" 
+                  class="pwd-toggle" 
+                  (click)="showNewPassword = !showNewPassword">
+                  {{ showNewPassword ? 'Hide' : 'Show' }}
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group flex-1">
+              <label class="form-label">Confirm New Password</label>
+              <div class="password-input-wrap">
+                <input 
+                  [type]="showConfirmPassword ? 'text' : 'password'" 
+                  class="form-input" 
+                  [(ngModel)]="securityData.confirmPassword" 
+                  name="confirmPassword" 
+                  placeholder="Re-enter new password" />
+                <button 
+                  type="button" 
+                  class="pwd-toggle" 
+                  (click)="showConfirmPassword = !showConfirmPassword">
+                  {{ showConfirmPassword ? 'Hide' : 'Show' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions mt-12">
+            <button type="submit" class="btn btn-warning">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>Update Password</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="section-divider mt-32">
+          <h3>Authentication & Session Control</h3>
+        </div>
+
+        <form (ngSubmit)="saveSecuritySettings()" class="settings-form">
+          <div class="toggle-list">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <span class="toggle-title">Two-Factor Authentication (2FA)</span>
+                <span class="toggle-desc">Require an authenticator app code when logging into the system.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" [(ngModel)]="securityData.twoFactorEnabled" name="twoFactorEnabled" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <span class="toggle-title">Unrecognized Device Email Alerts</span>
+                <span class="toggle-desc">Send alert email when account is accessed from a new IP or browser.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" [(ngModel)]="securityData.loginAlerts" name="loginAlerts" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group mt-20">
+            <label class="form-label">Inactivity Session Timeout</label>
+            <select class="form-select" [(ngModel)]="securityData.sessionTimeoutMinutes" name="sessionTimeoutMinutes">
+              <option [ngValue]="15">15 minutes (High Security)</option>
+              <option [ngValue]="30">30 minutes (Standard)</option>
+              <option [ngValue]="60">60 minutes</option>
+            </select>
+          </div>
+
+          <div class="form-actions mt-24">
+            <button type="submit" class="btn btn-secondary">
+              <span>Save Security Settings</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- TAB 5: SYSTEM RULES (Admin) -->
+      <section *ngIf="activeTab === 'system' && isAdmin" class="glass-card panel-card">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">System & Case Parameters</h2>
+            <p class="panel-subtitle">Configure global case ID prefixes, costing currency formats, and institutional compliance rules.</p>
+          </div>
+        </div>
+
+        <form (ngSubmit)="saveSystemSettings()" class="settings-form mt-20">
+          <div class="section-divider">
+            <h3>Case Formatting & Financials</h3>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label class="form-label">Case ID Prefix</label>
+              <input type="text" class="form-input" [(ngModel)]="systemData.casePrefix" name="casePrefix" placeholder="e.g. C or CASE" />
+              <small class="form-hint">Generated case numbers will follow prefix rule (e.g. C006).</small>
+            </div>
+
+            <div class="form-group flex-1">
+              <label class="form-label">Currency Symbol / Format</label>
+              <select class="form-select" [(ngModel)]="systemData.currency" name="currency">
+                <option value="ZAR">ZAR - South African Rand (R)</option>
+                <option value="USD">USD - US Dollar ($)</option>
+                <option value="EUR">EUR - Euro (€)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-divider mt-24">
+            <h3>Archival & Compliance Policy</h3>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label class="form-label">Auto-Archive Closed Cases After</label>
+              <select class="form-select" [(ngModel)]="systemData.autoArchiveMonths" name="autoArchiveMonths">
+                <option [ngValue]="6">6 months</option>
+                <option [ngValue]="12">12 months (1 year)</option>
+                <option [ngValue]="24">24 months (2 years)</option>
+                <option [ngValue]="0">Never (Keep active in search)</option>
+              </select>
+            </div>
+
+            <div class="form-group flex-1">
+              <label class="form-label">Default Export Format</label>
+              <select class="form-select" [(ngModel)]="systemData.defaultExportFormat" name="defaultExportFormat">
+                <option value="PDF">PDF Document (.pdf)</option>
+                <option value="CSV">CSV Data Spreadsheet (.csv)</option>
+                <option value="EXCEL">Excel Workbook (.xlsx)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="toggle-list mt-16">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <span class="toggle-title">System Audit Logging</span>
+                <span class="toggle-desc">Record detailed timestamp logs for all case modifications and access.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" [(ngModel)]="systemData.auditLogging" name="auditLogging" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <span class="toggle-title">Mandatory Note on Status Change</span>
+                <span class="toggle-desc">Require officers to enter an explanatory note when closing or reopening a case.</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" [(ngModel)]="systemData.requireNoteOnStatusChange" name="requireNoteOnStatusChange" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-actions mt-24">
+            <button type="submit" class="btn btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              <span>Save System Parameters</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+    </main>
+  </div>
+</div>

@@ -1,0 +1,380 @@
+<div class="activity-log-page">
+  <!-- Toast Notification -->
+  <div *ngIf="toastMessage" class="toast-alert">
+    <div class="toast-content">
+      <svg lucideCheckCircle2 class="toast-icon"></svg>
+      <span>{{ toastMessage }}</span>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="header-titles">
+      <h1 class="page-title">
+        <svg lucideActivity class="title-icon"></svg>
+        System Activity & Audit Log
+      </h1>
+      <p class="page-subtitle">
+        Real-time chronological timeline and security audit trail for all case modifications, user authentications, and system actions.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary btn-sm" (click)="simulateLiveEvent()" title="Simulate incoming real-time audit event">
+        <svg lucideZap class="btn-icon"></svg>
+        <span>Simulate Event</span>
+      </button>
+
+      <button class="btn btn-secondary btn-sm" (click)="exportToCsv()" title="Export current audit list to CSV spreadsheet">
+        <svg lucideDownload class="btn-icon"></svg>
+        <span>Export CSV</span>
+      </button>
+
+      <button class="btn btn-danger-soft btn-sm" (click)="clearLogs()" title="Clear audit history">
+        <svg lucideTrash2 class="btn-icon"></svg>
+        <span>Clear</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- KPI Metrics Row -->
+  <div class="metrics-grid">
+    <div class="glass-card metric-card">
+      <div class="metric-icon-wrap icon-blue">
+        <svg lucideActivity class="metric-icon"></svg>
+      </div>
+      <div class="metric-info">
+        <span class="metric-value">{{ totalLogsCount }}</span>
+        <span class="metric-label">Total Audit Events</span>
+      </div>
+    </div>
+
+    <div class="glass-card metric-card">
+      <div class="metric-icon-wrap icon-gold">
+        <svg lucideBriefcase class="metric-icon"></svg>
+      </div>
+      <div class="metric-info">
+        <span class="metric-value">{{ caseLogsCount }}</span>
+        <span class="metric-label">Case Management Logs</span>
+      </div>
+    </div>
+
+    <div class="glass-card metric-card">
+      <div class="metric-icon-wrap icon-cyan">
+        <svg lucideShieldAlert class="metric-icon"></svg>
+      </div>
+      <div class="metric-info">
+        <span class="metric-value">{{ securityAlertsCount }}</span>
+        <span class="metric-label">Security & Access Events</span>
+      </div>
+    </div>
+
+    <div class="glass-card metric-card">
+      <div class="metric-icon-wrap icon-danger">
+        <svg lucideAlertTriangle class="metric-icon"></svg>
+      </div>
+      <div class="metric-info">
+        <span class="metric-value">{{ failedCount }}</span>
+        <span class="metric-label">Failed / Warning Alerts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter & Control Toolbar -->
+  <div class="glass-card toolbar-card">
+    <div class="toolbar-top">
+      <!-- Search Input -->
+      <div class="search-box">
+        <svg lucideSearch class="search-icon"></svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by user, action, description, case ID, or IP..."
+          [(ngModel)]="searchQuery"
+          (input)="applyFilters()"
+        />
+        <button *ngIf="searchQuery" class="clear-search" (click)="searchQuery = ''; applyFilters()">
+          <svg lucideX class="x-icon"></svg>
+        </button>
+      </div>
+
+      <!-- Right Controls: Status Filter & View Switch -->
+      <div class="toolbar-controls">
+        <div class="control-group">
+          <label class="control-label">Status:</label>
+          <select class="form-select status-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+            <option value="ALL">All Statuses</option>
+            <option value="SUCCESS">Success</option>
+            <option value="WARNING">Warning</option>
+            <option value="FAILED">Failed</option>
+          </select>
+        </div>
+
+        <!-- View Mode Switch -->
+        <div class="view-toggle">
+          <button
+            class="toggle-btn"
+            [class.active]="viewMode === 'timeline'"
+            (click)="viewMode = 'timeline'"
+            title="Timeline View"
+          >
+            <svg lucideClock class="toggle-icon"></svg>
+            <span>Timeline</span>
+          </button>
+          <button
+            class="toggle-btn"
+            [class.active]="viewMode === 'table'"
+            (click)="viewMode = 'table'"
+            title="Table View"
+          >
+            <svg lucideList class="toggle-icon"></svg>
+            <span>Table</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Tabs Filter -->
+    <div class="category-tabs">
+      <button
+        *ngFor="let cat of categories"
+        class="cat-tab"
+        [class.active]="selectedCategory === cat.key"
+        (click)="selectedCategory = cat.key; applyFilters()"
+      >
+        <span>{{ cat.label }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT DISPLAY -->
+  <main class="log-content-area">
+
+    <!-- Empty State -->
+    <div *ngIf="filteredActivities.length === 0" class="glass-card empty-state">
+      <svg lucideInfo class="empty-icon"></svg>
+      <h3>No Activity Logs Found</h3>
+      <p>No audit trail records match your current search or filter criteria.</p>
+      <button class="btn btn-secondary btn-sm mt-16" (click)="searchQuery = ''; selectedCategory = 'ALL'; selectedStatus = 'ALL'; applyFilters()">
+        Reset Filters
+      </button>
+    </div>
+
+    <!-- 1. TIMELINE VIEW -->
+    <div *ngIf="viewMode === 'timeline' && filteredActivities.length > 0" class="timeline-container">
+      <div class="timeline-stream">
+        <div *ngFor="let item of paginatedActivities" class="timeline-item" [ngClass]="getCategoryColorClass(item.category)">
+
+          <!-- Category Icon Pillar Node -->
+          <div class="timeline-node">
+            <div class="node-badge" [ngClass]="getCategoryColorClass(item.category)">
+              <svg *ngIf="item.category === 'CASE'" lucideBriefcase class="node-icon"></svg>
+              <svg *ngIf="item.category === 'USER'" lucideUserCheck class="node-icon"></svg>
+              <svg *ngIf="item.category === 'SECURITY'" lucideShieldAlert class="node-icon"></svg>
+              <svg *ngIf="item.category === 'SYSTEM'" lucideSettings class="node-icon"></svg>
+              <svg *ngIf="item.category === 'REPORT'" lucideFileText class="node-icon"></svg>
+            </div>
+            <div class="timeline-line"></div>
+          </div>
+
+          <!-- Timeline Event Card -->
+          <div class="glass-card timeline-card">
+            <!-- Event Card Header -->
+            <div class="card-header">
+              <div class="user-meta">
+                <div class="avatar-circle">
+                  <img *ngIf="item.userAvatar" [src]="item.userAvatar" alt="User" class="avatar-img" />
+                  <span *ngIf="!item.userAvatar" class="avatar-initial">{{ item.userName.charAt(0) }}</span>
+                </div>
+                <div class="user-details">
+                  <span class="user-name">{{ item.userName }}</span>
+                  <span class="user-role">{{ item.userRole }}</span>
+                </div>
+              </div>
+
+              <div class="header-right">
+                <span class="badge" [ngClass]="getStatusBadgeClass(item.status)">
+                  <svg *ngIf="item.status === 'SUCCESS'" lucideCheckCircle2 class="badge-icon"></svg>
+                  <svg *ngIf="item.status === 'WARNING'" lucideAlertTriangle class="badge-icon"></svg>
+                  <svg *ngIf="item.status === 'FAILED'" lucideXCircle class="badge-icon"></svg>
+                  {{ item.status }}
+                </span>
+                <span class="relative-time" [title]="formatDate(item.timestamp)">
+                  {{ getRelativeTime(item.timestamp) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Event Card Body -->
+            <div class="card-body">
+              <div class="action-tag">
+                <span class="action-name">{{ item.action }}</span>
+                <span *ngIf="item.entityId" class="entity-link">
+                  <a *ngIf="item.entityType === 'Case'" [routerLink]="['/cases', item.entityId]" class="case-chip">
+                    {{ item.entityId }} ↗
+                  </a>
+                  <span *ngIf="item.entityType !== 'Case'" class="entity-chip">
+                    {{ item.entityId }}
+                  </span>
+                </span>
+              </div>
+
+              <p class="event-description">{{ item.description }}</p>
+
+              <!-- Footer Metadata Info -->
+              <div class="card-footer-info">
+                <span class="meta-item">
+                  <svg lucideClock class="meta-icon"></svg>
+                  {{ formatDate(item.timestamp) }}
+                </span>
+                <span class="meta-item">
+                  <strong>IP:</strong> {{ item.ipAddress }}
+                </span>
+                <span class="meta-item log-id">
+                  ID: {{ item.id }}
+                </span>
+
+                <button *ngIf="item.details && getObjectKeys(item.details).length > 0" class="inspect-btn" (click)="openModal(item)">
+                  <svg lucideEye class="btn-sm-icon"></svg>
+                  Inspect Payload
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TABLE VIEW -->
+    <div *ngIf="viewMode === 'table' && filteredActivities.length > 0" class="glass-card table-card">
+      <div class="table-container">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Log ID</th>
+              <th>Timestamp</th>
+              <th>User</th>
+              <th>Category</th>
+              <th>Action</th>
+              <th>Description</th>
+              <th>IP Address</th>
+              <th>Status</th>
+              <th>Payload</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of paginatedActivities">
+              <td class="font-mono text-muted">{{ item.id }}</td>
+              <td class="text-sm whitespace-nowrap">{{ formatDate(item.timestamp) }}</td>
+              <td>
+                <div class="table-user">
+                  <span class="user-bold">{{ item.userName }}</span>
+                  <span class="role-muted">{{ item.userRole }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="cat-pill" [ngClass]="getCategoryColorClass(item.category)">
+                  {{ item.category }}
+                </span>
+              </td>
+              <td class="font-medium">{{ item.action }}</td>
+              <td class="desc-cell">
+                <span class="desc-text">{{ item.description }}</span>
+                <a *ngIf="item.entityId && item.entityType === 'Case'" [routerLink]="['/cases', item.entityId]" class="table-case-link">
+                  [{{ item.entityId }}]
+                </a>
+              </td>
+              <td class="font-mono text-xs">{{ item.ipAddress }}</td>
+              <td>
+                <span class="badge" [ngClass]="getStatusBadgeClass(item.status)">
+                  {{ item.status }}
+                </span>
+              </td>
+              <td>
+                <button class="btn-icon-only" (click)="openModal(item)" title="View Details">
+                  <svg lucideEye class="icon-sm"></svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div *ngIf="filteredActivities.length > 0" class="glass-card pagination-bar mt-20">
+      <div class="pagination-info">
+        Showing <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> to
+        <strong>{{ Math.min(currentPage * itemsPerPage, filteredActivities.length) }}</strong> of
+        <strong>{{ filteredActivities.length }}</strong> logs
+      </div>
+
+      <div class="pagination-controls">
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="prevPage()">
+          Previous
+        </button>
+        <span class="page-indicator">Page {{ currentPage }} of {{ totalPages }}</span>
+        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+          Next
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- LOG PAYLOAD INSPECTOR MODAL -->
+  <div *ngIf="selectedLogModal" class="modal-overlay" (click)="closeModal()">
+    <div class="glass-card modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <svg lucideInfo class="modal-title-icon"></svg>
+          <h3>Audit Payload Details - {{ selectedLogModal.id }}</h3>
+        </div>
+        <button class="close-btn" (click)="closeModal()">
+          <svg lucideX class="close-icon"></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div class="grid-item">
+            <span class="grid-label">Timestamp</span>
+            <span class="grid-value">{{ formatDate(selectedLogModal.timestamp) }}</span>
+          </div>
+
+          <div class="grid-item">
+            <span class="grid-label">Performed By</span>
+            <span class="grid-value">{{ selectedLogModal.userName }} ({{ selectedLogModal.userRole }})</span>
+          </div>
+
+          <div class="grid-item">
+            <span class="grid-label">Category / Action</span>
+            <span class="grid-value">{{ selectedLogModal.category }} - {{ selectedLogModal.action }}</span>
+          </div>
+
+          <div class="grid-item">
+            <span class="grid-label">IP Address</span>
+            <span class="grid-value font-mono">{{ selectedLogModal.ipAddress }}</span>
+          </div>
+        </div>
+
+        <div class="description-box mt-16">
+          <span class="grid-label">Full Description</span>
+          <p class="modal-desc">{{ selectedLogModal.description }}</p>
+        </div>
+
+        <!-- JSON Payload Viewer -->
+        <div class="payload-box mt-16" *ngIf="selectedLogModal.details">
+          <span class="grid-label">Metadata Payload (JSON)</span>
+          <pre class="json-pre"><code>{{ selectedLogModal.details | json }}</code></pre>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Close Inspector</button>
+      </div>
+    </div>
+  </div>
+
+</div>
