@@ -513,3 +513,25 @@ input:checked + .slider:before {
   padding: 6px 14px;
   font-size: 13px;
 }
+
+/* Custom Input, Textarea and Select overrides for Settings Panels */
+.settings-form .form-input,
+.settings-form .form-textarea,
+.settings-form .form-select {
+  background-color: #ffffff !important;
+  color: #475569 !important; /* Grey text color */
+  border: 1px solid #cbd5e1 !important;
+}
+
+.settings-form .form-input::placeholder,
+.settings-form .form-textarea::placeholder {
+  color: #94a3b8 !important; /* Light grey placeholder text */
+}
+
+.settings-form .form-input:focus,
+.settings-form .form-textarea:focus,
+.settings-form .form-select:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+  background-color: #ffffff !important;
+}
