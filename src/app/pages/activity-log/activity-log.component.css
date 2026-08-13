@@ -252,6 +252,9 @@
   padding: 8px 12px;
   font-size: 13px;
   width: auto;
+  background-color: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
 }
 
 .view-toggle {
@@ -600,6 +603,11 @@
   padding: 16px 24px;
   flex-wrap: wrap;
   gap: 12px;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+  border-radius: 10px !important;
+  margin-top: 32px !important; /* Space between pagination and card above it */
 }
 
 .pagination-info { font-size: 14px; color: #64748b !important; }

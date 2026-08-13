@@ -123,7 +123,7 @@
 
 /* Labels */
 .bashboard, .cases, .new-case, .case-detail, 
-.reports, .activity-log, .user-management, .settings2,
+.reports, .activity-log, .user-management, .settings,
 .my-bashboard, .cases-list, .create-new-case, .close-a-case, .case-detail-view, .my-activity-log {
   font-size: 12.5px; /* Sized down for narrower bar */
   font-weight: 500;

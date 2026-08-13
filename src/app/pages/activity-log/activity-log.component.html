@@ -20,19 +20,9 @@
     </div>
 
     <div class="header-actions">
-      <button class="btn btn-secondary btn-sm" (click)="simulateLiveEvent()" title="Simulate incoming real-time audit event">
-        <svg lucideZap class="btn-icon"></svg>
-        <span>Simulate Event</span>
-      </button>
-
       <button class="btn btn-secondary btn-sm" (click)="exportToCsv()" title="Export current audit list to CSV spreadsheet">
         <svg lucideDownload class="btn-icon"></svg>
         <span>Export CSV</span>
-      </button>
-
-      <button class="btn btn-danger-soft btn-sm" (click)="clearLogs()" title="Clear audit history">
-        <svg lucideTrash2 class="btn-icon"></svg>
-        <span>Clear</span>
       </button>
     </div>
   </header>

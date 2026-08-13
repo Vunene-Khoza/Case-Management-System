@@ -41,6 +41,19 @@
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
+.filters-card .form-input,
+.filters-card .form-select {
+  background-color: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.filters-card .form-input:focus,
+.filters-card .form-select:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
 .section-title-small {
   display: flex;
   align-items: center;

@@ -69,6 +69,11 @@ To keep the codebase modular, I refactored every standalone page and component i
 * **Component Theme Sync:** Restyled settings and activity log stylesheet cards to use grey background (`#f3f4f6`) with white card borders and clear text contrast colors.
 * **Committed and Pushed:** All local folders, dependencies, and routing files committed and successfully force-pushed to the remote branch on GitHub.
 
+### 📊 Page Refinements & ECharts Integration
+* **Activity Log Upgrades:** Removed "Simulate Event" and "Clear" buttons. Configured status filter select dropdown to be white, and styled the pagination bar at the bottom to be white with `32px` vertical margin spacing.
+* **Reports Page Styling:** Forced date inputs and case type/status select lists to be white.
+* **Apache ECharts Integration:** Integrated ECharts library and replaced the static SVG donut chart with a dynamic, interactive ECharts rounded doughnut chart. The dynamic text indicator ("3 Matters") is placed perfectly in the center and is kept upright.
+
 ---
 
 ## 2. Compilation Verification Results

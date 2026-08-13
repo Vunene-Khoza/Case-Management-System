@@ -17,17 +17,17 @@
     <div class="filters-grid">
       <div class="form-group">
         <label class="form-label">Date Opened Range (From)</label>
-        <input type="date" class="form-input" [(ngModel)]="startDate" />
+        <input type="date" class="form-input" [(ngModel)]="startDate" (change)="generateReport()" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Date Opened Range (To)</label>
-        <input type="date" class="form-input" [(ngModel)]="endDate" />
+        <input type="date" class="form-input" [(ngModel)]="endDate" (change)="generateReport()" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Case Type</label>
-        <select class="form-select" [(ngModel)]="caseType">
+        <select class="form-select" [(ngModel)]="caseType" (change)="generateReport()">
           <option value="ALL">All Types</option>
           <option value="LEGAL">Legal Cases</option>
           <option value="LABOUR">Labour Cases</option>
@@ -36,19 +36,13 @@
 
       <div class="form-group">
         <label class="form-label">Status</label>
-        <select class="form-select" [(ngModel)]="status">
+        <select class="form-select" [(ngModel)]="status" (change)="generateReport()">
           <option value="ALL">All Statuses</option>
           <option value="OPEN">Open</option>
           <option value="IN_PROGRESS">In Progress</option>
           <option value="CLOSED">Closed</option>
         </select>
       </div>
-    </div>
-
-    <div class="filter-actions mt-12">
-      <button (click)="generateReport()" class="btn btn-primary">
-        <span>Generate Report</span>
-      </button>
     </div>
   </section>
 
@@ -86,55 +80,8 @@
         </h4>
         
         <div class="donut-chart-container">
-          <!-- SVG Donut Chart -->
-          <svg width="200" height="200" viewBox="0 0 200 200" class="donut-svg">
-            <!-- Outer Glow and Gradients definitions -->
-            <defs>
-              <radialGradient id="blueGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="60%" stop-color="#3b82f6" stop-opacity="1" />
-                <stop offset="100%" stop-color="#1d4ed8" stop-opacity="1" />
-              </radialGradient>
-              <radialGradient id="goldGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="60%" stop-color="#fbbf24" stop-opacity="1" />
-                <stop offset="100%" stop-color="#d97706" stop-opacity="1" />
-              </radialGradient>
-            </defs>
-
-            <!-- Background ring -->
-            <circle cx="100" cy="100" r="70" fill="transparent" stroke="rgba(255,255,255,0.03)" stroke-width="20" />
-            
-            <!-- Legal Sector (Blue) -->
-            <circle 
-              cx="100" 
-              cy="100" 
-              r="70" 
-              fill="transparent" 
-              stroke="url(#blueGlow)" 
-              stroke-width="20" 
-              [attr.stroke-dasharray]="getPieCircumference()"
-              [attr.stroke-dashoffset]="getPieOffset(0)"
-              stroke-linecap="round"
-              class="chart-segment"
-            />
-
-            <!-- Labour Sector (Gold) -->
-            <circle 
-              cx="100" 
-              cy="100" 
-              r="70" 
-              fill="transparent" 
-              stroke="url(#goldGlow)" 
-              stroke-width="20" 
-              [attr.stroke-dasharray]="getPieCircumference()"
-              [attr.stroke-dashoffset]="getPieOffset(1)"
-              stroke-linecap="round"
-              class="chart-segment"
-            />
-
-            <!-- Center Text -->
-            <text x="100" y="95" text-anchor="middle" class="donut-center-num">{{ summaryData.totalCases }}</text>
-            <text x="100" y="115" text-anchor="middle" class="donut-center-lbl">MATTERS</text>
-          </svg>
+          <!-- ECharts Donut Chart -->
+          <div #chartContainer style="width: 200px; height: 200px; margin: 0 auto;"></div>
 
           <!-- Legend -->
           <div class="chart-legend">
@@ -149,40 +96,16 @@
         </div>
       </div>
 
-      <!-- Chart 2: Monthly Cases Bar Chart (SVG Columns) -->
+      <!-- Chart 2: Monthly Cases Bar Chart (ECharts Bar) -->
       <div class="glass-card chart-card">
         <h4 class="chart-title">
           <svg lucideBarChart3 class="chart-title-icon"></svg>
           <span>Monthly Volume Trends</span>
         </h4>
         
-        <div class="bar-chart-container">
-          <div class="bar-chart-y-axis">
-            <span>{{ getMaxCount() }}</span>
-            <span>{{ Math.round(getMaxCount() / 2) }}</span>
-            <span>0</span>
-          </div>
-          
-          <div class="bar-chart-visual">
-            <div class="bar-column" *ngFor="let bar of summaryData.monthlyCasesChart">
-              <div class="bar-fill-wrapper">
-                <!-- Actual bar representation -->
-                <div 
-                  class="bar-fill" 
-                  [style.height.%]="getBarHeightPercentage(bar.count)"
-                  [attr.data-count]="bar.count"
-                  [title]="bar.count + ' cases opened in ' + bar.month"
-                >
-                  <span class="bar-tooltip">{{ bar.count }} cases</span>
-                </div>
-              </div>
-              <span class="bar-label">{{ formatMonthLabel(bar.month) }}</span>
-            </div>
-
-            <div class="empty-chart" *ngIf="summaryData.monthlyCasesChart.length === 0">
-              No date ranges found in results.
-            </div>
-          </div>
+        <div class="bar-chart-container" style="width: 100%; height: 260px;">
+          <!-- ECharts container -->
+          <div #barChartContainer style="width: 100%; height: 100%;"></div>
         </div>
       </div>
     </section>
