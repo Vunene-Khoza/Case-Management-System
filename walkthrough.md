@@ -59,6 +59,16 @@ To keep the codebase modular, I refactored every standalone page and component i
 * **Structured Columns:** Reorganized the cases list table to display exactly the columns requested (`CASE ID`, `EMPLOYEE`, `EMPLOYEE NO`, `TYPE`, `CLASSIFICATION`, `STATUS`, `DATE OPENED`, `TRIAL DATE`, `ACTION`).
 * **Compact Table Presentation:** Reduced cell padding to `8px 12px` and shrank text fonts, badge paddings, and button dimensions to render a data-dense layout.
 
+### 🖥️ Page Backgrounds & Cards Theme Sync
+* **Synced Core Layout Blocks:** Updated Dashboard, Reports, and User Management page layouts to use the clean grey background (`#f3f4f6`) and card/block segments to be pure white (`#ffffff`).
+* **Enhanced Visual Spacing:** Refined text contrast parameters, alert listings, and metric layouts to keep visual presentation uniform across the entire app.
+
+### ⚙️ Settings & Activity Log Integration
+* **Router Registration:** Registered `/settings` and `/activity-log` routes under [`app.routes.ts`](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents%20-%20GitHub/Case-Management-System/src/app/app.routes.ts).
+* **Sidebar Menu Activation:** Replaced placeholder `javascript:void(0)` links inside [`sidebar.component.html`](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents%20-%20GitHub/Case-Management-System/src/app/components/sidebar/sidebar.component.html) with active router links.
+* **Component Theme Sync:** Restyled settings and activity log stylesheet cards to use grey background (`#f3f4f6`) with white card borders and clear text contrast colors.
+* **Committed and Pushed:** All local folders, dependencies, and routing files committed and successfully force-pushed to the remote branch on GitHub.
+
 ---
 
 ## 2. Compilation Verification Results
