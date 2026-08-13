@@ -2,6 +2,19 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  background: #f3f4f6; /* Grey background */
+  min-height: 100vh;
+  margin: -32px;
+  padding: 32px;
+  width: calc(100% + 64px);
+}
+
+@media (max-width: 992px) {
+  .reports-page {
+    margin: -16px;
+    padding: 16px;
+    width: calc(100% + 32px);
+  }
 }
 
 .page-header {
@@ -11,17 +24,21 @@
 .page-title {
   font-size: 28px;
   font-weight: 700;
+  color: #0f172a !important; /* Dark Slate */
 }
 
 .page-subtitle {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: #64748b !important; /* Muted Slate */
   margin-top: 4px;
 }
 
 /* Filters Card */
 .filters-card {
   padding: 24px;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
 .section-title-small {
@@ -30,11 +47,11 @@
   gap: 10px;
   font-size: 15px;
   font-weight: 600;
-  color: var(--accent-gold);
+  color: #475569 !important; /* Muted slate instead of gold */
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 20px;
-  border-bottom: 1px solid var(--border-glass);
+  border-bottom: 1px solid #e2e8f0 !important;
   padding-bottom: 10px;
 }
 
@@ -75,12 +92,15 @@
   padding: 20px;
   border-radius: var(--radius-sm);
   text-align: center;
+  background-color: #ffffff !important; /* White card */
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
 .metric-label {
   font-size: 12px;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: #64748b !important; /* Muted Slate */
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -88,14 +108,14 @@
 .metric-value {
   font-size: 24px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #0f172a !important; /* Dark Slate */
   margin-top: 6px;
   font-family: var(--font-family-title);
 }
 
-.text-info { color: var(--color-info); }
-.text-success { color: var(--color-success); }
-.text-gold { color: var(--accent-gold); }
+.text-info { color: var(--accent-blue) !important; }
+.text-success { color: var(--color-success) !important; }
+.text-gold { color: var(--accent-gold) !important; }
 
 /* Chart Layout */
 .charts-container-grid {
@@ -114,6 +134,9 @@
   padding: 24px;
   display: flex;
   flex-direction: column;
+  background-color: #ffffff !important; /* White card */
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
 .chart-title {
@@ -122,8 +145,8 @@
   gap: 10px;
   font-size: 16px;
   font-weight: 600;
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border-glass);
+  color: #0f172a !important; /* Dark Slate */
+  border-bottom: 1px solid #e2e8f0 !important;
   padding-bottom: 12px;
   margin-bottom: 24px;
 }
@@ -159,14 +182,14 @@
 }
 
 .donut-center-num {
-  fill: var(--text-primary);
+  fill: #0f172a !important; /* Dark Slate */
   font-size: 28px;
   font-weight: bold;
   font-family: var(--font-family-title);
 }
 
 .donut-center-lbl {
-  fill: var(--text-muted);
+  fill: #64748b !important;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -203,12 +226,12 @@
 .legend-name {
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-primary);
+  color: #334155 !important;
 }
 
 .legend-val {
   font-size: 12px;
-  color: var(--text-secondary);
+  color: #64748b !important;
 }
 
 /* Bar Chart styles */
@@ -224,7 +247,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  color: var(--text-muted);
+  color: #64748b !important;
   font-size: 11px;
   padding-bottom: 24px;
   text-align: right;
@@ -236,7 +259,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  border-bottom: 1px solid var(--border-glass);
+  border-bottom: 1px solid #cbd5e1 !important;
   padding-bottom: 2px;
   gap: 10px;
   height: calc(100% - 24px);
@@ -280,9 +303,9 @@
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(-6px);
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-glass);
-  color: var(--text-primary);
+  background-color: #0f172a !important;
+  border: 1px solid #0f172a !important;
+  color: #ffffff !important;
   font-size: 11px;
   padding: 4px 8px;
   border-radius: 4px;
@@ -301,7 +324,7 @@
 
 .bar-label {
   font-size: 11px;
-  color: var(--text-muted);
+  color: #64748b !important;
   margin-top: 10px;
   white-space: nowrap;
   position: absolute;
@@ -314,7 +337,7 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  color: var(--text-muted);
+  color: #94a3b8 !important;
   font-style: italic;
   font-size: 13px;
 }
@@ -322,16 +345,20 @@
 /* Export Options Card */
 .export-section {
   padding: 24px;
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
 .export-title {
   font-size: 16px;
   font-weight: 600;
+  color: #0f172a !important;
 }
 
 .export-desc {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: #64748b !important;
   margin-top: 4px;
   margin-bottom: 20px;
 }
