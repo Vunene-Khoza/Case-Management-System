@@ -1,7 +1,7 @@
-<aside class="sidebar-container">
+<aside class="sidebar-container" [class.collapsed]="isCollapsed">
   <div class="section-1">
     <!-- Logo block -->
-    <div class="univen-logo-1">
+    <div class="univen-logo-1" (click)="toggleSidebar()" style="cursor: pointer;">
       <img class="logo-image" src="logo/University_of_Venda_logo.svg" alt="University of Venda Logo" />
     </div>
     <div class="case-management">CASE MANAGEMENT</div>

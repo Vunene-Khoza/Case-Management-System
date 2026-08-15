@@ -8,6 +8,7 @@
   border-right: 1px solid var(--border-glass);
   z-index: 100;
   overflow-y: hidden;
+  transition: var(--transition-normal);
 }
 
 .section-1 {
@@ -175,4 +176,89 @@
   font-size: 9.5px; /* Reduced from 10px */
   color: var(--accent-gold);
   font-weight: 500;
+}
+
+/* ==========================================================================
+   COLLAPSED STATE OVERRIDES
+   ========================================================================== */
+
+.sidebar-container.collapsed {
+  width: 70px !important;
+}
+
+/* Logo adjustments */
+.sidebar-container.collapsed .case-management {
+  display: none !important;
+}
+
+.sidebar-container.collapsed .univen-logo-1 {
+  margin-bottom: 12px !important;
+  justify-content: center !important;
+}
+
+.sidebar-container.collapsed .logo-image {
+  max-width: 32px !important;
+  max-height: 32px !important;
+}
+
+/* Category headers */
+.sidebar-container.collapsed .main,
+.sidebar-container.collapsed .insights,
+.sidebar-container.collapsed .admin,
+.sidebar-container.collapsed .overview,
+.sidebar-container.collapsed .case-work,
+.sidebar-container.collapsed .activity {
+  display: none !important;
+}
+
+/* Menu links & icon centering */
+.sidebar-container.collapsed .menu-item {
+  justify-content: center !important;
+  gap: 0 !important;
+  padding: 10px !important;
+}
+
+.sidebar-container.collapsed .menu-icon {
+  margin: 0 !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Text labels hide */
+.sidebar-container.collapsed .bashboard,
+.sidebar-container.collapsed .cases,
+.sidebar-container.collapsed .new-case,
+.sidebar-container.collapsed .case-detail,
+.sidebar-container.collapsed .reports,
+.sidebar-container.collapsed .activity-log,
+.sidebar-container.collapsed .user-management,
+.sidebar-container.collapsed .settings,
+.sidebar-container.collapsed .my-bashboard,
+.sidebar-container.collapsed .cases-list,
+.sidebar-container.collapsed .create-new-case,
+.sidebar-container.collapsed .close-a-case,
+.sidebar-container.collapsed .case-detail-view,
+.sidebar-container.collapsed .my-activity-log {
+  display: none !important;
+}
+
+/* Profile footer footer centering */
+.sidebar-container.collapsed .profile-section {
+  padding-top: 0 !important;
+}
+
+.sidebar-container.collapsed .line-1 {
+  display: none !important;
+}
+
+.sidebar-container.collapsed .profile-box {
+  justify-content: center !important;
+}
+
+.sidebar-container.collapsed .profile-info {
+  display: none !important;
+}
+
+.sidebar-container.collapsed .profile {
+  margin: 0 !important;
 }

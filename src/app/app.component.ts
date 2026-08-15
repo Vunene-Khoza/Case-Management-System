@@ -8,8 +8,8 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [RouterOutlet, SidebarComponent, CommonModule],
   template: `
-    <div class="app-container" [class.no-sidebar]="isLoginPage">
-      <app-sidebar *ngIf="!isLoginPage"></app-sidebar>
+    <div class="app-container" [class.no-sidebar]="isLoginPage" [class.sidebar-collapsed]="isSidebarCollapsed">
+      <app-sidebar *ngIf="!isLoginPage" (collapsedChange)="isSidebarCollapsed = $event"></app-sidebar>
       <main class="main-content" style="width: 100%; min-height: 100vh;">
         <router-outlet></router-outlet>
       </main>
@@ -18,6 +18,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AppComponent implements OnInit {
   isLoginPage = false;
+  isSidebarCollapsed = false;
 
   constructor(private router: Router) {}
 

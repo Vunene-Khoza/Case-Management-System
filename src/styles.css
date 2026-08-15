@@ -163,6 +163,10 @@ p {
   transition: var(--transition-normal);
 }
 
+.app-container.sidebar-collapsed .main-content {
+  margin-left: 70px;
+}
+
 .app-container.no-sidebar .main-content {
   margin-left: 0 !important;
   padding: 0 !important;

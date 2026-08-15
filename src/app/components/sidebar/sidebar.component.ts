@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CaseService } from '../../services/case.service';
@@ -14,6 +14,8 @@ import { User } from '../../models/case.model';
 })
 export class SidebarComponent implements OnInit {
   currentUser!: User;
+  isCollapsed = false;
+  @Output() collapsedChange = new EventEmitter<boolean>();
 
   constructor(
     private caseService: CaseService,
@@ -23,6 +25,11 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit() {
     this.currentUser = this.caseService.getCurrentUser();
+  }
+
+  toggleSidebar() {
+    this.isCollapsed = !this.isCollapsed;
+    this.collapsedChange.emit(this.isCollapsed);
   }
 
   logout() {
