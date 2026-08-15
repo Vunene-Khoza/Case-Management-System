@@ -74,6 +74,11 @@ To keep the codebase modular, I refactored every standalone page and component i
 * **Reports Page Styling:** Forced date inputs and case type/status select lists to be white.
 * **Apache ECharts Integration:** Integrated ECharts library and replaced the static SVG donut chart with a dynamic, interactive ECharts rounded doughnut chart. The dynamic text indicator ("3 Matters") is placed perfectly in the center and is kept upright.
 
+### ↔️ Collapsible Sidebar Integration
+* **Logo Click Toggle:** Wrapped the UNIVEN logo inside [`sidebar.component.html`](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents%20-%20GitHub/Case-Management-System/src/app/components/sidebar/sidebar.component.html) inside a click event handler to toggle the collapse state flag.
+* **Core Event Binding:** Set up a `collapsedChange` event emitter in [`sidebar.component.ts`](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents%20-%20GitHub/Case-Management-System/src/app/components/sidebar/sidebar.component.ts) which is captured by the master wrapper inside [`app.component.ts`](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents%20-%20GitHub/Case-Management-System/src/app/app.component.ts).
+* **Responsive Spacing Shifts:** Custom-styled the sidebar CSS overrides to collapse width to `70px` and hide category headers, text labels, line dividers, and profile info blocks, leaving centered icon modules. Shifts the main content margins using fluid transitions in [`styles.css`](file:///C:/Users/vunene.khoza/OneDrive%20-%20University%20of%20Venda/Documents%20-%20GitHub/Case-Management-System/src/styles.css).
+
 ---
 
 ## 2. Compilation Verification Results
