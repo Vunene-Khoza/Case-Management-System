@@ -52,7 +52,7 @@
   margin-bottom: 12px; /* Reduced from 16px */
 }
 
-.main, .insights, .admin, .overview, .case-work, .activity {
+.main, .insights, .admin, .overview, .case-work, .activity, .role-access, .monitoring, .user-control {
   font-family: var(--font-family-title);
   font-size: 9px; /* Reduced from 10px */
   font-weight: 700;
@@ -207,7 +207,10 @@
 .sidebar-container.collapsed .admin,
 .sidebar-container.collapsed .overview,
 .sidebar-container.collapsed .case-work,
-.sidebar-container.collapsed .activity {
+.sidebar-container.collapsed .activity,
+.sidebar-container.collapsed .role-access,
+.sidebar-container.collapsed .monitoring,
+.sidebar-container.collapsed .user-control {
   display: none !important;
 }
 
@@ -261,4 +264,46 @@
 
 .sidebar-container.collapsed .profile {
   margin: 0 !important;
+}
+
+/* Super Admin status badges */
+.live-badge {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-left: auto;
+  animation: pulse-live 1.5s infinite;
+}
+
+.count-badge {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 9999px;
+  margin-left: auto;
+}
+
+.count-badge.badge-warning {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: var(--accent-gold) !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+
+@keyframes pulse-live {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Collapsed state badge hides */
+.sidebar-container.collapsed .live-badge,
+.sidebar-container.collapsed .count-badge {
+  display: none !important;
 }

@@ -16,6 +16,8 @@ export class SidebarComponent implements OnInit {
   currentUser!: User;
   isCollapsed = false;
   @Output() collapsedChange = new EventEmitter<boolean>();
+  totalUsersCount = 12;
+  pendingApprovalsCount = 3;
 
   constructor(
     private caseService: CaseService,

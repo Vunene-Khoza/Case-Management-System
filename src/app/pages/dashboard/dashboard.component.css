@@ -324,3 +324,608 @@
 .custom-table tbody tr:hover {
   background-color: #f8fafc !important;
 }
+
+/* ==========================================================================
+   SUPER ADMIN DASHBOARD STYLES (Modern Responsive Layout)
+   ========================================================================== */
+
+/* Super Admin Header Row */
+.sa-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.sa-header-text {
+  flex: 1;
+}
+
+.system-dashboard {
+  color: #f8fafc !important; /* Premium light color */
+  font-family: var(--font-family-title);
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.complete-operational-overview-all-roles-all-cases-all-activity {
+  color: #94a3b8 !important; /* Muted Slate */
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.sa-header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Actions buttons styling */
+.button-background-color {
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  padding: 8px 16px;
+  color: #334155;
+  font-family: var(--font-family-body);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.button-background-color:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.button-background-color2 {
+  background: #5b4fe8;
+  border-radius: 6px;
+  padding: 8px 16px;
+  color: #ffffff;
+  font-family: var(--font-family-body);
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.button-background-color2:hover {
+  background-color: #4b3fd3;
+}
+
+/* Metrics Grid (5 column fluid layout) */
+.sa-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1200px) {
+  .sa-metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .sa-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.container-background-color,
+.container-background-color3,
+.container-background-color5,
+.container-background-color7,
+.container-background-color9 {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.total-users,
+.active-users,
+.pending-approvals,
+.inactive-accounts,
+.total-cases {
+  color: #94a3b8 !important;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+._12,
+._10,
+._3,
+._2,
+._120 {
+  color: #f8fafc !important;
+  font-family: var(--font-family-title);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.all-roles-combined,
+.currently-enabled,
+.awaiting-review,
+.suspended-access,
+.system-wide {
+  color: #64748b !important;
+  font-size: 12px;
+}
+
+/* Accent bottom lines */
+.pseudo-after-background-color {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #5b4fe8;
+}
+
+.pseudo-after-background-color2 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #059669;
+}
+
+.pseudo-after-background-color3 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #d97706;
+}
+
+.pseudo-after-background-color4 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #dc2626;
+}
+
+.pseudo-after-background-color5 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #c9960c;
+}
+
+/* Main Split Grid */
+.sa-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 992px) {
+  .sa-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.container-background-color11,
+.container-background-color21 {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+}
+
+.sa-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.container8,
+.container19 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-icon {
+  font-size: 16px;
+}
+
+.users-by-role,
+.live-activity-feed {
+  color: #f8fafc !important;
+  font-family: var(--font-family-title);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Small header links */
+.button,
+.button2 {
+  color: var(--accent-blue) !important;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.button:hover,
+.button2:hover {
+  color: var(--accent-blue-hover) !important;
+}
+
+/* Users by Role rows */
+.sa-role-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.role-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.role-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.role-left-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.role-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.bg-super-admin { background-color: #5b4fe8; }
+.bg-admin { background-color: #10b981; }
+.bg-legal-officer { background-color: #3b82f6; }
+.bg-viewer { background-color: #6b7280; }
+
+.role-name {
+  color: #cbd5e1 !important;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.role-count {
+  color: #cbd5e1 !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.fill-super-admin { background-color: #5b4fe8; }
+.fill-admin { background-color: #10b981; }
+.fill-legal-officer { background-color: #3b82f6; }
+.fill-viewer { background-color: #6b7280; }
+
+/* Live Activity Feed Items */
+.container20 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 310px;
+  overflow-y: auto;
+}
+
+.feed-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.feed-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.feed-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.bg-pulse {
+  background-color: #5b4fe8;
+  animation: pulse-live 1.5s infinite;
+}
+
+.bg-gold { background-color: #fbbf24; }
+.bg-green { background-color: #10b981; }
+.bg-yellow { background-color: #d97706; }
+
+.feed-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.feed-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feed-username {
+  color: #f8fafc !important;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Micro badges inside feed */
+.span-background-color,
+.span-background-color2,
+.span-background-color3 {
+  padding: 1px 6px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.span-background-color {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.span-background-color2 {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.span-background-color3 {
+  background-color: rgba(91, 79, 232, 0.15);
+  color: #818cf8;
+}
+
+.feed-message {
+  color: #cbd5e1 !important;
+  font-size: 13px;
+}
+
+.feed-timestamp {
+  color: #64748b !important;
+  font-size: 11px;
+}
+
+/* Pending Registration Approvals Box */
+.container-background-color25 {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  margin-top: 8px;
+}
+
+.sa-approvals-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.approvals-header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pending-registration-approvals {
+  color: #f8fafc !important;
+  font-family: var(--font-family-title);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.users-awaiting-account-activation {
+  color: #94a3b8 !important;
+  font-size: 12px;
+}
+
+.button-background-color3 {
+  color: var(--accent-blue) !important;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.button-background-color3:hover {
+  color: var(--accent-blue-hover) !important;
+}
+
+.sa-approvals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.container-background-color26,
+.container-background-color28 {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: var(--transition-fast);
+}
+
+.container-background-color26:hover,
+.container-background-color28:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family-title);
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.bg-avatar-blue { background-color: #1e3a8a; }
+.bg-avatar-grey { background-color: #475569; }
+
+.container31 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vhutshilo-sinthumule,
+.ndidzulafhi-baloyi {
+  color: #f8fafc !important;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.container32 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.legal-officer2,
+.viewer2 {
+  color: #cbd5e1 !important;
+  font-size: 11px;
+  font-weight: 500;
+  background-color: rgba(255, 255, 255, 0.06);
+  padding: 1px 8px;
+  border-radius: 4px;
+}
+
+.meta-dot {
+  width: 3px;
+  height: 3px;
+  background-color: #64748b;
+  border-radius: 50%;
+}
+
+.vs-univen-ac-za,
+.nb-univen-ac-za,
+._1-jun-2026,
+._31-may-2026 {
+  color: #94a3b8 !important;
+  font-size: 12px;
+}
+
+/* Action buttons for Approvals */
+.container33 {
+  display: flex;
+  gap: 10px;
+}
+
+.button-background-color4 {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 6px;
+  padding: 6px 14px;
+  color: #34d399;
+  font-family: var(--font-family-body);
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.button-background-color4:hover {
+  background: rgba(16, 185, 129, 0.25);
+}
+
+.button-background-color5 {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  padding: 6px 14px;
+  color: #f87171;
+  font-family: var(--font-family-body);
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.button-background-color5:hover {
+  background: rgba(239, 68, 68, 0.25);
+}

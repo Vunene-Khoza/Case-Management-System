@@ -1,191 +1,463 @@
 <div class="dashboard-page">
-  <!-- Header Area -->
-  <header class="page-header">
-    <div>
-      <h1 class="page-title">University of Venda Legal System</h1>
-      <p class="page-subtitle">Welcome back, {{ currentUserName }}. Here is a summary of active legal & labour matters.</p>
-    </div>
-    <div class="header-actions">
-      <a routerLink="/cases/create" class="btn btn-primary">
-        <span>+ Create New Case</span>
-      </a>
-    </div>
-  </header>
-
-  <!-- Skeleton Loading State -->
-  <ng-container *ngIf="loading; else dashboardContent">
-    <!-- Summary Grid Skeleton -->
-    <section class="summary-grid">
-      <div class="glass-card stat-card" *ngFor="let i of [1, 2, 3, 4]">
-        <div class="skeleton" style="width: 54px; height: 54px; border-radius: var(--radius-sm);"></div>
-        <div class="stat-data" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-          <div class="skeleton" style="width: 60%; height: 12px;"></div>
-          <div class="skeleton" style="width: 40%; height: 24px;"></div>
-        </div>
+  <!-- ==================== SUPER ADMIN DASHBOARD ==================== -->
+  <ng-container *ngIf="currentUserRole === 'SUPER_ADMIN'; else standardDashboard">
+    <!-- Super Admin Header -->
+    <div class="sa-header">
+      <div class="sa-header-text">
+        <h1 class="system-dashboard">System Dashboard</h1>
+        <p class="complete-operational-overview-all-roles-all-cases-all-activity">
+          Complete operational overview — all roles, all cases, all activity
+        </p>
       </div>
-    </section>
+      <div class="sa-header-actions">
+        <a routerLink="/activity-log" class="button-background-color">
+          <span class="view-full-log">View Full Log</span>
+        </a>
+        <a routerLink="/users/create" class="button-background-color2">
+          <span class="create-user">Create User</span>
+        </a>
+      </div>
+    </div>
 
-    <!-- Split Grid Skeleton -->
-    <div class="dashboard-content-split">
-      <!-- Left Table Skeleton -->
-      <div class="glass-card">
-        <div class="skeleton" style="width: 150px; height: 20px; margin-bottom: 24px;"></div>
-        <div style="display: flex; flex-direction: column; gap: 16px;">
-          <div *ngFor="let r of [1, 2, 3, 4, 5]" style="display: flex; gap: 16px; align-items: center;">
-            <div class="skeleton" style="width: 60px; height: 16px;"></div>
-            <div class="skeleton" style="flex: 2; height: 16px;"></div>
-            <div class="skeleton" style="flex: 1; height: 16px;"></div>
-            <div class="skeleton" style="flex: 1; height: 16px;"></div>
-            <div class="skeleton" style="width: 80px; height: 28px; border-radius: var(--radius-sm);"></div>
+    <!-- Super Admin Metrics Grid -->
+    <div class="sa-metrics-grid">
+      <div class="container-background-color">
+        <div class="total-users">Total Users</div>
+        <div class="_12">12</div>
+        <div class="all-roles-combined">All roles combined</div>
+        <div class="pseudo-after-background-color"></div>
+      </div>
+      <div class="container-background-color3">
+        <div class="active-users">Active Users</div>
+        <div class="_10">10</div>
+        <div class="currently-enabled">Currently enabled</div>
+        <div class="pseudo-after-background-color2"></div>
+      </div>
+      <div class="container-background-color5">
+        <div class="pending-approvals">Pending Approvals</div>
+        <div class="_3">3</div>
+        <div class="awaiting-review">Awaiting review</div>
+        <div class="pseudo-after-background-color3"></div>
+      </div>
+      <div class="container-background-color7">
+        <div class="inactive-accounts">Inactive Accounts</div>
+        <div class="_2">2</div>
+        <div class="suspended-access">Suspended access</div>
+        <div class="pseudo-after-background-color4"></div>
+      </div>
+      <div class="container-background-color9">
+        <div class="total-cases">Total Cases</div>
+        <div class="_120">120</div>
+        <div class="system-wide">System-wide</div>
+        <div class="pseudo-after-background-color5"></div>
+      </div>
+    </div>
+
+    <!-- Super Admin Panels (Users by Role & Live Feed) -->
+    <div class="sa-main-grid">
+      <!-- Left Panel: Users by Role -->
+      <div class="container-background-color11">
+        <div class="sa-panel-header">
+          <div class="container8">
+            <span class="panel-icon">📊</span>
+            <div class="users-by-role">Users by Role</div>
+          </div>
+          <a routerLink="/users" class="button">
+            <span class="manage-all">Manage all</span>
+          </a>
+        </div>
+        
+        <div class="sa-role-list">
+          <!-- Super Admin -->
+          <div class="role-row">
+            <div class="role-details">
+              <div class="role-left-group">
+                <span class="role-indicator bg-super-admin"></span>
+                <span class="role-name">Super Admin</span>
+              </div>
+              <span class="role-count">1</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill fill-super-admin" style="width: 8.3%"></div>
+            </div>
+          </div>
+          <!-- Admin -->
+          <div class="role-row">
+            <div class="role-details">
+              <div class="role-left-group">
+                <span class="role-indicator bg-admin"></span>
+                <span class="role-name">Admin</span>
+              </div>
+              <span class="role-count">3</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill fill-admin" style="width: 25%"></div>
+            </div>
+          </div>
+          <!-- Legal Officer -->
+          <div class="role-row">
+            <div class="role-details">
+              <div class="role-left-group">
+                <span class="role-indicator bg-legal-officer"></span>
+                <span class="role-name">Legal Officer</span>
+              </div>
+              <span class="role-count">6</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill fill-legal-officer" style="width: 50%"></div>
+            </div>
+          </div>
+          <!-- Viewer -->
+          <div class="role-row">
+            <div class="role-details">
+              <div class="role-left-group">
+                <span class="role-indicator bg-viewer"></span>
+                <span class="role-name">Viewer</span>
+              </div>
+              <span class="role-count">2</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill fill-viewer" style="width: 16.7%"></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Right Alerts Skeleton -->
-      <div class="glass-card">
-        <div class="skeleton" style="width: 180px; height: 20px; margin-bottom: 24px;"></div>
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-          <div *ngFor="let a of [1, 2, 3]" style="display: flex; gap: 12px;">
-            <div class="skeleton" style="width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0;"></div>
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-              <div class="skeleton" style="width: 90%; height: 12px;"></div>
-              <div class="skeleton" style="width: 70%; height: 12px;"></div>
-              <div class="skeleton" style="width: 30%; height: 10px;"></div>
+      <!-- Right Panel: Live Activity Feed -->
+      <div class="container-background-color21">
+        <div class="sa-panel-header">
+          <div class="container19">
+            <span class="panel-icon">⚡</span>
+            <div class="live-activity-feed">Live Activity Feed</div>
+          </div>
+          <a routerLink="/activity-log" class="button2">
+            <span class="full-log">Full log</span>
+          </a>
+        </div>
+        
+        <div class="container20">
+          <!-- Feed Item 1 -->
+          <div class="feed-item">
+            <div class="feed-indicator bg-pulse"></div>
+            <div class="feed-content-wrapper">
+              <div class="feed-meta-row">
+                <span class="feed-username">T. Avhashoni</span>
+                <span class="span-background-color">
+                  <span class="officer">Officer</span>
+                </span>
+              </div>
+              <p class="feed-message">Note added to Case C001</p>
+              <span class="feed-timestamp">2026-06-02 · 14:22</span>
             </div>
+          </div>
+
+          <!-- Feed Item 2 -->
+          <div class="feed-item">
+            <div class="feed-indicator bg-gold"></div>
+            <div class="feed-content-wrapper">
+              <div class="feed-meta-row">
+                <span class="feed-username">R.E. Mukosi</span>
+                <span class="span-background-color2">
+                  <span class="admin2">Admin</span>
+                </span>
+              </div>
+              <p class="feed-message">Logged in to system</p>
+              <span class="feed-timestamp">2026-06-02 · 08:14</span>
+            </div>
+          </div>
+
+          <!-- Feed Item 3 -->
+          <div class="feed-item">
+            <div class="feed-indicator bg-green"></div>
+            <div class="feed-content-wrapper">
+              <div class="feed-meta-row">
+                <span class="feed-username">S. Mukosi</span>
+                <span class="span-background-color3">
+                  <span class="super-admin2">Super Admin</span>
+                </span>
+              </div>
+              <p class="feed-message">Approved registration — N. Baloyi (Viewer)</p>
+              <span class="feed-timestamp">2026-06-01 · 17:05</span>
+            </div>
+          </div>
+
+          <!-- Feed Item 4 -->
+          <div class="feed-item">
+            <div class="feed-indicator bg-yellow"></div>
+            <div class="feed-content-wrapper">
+              <div class="feed-meta-row">
+                <span class="feed-username">T. Avhashoni</span>
+                <span class="span-background-color">
+                  <span class="officer">Officer</span>
+                </span>
+              </div>
+              <p class="feed-message">Case C019 closed — Total cost R 8,200</p>
+              <span class="feed-timestamp">2026-05-30 · 13:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Super Admin Pending Registration Approvals -->
+    <div class="container-background-color25">
+      <div class="sa-approvals-header">
+        <div class="approvals-header-title">
+          <div class="container29">
+            <span class="panel-icon">⏳</span>
+            <div class="pending-registration-approvals">Pending Registration Approvals</div>
+          </div>
+          <p class="users-awaiting-account-activation">Users awaiting account activation</p>
+        </div>
+        <a routerLink="/users" class="button-background-color3">
+          <span class="view-all">View all</span>
+        </a>
+      </div>
+
+      <div class="sa-approvals-list">
+        <!-- Vhutshilo Sinthumule -->
+        <div class="container-background-color26">
+          <div class="avatar-circle bg-avatar-blue">
+            <span class="vs">VS</span>
+          </div>
+          <div class="container31">
+            <div class="vhutshilo-sinthumule">Vhutshilo Sinthumule</div>
+            <div class="container32">
+              <span class="legal-officer2">Legal Officer</span>
+              <span class="meta-dot"></span>
+              <span class="vs-univen-ac-za">vs&#64;univen.ac.za</span>
+              <span class="meta-dot"></span>
+              <span class="_1-jun-2026">1 Jun 2026</span>
+            </div>
+          </div>
+          <div class="container33">
+            <button class="button-background-color4">
+              <span class="approve">Approve</span>
+            </button>
+            <button class="button-background-color5">
+              <span class="reject">Reject</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ndidzulafhi Baloyi -->
+        <div class="container-background-color28">
+          <div class="avatar-circle bg-avatar-grey">
+            <span class="nb">NB</span>
+          </div>
+          <div class="container31">
+            <div class="ndidzulafhi-baloyi">Ndidzulafhi Baloyi</div>
+            <div class="container32">
+              <span class="viewer2">Viewer</span>
+              <span class="meta-dot"></span>
+              <span class="nb-univen-ac-za">nb&#64;univen.ac.za</span>
+              <span class="meta-dot"></span>
+              <span class="_31-may-2026">31 May 2026</span>
+            </div>
+          </div>
+          <div class="container33">
+            <button class="button-background-color4">
+              <span class="approve">Approve</span>
+            </button>
+            <button class="button-background-color5">
+              <span class="reject">Reject</span>
+            </button>
           </div>
         </div>
       </div>
     </div>
   </ng-container>
 
-  <!-- Actual Dashboard Content -->
-  <ng-template #dashboardContent>
-    <!-- Summary Grid Cards -->
-    <section class="summary-grid">
-      <div class="glass-card stat-card card-total">
-        <div class="stat-icon-wrapper">
-          <svg lucideBriefcase class="stat-icon"></svg>
-        </div>
-        <div class="stat-data">
-          <span class="stat-label">Total Cases</span>
-          <h2 class="stat-value">{{ metrics.totalCases }}</h2>
-        </div>
+  <!-- ==================== STANDARD DASHBOARD ==================== -->
+  <ng-template #standardDashboard>
+    <!-- Header Area -->
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">University of Venda Legal System</h1>
+        <p class="page-subtitle">Welcome back, {{ currentUserName }}. Here is a summary of active legal & labour matters.</p>
       </div>
-
-      <div class="glass-card stat-card card-open">
-        <div class="stat-icon-wrapper">
-          <svg lucideAlertCircle class="stat-icon"></svg>
-        </div>
-        <div class="stat-data">
-          <span class="stat-label">Open / In Progress</span>
-          <h2 class="stat-value">{{ metrics.openCases }}</h2>
-        </div>
+      <div class="header-actions">
+        <a routerLink="/cases/create" class="btn btn-primary">
+          <span>+ Create New Case</span>
+        </a>
       </div>
+    </header>
 
-      <div class="glass-card stat-card card-closed">
-        <div class="stat-icon-wrapper">
-          <svg lucideCheckCircle class="stat-icon"></svg>
-        </div>
-        <div class="stat-data">
-          <span class="stat-label">Closed Cases</span>
-          <h2 class="stat-value">{{ metrics.closedCases }}</h2>
-        </div>
-      </div>
-
-      <div class="glass-card stat-card card-cost">
-        <div class="stat-icon-wrapper">
-          <svg lucideDollarSign class="stat-icon"></svg>
-        </div>
-        <div class="stat-data">
-          <span class="stat-label">Total Costing (ZAR)</span>
-          <h2 class="stat-value">R {{ formatCost(metrics.totalCost) }}</h2>
-        </div>
-      </div>
-    </section>
-
-    <!-- Main Dashboard Content (Split Layout) -->
-    <div class="dashboard-content-split">
-      
-      <!-- Left: Recent Cases Table -->
-      <section class="dashboard-left glass-card">
-        <div class="section-header">
-          <h3 class="section-title">Recent Cases</h3>
-          <a routerLink="/cases" class="view-all-link">
-            <span>View All</span>
-            <svg lucideArrowRight class="link-icon"></svg>
-          </a>
-        </div>
-
-        <div class="table-container">
-          <table class="custom-table">
-            <thead>
-              <tr>
-                <th>Case ID</th>
-                <th>Employee</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Trial Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let case of metrics.recentCases">
-                <td class="font-mono text-accent">{{ case.caseId }}</td>
-                <td>
-                  <div class="emp-cell">
-                    <span class="emp-name">{{ case.employeeName }}</span>
-                    <span class="emp-no">No: {{ case.employeeNumber }}</span>
-                  </div>
-                </td>
-                <td>
-                  <span class="badge" [ngClass]="getCaseTypeClass(case.caseType)">
-                    {{ case.caseType }}
-                  </span>
-                </td>
-                <td>
-                  <span class="badge" [ngClass]="getStatusClass(case.status)">
-                    {{ formatStatusLabel(case.status) }}
-                  </span>
-                </td>
-                <td>
-                  <div class="date-cell">
-                    <svg lucideCalendar class="inline-icon"></svg>
-                    <span>{{ case.trialDate || 'Not Scheduled' }}</span>
-                  </div>
-                </td>
-                <td>
-                  <a [routerLink]="['/cases', case.caseId]" class="action-btn-view" title="View Case Details">
-                    <svg lucideEye class="action-icon"></svg>
-                    <span>View</span>
-                  </a>
-                </td>
-              </tr>
-              <tr *ngIf="metrics.recentCases.length === 0">
-                <td colspan="6" class="empty-row">No recent cases found.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Right: Notifications & Reminders -->
-      <section class="dashboard-right glass-card">
-        <div class="section-header">
-          <h3 class="section-title">System Alerts & Reminders</h3>
-          <span class="notification-badge">{{ metrics.notifications.length }}</span>
-        </div>
-
-        <div class="notifications-list">
-          <div class="notification-item" *ngFor="let note of metrics.notifications">
-            <div class="notif-bullet"></div>
-            <div class="notif-content">
-              <p class="notif-text">{{ note }}</p>
-              <span class="notif-time">Real-time alert</span>
-            </div>
+    <!-- Skeleton Loading State -->
+    <ng-container *ngIf="loading; else dashboardContent">
+      <!-- Summary Grid Skeleton -->
+      <section class="summary-grid">
+        <div class="glass-card stat-card" *ngFor="let i of [1, 2, 3, 4]">
+          <div class="skeleton" style="width: 54px; height: 54px; border-radius: var(--radius-sm);"></div>
+          <div class="stat-data" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+            <div class="skeleton" style="width: 60%; height: 12px;"></div>
+            <div class="skeleton" style="width: 40%; height: 24px;"></div>
           </div>
         </div>
       </section>
 
-    </div>
+      <!-- Split Grid Skeleton -->
+      <div class="dashboard-content-split">
+        <!-- Left Table Skeleton -->
+        <div class="glass-card">
+          <div class="skeleton" style="width: 150px; height: 20px; margin-bottom: 24px;"></div>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div *ngFor="let r of [1, 2, 3, 4, 5]" style="display: flex; gap: 16px; align-items: center;">
+              <div class="skeleton" style="width: 60px; height: 16px;"></div>
+              <div class="skeleton" style="flex: 2; height: 16px;"></div>
+              <div class="skeleton" style="flex: 1; height: 16px;"></div>
+              <div class="skeleton" style="flex: 1; height: 16px;"></div>
+              <div class="skeleton" style="width: 80px; height: 28px; border-radius: var(--radius-sm);"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Alerts Skeleton -->
+        <div class="glass-card">
+          <div class="skeleton" style="width: 180px; height: 20px; margin-bottom: 24px;"></div>
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div *ngFor="let a of [1, 2, 3]" style="display: flex; gap: 12px;">
+              <div class="skeleton" style="width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0;"></div>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                <div class="skeleton" style="width: 90%; height: 12px;"></div>
+                <div class="skeleton" style="width: 70%; height: 12px;"></div>
+                <div class="skeleton" style="width: 30%; height: 10px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Actual Dashboard Content -->
+    <ng-template #dashboardContent>
+      <!-- Summary Grid Cards -->
+      <section class="summary-grid">
+        <div class="glass-card stat-card card-total">
+          <div class="stat-icon-wrapper">
+            <svg lucideBriefcase class="stat-icon"></svg>
+          </div>
+          <div class="stat-data">
+            <span class="stat-label">Total Cases</span>
+            <h2 class="stat-value">{{ metrics.totalCases }}</h2>
+          </div>
+        </div>
+
+        <div class="glass-card stat-card card-open">
+          <div class="stat-icon-wrapper">
+            <svg lucideAlertCircle class="stat-icon"></svg>
+          </div>
+          <div class="stat-data">
+            <span class="stat-label">Open / In Progress</span>
+            <h2 class="stat-value">{{ metrics.openCases }}</h2>
+          </div>
+        </div>
+
+        <div class="glass-card stat-card card-closed">
+          <div class="stat-icon-wrapper">
+            <svg lucideCheckCircle class="stat-icon"></svg>
+          </div>
+          <div class="stat-data">
+            <span class="stat-label">Closed Cases</span>
+            <h2 class="stat-value">{{ metrics.closedCases }}</h2>
+          </div>
+        </div>
+
+        <div class="glass-card stat-card card-cost">
+          <div class="stat-icon-wrapper">
+            <svg lucideDollarSign class="stat-icon"></svg>
+          </div>
+          <div class="stat-data">
+            <span class="stat-label">Total Costing (ZAR)</span>
+            <h2 class="stat-value">R {{ formatCost(metrics.totalCost) }}</h2>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Dashboard Content (Split Layout) -->
+      <div class="dashboard-content-split">
+        
+        <!-- Left: Recent Cases Table -->
+        <section class="dashboard-left glass-card">
+          <div class="section-header">
+            <h3 class="section-title">Recent Cases</h3>
+            <a routerLink="/cases" class="view-all-link">
+              <span>View All</span>
+              <svg lucideArrowRight class="link-icon"></svg>
+            </a>
+          </div>
+
+          <div class="table-container">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Case ID</th>
+                  <th>Employee</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Trial Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let case of metrics.recentCases">
+                  <td class="font-mono text-accent">{{ case.caseId }}</td>
+                  <td>
+                    <div class="emp-cell">
+                      <span class="emp-name">{{ case.employeeName }}</span>
+                      <span class="emp-no">No: {{ case.employeeNumber }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge" [ngClass]="getCaseTypeClass(case.caseType)">
+                      {{ case.caseType }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusClass(case.status)">
+                      {{ formatStatusLabel(case.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="date-cell">
+                      <svg lucideCalendar class="inline-icon"></svg>
+                      <span>{{ case.trialDate || 'Not Scheduled' }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <a [routerLink]="['/cases', case.caseId]" class="action-btn-view" title="View Case Details">
+                      <svg lucideEye class="action-icon"></svg>
+                      <span>View</span>
+                    </a>
+                  </td>
+                </tr>
+                <tr *ngIf="metrics.recentCases.length === 0">
+                  <td colspan="6" class="empty-row">No recent cases found.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Right: Notifications & Reminders -->
+        <section class="dashboard-right glass-card">
+          <div class="section-header">
+            <h3 class="section-title">System Alerts & Reminders</h3>
+            <span class="notification-badge">{{ metrics.notifications.length }}</span>
+          </div>
+
+          <div class="notifications-list">
+            <div class="notification-item" *ngFor="let note of metrics.notifications">
+              <div class="notif-bullet"></div>
+              <div class="notif-content">
+                <p class="notif-text">{{ note }}</p>
+                <span class="notif-time">Real-time alert</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </ng-template>
   </ng-template>
 </div>

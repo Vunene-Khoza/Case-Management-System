@@ -32,6 +32,7 @@ import {
 })
 export class DashboardComponent implements OnInit {
   currentUserName = '';
+  currentUserRole = '';
   loading = true;
   metrics = {
     totalCases: 0,
@@ -45,8 +46,14 @@ export class DashboardComponent implements OnInit {
   constructor(private caseService: CaseService) {}
 
   ngOnInit() {
-    this.currentUserName = this.caseService.getCurrentUser().name;
-    this.loadDashboardData();
+    const user = this.caseService.getCurrentUser();
+    this.currentUserName = user.name;
+    this.currentUserRole = user.role;
+    if (this.currentUserRole !== 'SUPER_ADMIN') {
+      this.loadDashboardData();
+    } else {
+      this.loading = false;
+    }
   }
 
   loadDashboardData() {

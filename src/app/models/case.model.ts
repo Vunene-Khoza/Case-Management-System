@@ -18,7 +18,8 @@ export enum CaseStatus {
 export enum UserRole {
   ADMIN = "ADMIN",
   LEGAL_OFFICER = "LEGAL_OFFICER",
-  VIEWER = "VIEWER"
+  VIEWER = "VIEWER",
+  SUPER_ADMIN = "SUPER_ADMIN"
 }
 
 export interface Case {

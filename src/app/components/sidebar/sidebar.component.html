@@ -7,7 +7,7 @@
     <div class="case-management">CASE MANAGEMENT</div>
     
     <!-- ==================== ADMINISTRATOR / OTHER ROLES SIDEBAR ==================== -->
-    <ng-container *ngIf="currentUser.role !== 'LEGAL_OFFICER'">
+    <ng-container *ngIf="currentUser.role === 'ADMIN' || currentUser.role === 'VIEWER'">
       <!-- MAIN Section -->
       <div class="frame-2">
         <div class="main">MAIN</div>
@@ -78,6 +78,75 @@
             <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
           </svg>
           <div class="settings">Settings</div>
+        </a>
+      </div>
+    </ng-container>
+
+    <!-- ==================== SUPER ADMINISTRATOR SIDEBAR ==================== -->
+    <ng-container *ngIf="currentUser.role === 'SUPER_ADMIN'">
+      <!-- OVERVIEW Section -->
+      <div class="frame-2">
+        <div class="overview">Overview</div>
+        
+        <a routerLink="/dashboard" routerLinkActive="active" class="menu-item" [routerLinkActiveOptions]="{exact: true}">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-columns-gap" viewBox="0 0 16 16">
+            <path d="M6 1v3H1V1zM1 0a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1zm14 12v3h-5v-3zm-5-1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1zM6 8v7H1V8zM1 7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zm14-6v7h-5V1zm-5-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1z"/>
+          </svg>
+          <div class="dashboard">Dashboard</div>
+        </a>
+      </div>
+
+      <!-- ROLE ACCESS Section -->
+      <div class="frame-2">
+        <div class="role-access">Role Access</div>
+        
+        <a routerLink="/role-access" routerLinkActive="active" class="menu-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-shield-lock" viewBox="0 0 16 16">
+            <path d="M5.338 1.59a6.1 6.1 0 0 0-2.837.856.48.48 0 0 0-.228.426v2.13a4.8 4.8 0 0 0 2.018 3.848.544.544 0 0 0 .68 0 4.8 4.8 0 0 0 2.018-3.849V2.871a.48.48 0 0 0-.228-.426 6.1 6.1 0 0 0-2.837-.856zm0 1.29a3.58 3.58 0 0 1 1.714.47v1.5a2.53 2.53 0 0 1-1.714 2.215 2.53 2.53 0 0 1-1.714-2.215v-1.5a3.58 3.58 0 0 1 1.714-.47zM8 9.5a2 2 0 1 0-4 0 2 2 0 0 0 4 0z"/>
+          </svg>
+          <div class="switch-to-role-view">Switch to Role View</div>
+        </a>
+      </div>
+
+      <!-- MONITORING Section -->
+      <div class="frame-2">
+        <div class="monitoring">Monitoring</div>
+        
+        <a routerLink="/activity-log" routerLinkActive="active" class="menu-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-activity" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M6 2a.5.5 0 0 1 .47.33L10 12.036l1.53-4.208A.5.5 0 0 1 12 7.5h3.5a.5.5 0 0 1 0 1h-3.15l-1.88 5.17a.5.5 0 0 1-.94 0L6 3.964 4.47 8.171A.5.5 0 0 1 4 8.5H.5a.5.5 0 0 1 0-1h3.15l1.88-5.17A.5.5 0 0 1 6 2"/>
+          </svg>
+          <div class="activity-log">Activity Log</div>
+          <span class="live-badge" *ngIf="!isCollapsed">Live</span>
+        </a>
+      </div>
+
+      <!-- USER CONTROL Section -->
+      <div class="frame-2">
+        <div class="user-control">User Control</div>
+        
+        <a routerLink="/users" routerLinkActive="active" class="menu-item" [routerLinkActiveOptions]="{exact: true}">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-people" viewBox="0 0 16 16">
+            <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.246.154-.986.832-1.664C8.516 10.68 9.289 10 11 10s2.484.68 3.168 1.332c.678.678.83 1.418.832 1.664zM11 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m0-1a2 2 0 1 1 0-4 2 2 0 0 1 0 4m-3-4a.5.5 0 0 1 .5.5V4h1.5a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V5H6a.5.5 0 0 1 0-1h1.5V2.5A.5.5 0 0 1 8 2"/>
+          </svg>
+          <div class="all-users">All Users</div>
+          <span class="count-badge" *ngIf="!isCollapsed">{{ totalUsersCount }}</span>
+        </a>
+
+        <a routerLink="/users/create" routerLinkActive="active" class="menu-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-person-plus" viewBox="0 0 16 16">
+            <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+            <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
+          </svg>
+          <div class="create-user">Create User</div>
+        </a>
+
+        <a routerLink="/users/pending" routerLinkActive="active" class="menu-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-person-exclamation" viewBox="0 0 16 16">
+            <path d="M12 11a1 1 0 0 1 1-1h1.5a.5.5 0 0 1 0 1H13v1.5a.5.5 0 0 1-1 0V11zm.5-7.5a.5.5 0 0 0-1 0V7a.5.5 0 0 0 1 0V3.5zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+          </svg>
+          <div class="pending-approvals">Pending Approvals</div>
+          <span class="count-badge badge-warning" *ngIf="!isCollapsed">{{ pendingApprovalsCount }}</span>
         </a>
       </div>
     </ng-container>
@@ -161,8 +230,8 @@
       <div class="profile-box" (click)="logout()" title="Click to logout" style="cursor: pointer;">
         <img class="profile" src="profile0.png" alt="Profile" />
         <div class="profile-info">
-          <div class="r-e-mukosi">{{ currentUser.name }}</div>
-          <div class="administator">{{ currentUser.role === 'LEGAL_OFFICER' ? 'Legal Officer' : (currentUser.role === 'ADMIN' ? 'Administrator' : 'Viewer') }}</div>
+          <div class="r-e-mukosi">{{ currentUser.role === 'SUPER_ADMIN' ? currentUser.email : currentUser.name }}</div>
+          <div class="administator">{{ currentUser.role === 'SUPER_ADMIN' ? 'Super Admin' : (currentUser.role === 'LEGAL_OFFICER' ? 'Legal Officer' : (currentUser.role === 'ADMIN' ? 'Administrator' : 'Viewer')) }}</div>
         </div>
       </div>
     </div>
