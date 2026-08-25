@@ -18,6 +18,7 @@ export class SidebarComponent implements OnInit {
   @Output() collapsedChange = new EventEmitter<boolean>();
   totalUsersCount = 12;
   pendingApprovalsCount = 3;
+  isPreviewMode = false;
 
   constructor(
     private caseService: CaseService,
@@ -27,6 +28,18 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit() {
     this.currentUser = this.caseService.getCurrentUser();
+    this.isPreviewMode = !!localStorage.getItem('original_role');
+  }
+
+  exitPreviewMode() {
+    const orig = localStorage.getItem('original_role');
+    if (orig) {
+      localStorage.setItem('user_role', orig);
+      localStorage.removeItem('original_role');
+    }
+    this.router.navigate(['/role-access']).then(() => {
+      window.location.reload();
+    });
   }
 
   toggleSidebar() {

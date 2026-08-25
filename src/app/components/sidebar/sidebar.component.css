@@ -82,6 +82,10 @@
   opacity: 0.6;
   transition: var(--transition-fast);
   flex-shrink: 0;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
 }
 
 .menu-item:hover {
@@ -123,7 +127,7 @@
 }
 
 /* Labels */
-.bashboard, .cases, .new-case, .case-detail, 
+.bashboard, .dashboard, .switch-to-role-view, .all-users, .create-user, .pending-approvals, .cases, .new-case, .case-detail, 
 .reports, .activity-log, .user-management, .settings,
 .my-bashboard, .cases-list, .create-new-case, .close-a-case, .case-detail-view, .my-activity-log {
   font-size: 12.5px; /* Sized down for narrower bar */
@@ -229,6 +233,11 @@
 
 /* Text labels hide */
 .sidebar-container.collapsed .bashboard,
+.sidebar-container.collapsed .dashboard,
+.sidebar-container.collapsed .switch-to-role-view,
+.sidebar-container.collapsed .all-users,
+.sidebar-container.collapsed .create-user,
+.sidebar-container.collapsed .pending-approvals,
 .sidebar-container.collapsed .cases,
 .sidebar-container.collapsed .new-case,
 .sidebar-container.collapsed .case-detail,

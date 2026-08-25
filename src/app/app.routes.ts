@@ -10,6 +10,10 @@ import { ActivityLogComponent } from './pages/activity-log/activity-log.componen
 import { SettingsComponent } from './pages/settings/settings.component';
 import { authGuard } from './guards/auth.guard';
 
+import { PendingApprovalsComponent } from './pages/pending-approvals/pending-approvals.component';
+import { CreateUserComponent } from './pages/create-user/create-user.component';
+import { RoleAccessComponent } from './pages/role-access/role-access.component';
+
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -20,6 +24,9 @@ export const routes: Routes = [
   { path: 'cases/:id/edit', component: CaseFormComponent, canActivate: [authGuard] },
   { path: 'reports', component: ReportsComponent, canActivate: [authGuard] },
   { path: 'users', component: UserManagementComponent, canActivate: [authGuard] },
+  { path: 'users/create', component: CreateUserComponent, canActivate: [authGuard] },
+  { path: 'users/pending', component: PendingApprovalsComponent, canActivate: [authGuard] },
+  { path: 'role-access', component: RoleAccessComponent, canActivate: [authGuard] },
   { path: 'activity-log', component: ActivityLogComponent, canActivate: [authGuard] },
   { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: 'login' }

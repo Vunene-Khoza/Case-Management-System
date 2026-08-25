@@ -1,0 +1,283 @@
+<div class="container">
+  <div class="container2">
+    
+    <!-- Header Row -->
+    <div class="container3">
+      <div class="container4">
+        <div class="container5">
+          <h1 class="create-new-user">Create New User</h1>
+        </div>
+        <div class="margin">
+          <div class="container6">
+            <p class="add-a-new-account-to-the-system-and-a">
+              Add a new account to the system and assign their role
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="container7">
+        <button class="button" (click)="onCancel()">
+          <span class="cancel">Cancel</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content Split Grid -->
+    <div class="container8">
+      
+      <!-- Left Column: Form Sections -->
+      <form class="container9" (ngSubmit)="onSubmit()">
+        <!-- Error & Success Banners -->
+        <div class="alert alert-danger mb-3" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+        <div class="alert alert-success mb-3" *ngIf="successMessage">
+          {{ successMessage }}
+        </div>
+
+        <!-- 1. Personal Information -->
+        <div class="background card-section">
+          <div class="container10 card-header">
+            <div class="container11 title-wrapper">
+              <i class="bi bi-person-fill i2"></i>
+              <span class="personal-information">Personal Information</span>
+            </div>
+          </div>
+          <div class="container12 card-body">
+            <div class="margin2">
+              <div class="container13 input-row">
+                <div class="container14 input-group">
+                  <label class="label">
+                    <span class="full-name">Full Name <span class="required-star">*</span></span>
+                  </label>
+                  <input 
+                    type="text" 
+                    class="input form-control" 
+                    placeholder="e.g. Tshilidzi Avhashoni" 
+                    [(ngModel)]="fullName" 
+                    name="fullName"
+                    required
+                  />
+                </div>
+                <div class="container14 input-group">
+                  <label class="label">
+                    <span class="staff-employee-number">Staff / Employee Number <span class="required-star">*</span></span>
+                  </label>
+                  <input 
+                    type="text" 
+                    class="input form-control" 
+                    placeholder="e.g. 12345" 
+                    [(ngModel)]="staffNumber" 
+                    name="staffNumber"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="container15 input-row">
+              <div class="container14 input-group">
+                <label class="label">
+                  <span class="institutional-email">Institutional Email <span class="required-star">*</span></span>
+                </label>
+                <input 
+                  type="email" 
+                  class="input form-control" 
+                  placeholder="name&#64;univen.ac.za" 
+                  [(ngModel)]="email" 
+                  name="email"
+                  required
+                />
+              </div>
+              <div class="container14 input-group">
+                <label class="label">
+                  <span class="department-label">Department</span>
+                </label>
+                <input 
+                  type="text" 
+                  class="input form-control" 
+                  placeholder="e.g. Legal and HR Department" 
+                  [(ngModel)]="department" 
+                  name="department"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Role & Access Assignment -->
+        <div class="background2 card-section">
+          <div class="container10 card-header">
+            <div class="container16 title-wrapper">
+              <i class="bi bi-shield-lock-fill i3"></i>
+              <span class="role-access-assignment">Role &amp; Access Assignment</span>
+            </div>
+          </div>
+          <div class="container17 card-body">
+            <div class="margin2">
+              <div class="container13 input-row">
+                <div class="container14 input-group">
+                  <label class="label">
+                    <span class="assign-role">Assign Role <span class="required-star">*</span></span>
+                  </label>
+                  <select 
+                    class="select form-select" 
+                    [(ngModel)]="assignedRole" 
+                    name="assignedRole"
+                    required
+                  >
+                    <option value="SUPER_ADMIN">Super Admin</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="LEGAL_OFFICER">Legal Officer</option>
+                    <option value="VIEWER">Viewer</option>
+                  </select>
+                </div>
+                <div class="container14 input-group">
+                  <label class="label">
+                    <span class="account-status-label">Account Status <span class="required-star">*</span></span>
+                  </label>
+                  <select 
+                    class="select form-select" 
+                    [(ngModel)]="accountStatus" 
+                    name="accountStatus"
+                    required
+                  >
+                    <option value="ACTIVE">Active</option>
+                    <option value="INACTIVE">Inactive</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="background-margin">
+              <div class="background3 notice-banner">
+                <p class="legal-officers-can-create-manage-an">
+                  {{ getRoleDescription() }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Initial Password -->
+        <div class="background4 card-section">
+          <div class="container10 card-header">
+            <div class="container18 title-wrapper">
+              <i class="bi bi-key-fill i3"></i>
+              <span class="initial-password">Initial Password</span>
+            </div>
+          </div>
+          <div class="container19 card-body">
+            <div class="container15 input-row">
+              <div class="container20 input-group">
+                <label class="label">
+                  <span class="temporary-password">Temporary Password <span class="required-star">*</span></span>
+                </label>
+                <input 
+                  type="password" 
+                  class="input form-control" 
+                  placeholder="Set a temporary password" 
+                  [(ngModel)]="tempPassword" 
+                  name="tempPassword"
+                  required
+                />
+                <div class="container21 password-hint">
+                  <span class="user-will-be-prompted-to-change-on-fi">
+                    User will be prompted to change on first login
+                  </span>
+                </div>
+              </div>
+              <div class="container20 input-group">
+                <label class="label">
+                  <span class="confirm-password">Confirm Password <span class="required-star">*</span></span>
+                </label>
+                <input 
+                  type="password" 
+                  class="input form-control" 
+                  placeholder="Repeat the password" 
+                  [(ngModel)]="confirmPassword" 
+                  name="confirmPassword"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- Right Column: Sidebar Actions & Info -->
+      <div class="container22 right-sidebar">
+        
+        <!-- Authority Warning Panel -->
+        <div class="background5 authority-panel">
+          <div class="container23 panel-body">
+            <div class="margin3">
+              <div class="container24 warning-row">
+                <div class="i-margin">
+                  <i class="bi bi-info-circle-fill i4"></i>
+                </div>
+                <div class="paragraph">
+                  <p class="as-super-admin-you-have-the-authority-t">
+                    <span class="as-super-admin-you-have-the-authority-t-span">
+                      As Super Admin, you have the authority to create accounts for all roles including 
+                    </span>
+                    <span class="as-super-admin-you-have-the-authority-t-span2">
+                      Admin
+                    </span>
+                    <span class="as-super-admin-you-have-the-authority-t-span">
+                      . Role assignments take effect immediately upon account activation.
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Bottom Primary Action Buttons -->
+            <div class="container25 button-group">
+              <button class="button2 submit-btn" (click)="onSubmit()">
+                <i class="bi bi-person-plus-fill i5"></i>
+                <span class="create-user-account">Create User Account</span>
+              </button>
+              <button class="button3 cancel-btn" (click)="onCancel()">
+                <span class="cancel">Cancel</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Role Permissions Checklist -->
+        <div class="background6 permissions-panel">
+          <div class="container26 card-header">
+            <div class="container27 title-wrapper">
+              <span class="role-permissions">Role Permissions</span>
+            </div>
+          </div>
+          <div class="container28 panel-body">
+            <div class="container29 permissions-wrapper">
+              <div class="container30 sub-title">
+                <span class="legal-officer2">{{ getRoleLabel(assignedRole) }}</span>
+              </div>
+              <div class="container31 checklist-group">
+                <div 
+                  class="background7 checklist-item" 
+                  *ngFor="let perm of getRolePermissions()"
+                >
+                  <i 
+                    class="bi i6" 
+                    [ngClass]="perm.allowed ? 'bi-check-lg text-success' : 'bi-x-lg text-danger'"
+                  ></i>
+                  <div class="container32 label-wrapper">
+                    <span class="create-new-cases" [class.text-muted]="!perm.allowed">
+                      {{ perm.name }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>

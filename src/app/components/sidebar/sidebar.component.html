@@ -6,6 +6,12 @@
     </div>
     <div class="case-management">CASE MANAGEMENT</div>
     
+    <!-- Preview Banner in Sidebar -->
+    <div *ngIf="isPreviewMode" class="preview-mode-banner" (click)="exitPreviewMode()" style="cursor: pointer; background: #fee2e2; border: 1px solid #f87171; border-radius: 6px; padding: 6px 12px; margin: 10px 20px; display: flex; align-items: center; gap: 8px;">
+      <i class="bi bi-arrow-left-circle-fill text-danger" style="font-size: 14px;"></i>
+      <span *ngIf="!isCollapsed" style="font-size: 11px; font-weight: 700; color: #991b1b; text-transform: uppercase; letter-spacing: 0.05em;">Exit Preview</span>
+    </div>
+    
     <!-- ==================== ADMINISTRATOR / OTHER ROLES SIDEBAR ==================== -->
     <ng-container *ngIf="currentUser.role === 'ADMIN' || currentUser.role === 'VIEWER'">
       <!-- MAIN Section -->
@@ -16,7 +22,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-columns-gap" viewBox="0 0 16 16">
             <path d="M6 1v3H1V1zM1 0a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1zm14 12v3h-5v-3zm-5-1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1zM6 8v7H1V8zM1 7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zm14-6v7h-5V1zm-5-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1z"/>
           </svg>
-          <div class="bashboard">Bashboard</div>
+          <div class="bashboard">Dashboard</div>
         </a>
         
         <a routerLink="/cases" routerLinkActive="active" class="menu-item" [routerLinkActiveOptions]="{exact: true}">
@@ -89,9 +95,7 @@
         <div class="overview">Overview</div>
         
         <a routerLink="/dashboard" routerLinkActive="active" class="menu-item" [routerLinkActiveOptions]="{exact: true}">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-columns-gap" viewBox="0 0 16 16">
-            <path d="M6 1v3H1V1zM1 0a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1zm14 12v3h-5v-3zm-5-1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1zM6 8v7H1V8zM1 7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zm14-6v7h-5V1zm-5-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1z"/>
-          </svg>
+          <i class="bi bi-speedometer2 menu-icon"></i>
           <div class="dashboard">Dashboard</div>
         </a>
       </div>
@@ -101,8 +105,9 @@
         <div class="role-access">Role Access</div>
         
         <a routerLink="/role-access" routerLinkActive="active" class="menu-item">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-shield-lock" viewBox="0 0 16 16">
-            <path d="M5.338 1.59a6.1 6.1 0 0 0-2.837.856.48.48 0 0 0-.228.426v2.13a4.8 4.8 0 0 0 2.018 3.848.544.544 0 0 0 .68 0 4.8 4.8 0 0 0 2.018-3.849V2.871a.48.48 0 0 0-.228-.426 6.1 6.1 0 0 0-2.837-.856zm0 1.29a3.58 3.58 0 0 1 1.714.47v1.5a2.53 2.53 0 0 1-1.714 2.215 2.53 2.53 0 0 1-1.714-2.215v-1.5a3.58 3.58 0 0 1 1.714-.47zM8 9.5a2 2 0 1 0-4 0 2 2 0 0 0 4 0z"/>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-shuffle" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.6 9.6 0 0 0 7.556 8a9.6 9.6 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.6 10.6 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.6 9.6 0 0 0 6.444 8a9.6 9.6 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5"/>
+            <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192"/>
           </svg>
           <div class="switch-to-role-view">Switch to Role View</div>
         </a>
@@ -113,9 +118,7 @@
         <div class="monitoring">Monitoring</div>
         
         <a routerLink="/activity-log" routerLinkActive="active" class="menu-item">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-activity" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M6 2a.5.5 0 0 1 .47.33L10 12.036l1.53-4.208A.5.5 0 0 1 12 7.5h3.5a.5.5 0 0 1 0 1h-3.15l-1.88 5.17a.5.5 0 0 1-.94 0L6 3.964 4.47 8.171A.5.5 0 0 1 4 8.5H.5a.5.5 0 0 1 0-1h3.15l1.88-5.17A.5.5 0 0 1 6 2"/>
-          </svg>
+          <i class="bi bi-clock-history menu-icon"></i>
           <div class="activity-log">Activity Log</div>
           <span class="live-badge" *ngIf="!isCollapsed">Live</span>
         </a>
@@ -126,24 +129,22 @@
         <div class="user-control">User Control</div>
         
         <a routerLink="/users" routerLinkActive="active" class="menu-item" [routerLinkActiveOptions]="{exact: true}">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-people" viewBox="0 0 16 16">
-            <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.246.154-.986.832-1.664C8.516 10.68 9.289 10 11 10s2.484.68 3.168 1.332c.678.678.83 1.418.832 1.664zM11 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m0-1a2 2 0 1 1 0-4 2 2 0 0 1 0 4m-3-4a.5.5 0 0 1 .5.5V4h1.5a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V5H6a.5.5 0 0 1 0-1h1.5V2.5A.5.5 0 0 1 8 2"/>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-people-fill" viewBox="0 0 16 16">
+            <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
           </svg>
           <div class="all-users">All Users</div>
           <span class="count-badge" *ngIf="!isCollapsed">{{ totalUsersCount }}</span>
         </a>
 
         <a routerLink="/users/create" routerLinkActive="active" class="menu-item">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-person-plus" viewBox="0 0 16 16">
-            <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
-            <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
-          </svg>
+          <i class="bi bi-person-plus menu-icon"></i>
           <div class="create-user">Create User</div>
         </a>
 
         <a routerLink="/users/pending" routerLinkActive="active" class="menu-item">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-person-exclamation" viewBox="0 0 16 16">
-            <path d="M12 11a1 1 0 0 1 1-1h1.5a.5.5 0 0 1 0 1H13v1.5a.5.5 0 0 1-1 0V11zm.5-7.5a.5.5 0 0 0-1 0V7a.5.5 0 0 0 1 0V3.5zM6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="menu-icon bi bi-person-check" viewBox="0 0 16 16">
+            <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+            <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
           </svg>
           <div class="pending-approvals">Pending Approvals</div>
           <span class="count-badge badge-warning" *ngIf="!isCollapsed">{{ pendingApprovalsCount }}</span>

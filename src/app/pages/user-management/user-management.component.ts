@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { CaseService } from '../../services/case.service';
 import { User, UserRole } from '../../models/case.model';
 import { 
@@ -36,7 +37,21 @@ export class UserManagementComponent implements OnInit {
   users: User[] = [];
   currentUserId = '';
   isAdmin = false;
+  isSuperAdmin = false;
   UserRole = UserRole;
+
+  // Super Admin state controls
+  searchQuery = '';
+  selectedRole = 'all';
+  selectedStatus = 'all';
+
+  dummyUsers = [
+    { name: 'S. Mukosi', email: 'smukosi&#64;univen.ac.za', staffNo: '00001', role: 'SUPER_ADMIN', department: 'IT / Legal', lastLogin: 'Today · 07:45', status: 'Active' },
+    { name: 'R.E. Mukosi', email: 'mukosi&#64;univen.ac.za', staffNo: '10012', role: 'ADMIN', department: 'Legal and HR', lastLogin: 'Today · 08:14', status: 'Active' },
+    { name: 'T. Avhashoni', email: 'usera&#64;univen.ac.za', staffNo: '12345', role: 'LEGAL_OFFICER', department: 'Legal and HR', lastLogin: 'Yesterday · 16:35', status: 'Active' },
+    { name: 'N. Nndivho', email: 'userb&#64;univen.ac.za', staffNo: '22810', role: 'LEGAL_OFFICER', department: 'Legal and HR', lastLogin: '1 Jun · 10:12', status: 'Active' },
+    { name: 'V. Chauke', email: 'viewerc&#64;univen.ac.za', staffNo: '40234', role: 'VIEWER', department: 'Management', lastLogin: '28 May', status: 'Inactive' }
+  ];
 
   // Add User Form controls
   showAddModal = false;
@@ -46,16 +61,30 @@ export class UserManagementComponent implements OnInit {
     role: UserRole.LEGAL_OFFICER
   };
 
-  constructor(private caseService: CaseService) {}
+  constructor(
+    private caseService: CaseService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
     const cur = this.caseService.getCurrentUser();
     this.currentUserId = cur.userId;
-    this.isAdmin = cur.role === UserRole.ADMIN;
+    this.isSuperAdmin = cur.role === 'SUPER_ADMIN';
+    this.isAdmin = cur.role === UserRole.ADMIN || this.isSuperAdmin;
     
-    if (this.isAdmin) {
+    if (this.isAdmin && !this.isSuperAdmin) {
       this.loadUsers();
     }
+
+    // Check for route path matching to trigger auto-actions
+    this.route.url.subscribe(urlSegments => {
+      const path = urlSegments.map(segment => segment.path).join('/');
+      if (path === 'create') {
+        this.openAddModal();
+      } else if (path === 'pending') {
+        this.selectedStatus = 'Inactive';
+      }
+    });
   }
 
   loadUsers() {
@@ -73,8 +102,18 @@ export class UserManagementComponent implements OnInit {
     return name[0].toUpperCase();
   }
 
-  getRoleClass(role: UserRole): string {
+  getAvatarBgClass(name: string): string {
+    if (!name) return 'bg-avatar-blue';
+    const firstLetter = name[0].toUpperCase();
+    if (firstLetter < 'G') return 'bg-avatar-blue';
+    if (firstLetter < 'N') return 'bg-avatar-green';
+    if (firstLetter < 'U') return 'bg-avatar-gold';
+    return 'bg-avatar-grey';
+  }
+
+  getRoleClass(role: string): string {
     switch (role) {
+      case 'SUPER_ADMIN': return 'role-superadmin';
       case UserRole.ADMIN: return 'role-admin';
       case UserRole.LEGAL_OFFICER: return 'role-officer';
       case UserRole.VIEWER: return 'role-viewer';
@@ -82,13 +121,39 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  getRoleLabel(role: UserRole): string {
+  getRoleLabel(role: string): string {
     switch (role) {
+      case 'SUPER_ADMIN': return 'Super Admin';
       case UserRole.ADMIN: return 'Administrator';
       case UserRole.LEGAL_OFFICER: return 'Legal Officer';
       case UserRole.VIEWER: return 'Viewer';
       default: return role;
     }
+  }
+
+  // Super Admin actions
+  getFilteredDummyUsers() {
+    return this.dummyUsers.filter(u => {
+      const matchesSearch = !this.searchQuery || 
+        u.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+        u.email.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+        u.staffNo.includes(this.searchQuery);
+        
+      const matchesRole = this.selectedRole === 'all' || u.role === this.selectedRole;
+      const matchesStatus = this.selectedStatus === 'all' || u.status === this.selectedStatus;
+      
+      return matchesSearch && matchesRole && matchesStatus;
+    });
+  }
+
+  clearFilters() {
+    this.searchQuery = '';
+    this.selectedRole = 'all';
+    this.selectedStatus = 'all';
+  }
+
+  exportUsers() {
+    alert('User Directory exported successfully as CSV.');
   }
 
   // Modal Actions
@@ -107,6 +172,23 @@ export class UserManagementComponent implements OnInit {
 
   submitUserForm() {
     if (!this.formData.name || !this.formData.email) return;
+    
+    if (this.isSuperAdmin) {
+      // Add user to the dummy users list for Super Admin simulation
+      const mockStaffNo = Math.floor(10000 + Math.random() * 90000).toString();
+      this.dummyUsers.push({
+        name: this.formData.name,
+        email: this.formData.email,
+        staffNo: mockStaffNo,
+        role: this.formData.role,
+        department: this.formData.role === UserRole.ADMIN ? 'Legal and HR' : 'Legal and HR',
+        lastLogin: 'Never logged in',
+        status: 'Active'
+      });
+      this.closeAddModal();
+      return;
+    }
+
     this.caseService.addUser({
       name: this.formData.name,
       email: this.formData.email,

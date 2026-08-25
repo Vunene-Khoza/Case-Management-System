@@ -1,0 +1,157 @@
+<div class="div-content">
+  <div class="div-page-switcher">
+    
+    <!-- Header Block -->
+    <div class="div-ph-margin">
+      <div class="div-ph">
+        <div class="div">
+          <div class="div-ph-title">
+            <h1 class="switch-to-role-view">Switch to Role View</h1>
+          </div>
+          <div class="div-ph-sub-margin">
+            <div class="div-ph-sub">
+              <p class="preview-any-role-s-interface-to-inspe">
+                Preview any role's interface to inspect their experience and permissions
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="div-ph-actions">
+          <div class="span-badge admin-badge">
+            <i class="bi bi-shield-fill-check i-fa-solid text-primary"></i>
+            <span class="super-admin-mode">Super Admin Mode</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info banner warning -->
+    <div class="div-info-banner-margin">
+      <div class="div-info-banner">
+        <div class="i-fa-solid-margin">
+          <i class="bi bi-info-circle-fill i-fa-solid2 text-primary"></i>
+        </div>
+        <div class="div2">
+          <p class="switching-to-a-role-view-allows-you-to-i">
+            <span class="switching-to-a-role-view-allows-you-to-i-span">
+              Switching to a role view allows you to 
+            </span>
+            <span class="switching-to-a-role-view-allows-you-to-i-span2">
+              inspect what that role sees 
+            </span>
+            <span class="switching-to-a-role-view-allows-you-to-i-span">
+              without permanently changing your account. You remain Super Admin — this is a supervised preview only. Every role switch is recorded in the Activity Log.
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Role Cards grid row -->
+    <div class="div-role-cards-margin">
+      <div class="div-role-cards">
+        
+        <!-- Admin Card -->
+        <div class="div-card-admin role-card" (click)="switchToRole('ADMIN')">
+          <div class="overlay bg-success"></div>
+          <div class="div-role-card-ico bg-success-light">
+            <i class="bi bi-person-workspace i-fa-solid3 text-success"></i>
+          </div>
+          <div class="div-role-card-name">
+            <h3 class="admin">Admin</h3>
+          </div>
+          <div class="div-role-card-desc">
+            <p class="full-system-access-including-user-man">
+              Full system access including user management, all cases, and reports.
+            </p>
+          </div>
+          <div class="div-role-card-count bg-success-light">
+            <span class="_3-active-admins">3 active admins</span>
+          </div>
+        </div>
+
+        <!-- Legal Officer Card -->
+        <div class="div-card-officer role-card" (click)="switchToRole('LEGAL_OFFICER')">
+          <div class="overlay2 bg-primary"></div>
+          <div class="div-role-card-ico2 bg-primary-light">
+            <i class="bi bi-briefcase-fill i-fa-solid4 text-primary"></i>
+          </div>
+          <div class="div-role-card-name2">
+            <h3 class="legal-officer">Legal Officer</h3>
+          </div>
+          <div class="div-role-card-desc2">
+            <p class="case-creation-management-notes-dat">
+              Case creation, management, notes, date tracking and closure.
+            </p>
+          </div>
+          <div class="div-role-card-count2 bg-primary-light">
+            <span class="_6-active-officers">6 active officers</span>
+          </div>
+        </div>
+
+        <!-- Viewer Card -->
+        <div class="div-card-viewer role-card" (click)="switchToRole('VIEWER')">
+          <div class="overlay3 bg-secondary"></div>
+          <div class="div-role-card-ico3 bg-secondary-light">
+            <i class="bi bi-eye-fill i-fa-solid5 text-secondary"></i>
+          </div>
+          <div class="div-role-card-name">
+            <h3 class="viewer">Viewer</h3>
+          </div>
+          <div class="div-role-card-desc">
+            <p class="read-only-access-to-reports-and-case">
+              Read-only access to reports and case summaries only.
+            </p>
+          </div>
+          <div class="div-role-card-count3 bg-secondary-light">
+            <span class="_2-active-viewers">2 active viewers</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- History Panel -->
+    <div class="div-card history-card">
+      <div class="div-card-hd">
+        <div class="div3">
+          <div class="div-card-title">
+            <h2 class="role-switch-history">Role Switch History</h2>
+          </div>
+          <div class="div-card-sub-margin">
+            <div class="div-card-sub">
+              <span class="all-role-view-sessions-recorded-this">
+                All role view sessions recorded this month
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="div4 table-responsive">
+        <table class="table custom-table">
+          <thead>
+            <tr>
+              <th class="th-timestamp">Timestamp</th>
+              <th class="th-switched">Switched To</th>
+              <th class="th-duration">Duration</th>
+              <th class="th-actions">Actions Taken</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of historyList">
+              <td class="td-mono">{{ item.timestamp }}</td>
+              <td>
+                <span class="span-badge" [ngClass]="item.badgeClass">
+                  {{ item.switchedTo }}
+                </span>
+              </td>
+              <td class="td-duration">{{ item.duration }}</td>
+              <td class="td-actions">{{ item.actionsTaken }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>

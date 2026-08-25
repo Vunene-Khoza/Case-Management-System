@@ -1,0 +1,163 @@
+<div class="div-content">
+  <div class="div-page-pending">
+    
+    <!-- Header Block -->
+    <div class="div-ph-margin">
+      <div class="div-ph">
+        <div class="div">
+          <div class="div-ph-title">
+            <h1 class="pending-approvals">Pending Approvals</h1>
+          </div>
+          <div class="div-ph-sub-margin">
+            <div class="div-ph-sub">
+              <p class="review-and-action-self-registration-r">
+                Review and action self-registration requests from university staff
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="div-ph-actions">
+          <div class="span-pending-count-badge">
+            <span class="_3-awaiting-review">{{ awaitingReviewCount }} Awaiting Review</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Boxes Row -->
+    <div class="div-stats-row-margin">
+      <div class="div-stats-row">
+        <div class="div-stat-box box-pending">
+          <div class="div-stat-pending">
+            <div class="_3">{{ awaitingReviewCount }}</div>
+          </div>
+          <div class="div-stat-label-margin">
+            <div class="div-stat-label">
+              <div class="awaiting-review">Awaiting Review</div>
+            </div>
+          </div>
+        </div>
+        <div class="div-stat-box box-approved">
+          <div class="div-stat-approved">
+            <div class="_0">{{ approvedCount }}</div>
+          </div>
+          <div class="div-stat-label-margin">
+            <div class="div-stat-label">
+              <div class="approved-today">Approved Today</div>
+            </div>
+          </div>
+        </div>
+        <div class="div-stat-box box-rejected">
+          <div class="div-stat-rejected">
+            <div class="_02">{{ rejectedCount }}</div>
+          </div>
+          <div class="div-stat-label-margin">
+            <div class="div-stat-label">
+              <div class="rejected-today">Rejected Today</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Card Container Section -->
+    <div class="div-card glass-card">
+      <!-- Top Filters Bar -->
+      <div class="div-fbar">
+        <div class="div-sw-input">
+          <input 
+            type="text" 
+            class="input-search-input" 
+            placeholder="Search name, email, staff number..." 
+            [(ngModel)]="searchQuery"
+          />
+        </div>
+        
+        <select class="select-role-filter" [(ngModel)]="selectedRole">
+          <option value="all">All Roles</option>
+          <option value="SUPER_ADMIN">Super Admin</option>
+          <option value="ADMIN">Admin</option>
+          <option value="LEGAL_OFFICER">Legal Officer</option>
+          <option value="VIEWER">Viewer</option>
+        </select>
+
+        <select class="select-status-filter" [(ngModel)]="selectedStatus">
+          <option value="all">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+
+        <button class="button-btn3" (click)="clearFilters()">
+          <span class="clear">Clear</span>
+        </button>
+      </div>
+
+      <!-- Approvals List -->
+      <div class="div-approvals-container">
+        <div 
+          class="div-approval-card-margin" 
+          *ngFor="let req of getFilteredApprovals()"
+        >
+          <div class="div-approval-card" [class.approved-card]="req.status === 'Approved'" [class.rejected-card]="req.status === 'Rejected'">
+            <!-- Avatar -->
+            <div class="avatar-box" [ngClass]="req.avatarClass">
+              <span>{{ req.avatarInitials }}</span>
+            </div>
+            
+            <!-- Details -->
+            <div class="div-ap-info">
+              <div class="div-ap-name-margin">
+                <div class="div-ap-name">
+                  <span class="vhutshilo-sinthumule">{{ req.name }}</span>
+                  <div class="span-badge" [ngClass]="'badge-' + req.status.toLowerCase()">
+                    <span class="pending">{{ req.status }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="div-ap-meta-margin">
+                <div class="div-ap-meta">
+                  <span class="meta-email">{{ req.email }}</span>
+                  <span class="meta-dot"></span>
+                  <span class="meta-staff-no">Staff No. {{ req.staffNo }}</span>
+                  <span class="meta-dot"></span>
+                  <span class="meta-dept">{{ req.department }}</span>
+                  <span class="meta-dot"></span>
+                  <span class="meta-date">{{ req.date }}</span>
+                </div>
+              </div>
+              <div class="div-ap-role-request">
+                <span class="requested-role">Requested role:</span>
+                <div class="span-badge2" [ngClass]="getRoleBadgeClass(req.requestedRole)">
+                  <span class="legal-officer">{{ getRoleLabel(req.requestedRole) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions buttons (only show if request is Pending) -->
+            <div class="div-ap-actions" *ngIf="req.status === 'Pending'">
+              <button class="button-btn" (click)="approveRequest(req)">
+                <span class="approve">Approve</span>
+              </button>
+              <button class="button-btn2" (click)="rejectRequest(req)">
+                <span class="reject">Reject</span>
+              </button>
+            </div>
+            
+            <!-- Resolution confirmation banner -->
+            <div class="resolution-badge" *ngIf="req.status !== 'Pending'">
+              <span class="badge-text" [ngClass]="req.status === 'Approved' ? 'text-success' : 'text-danger'">
+                {{ req.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-approvals-row" *ngIf="getFilteredApprovals().length === 0">
+          No registration requests match the filter criteria.
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>

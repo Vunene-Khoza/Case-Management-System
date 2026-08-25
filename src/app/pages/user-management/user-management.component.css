@@ -294,3 +294,342 @@
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
   padding: 20px;
 }
+
+/* ==========================================================================
+   SUPER ADMIN USER MANAGEMENT LAYOUT
+   ========================================================================== */
+
+.sa-users-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.sa-header-text {
+  flex: 1;
+}
+
+.all-users {
+  color: #111827 !important;
+  font-family: var(--font-family-title);
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.create-edit-activate-or-deactivate {
+  color: #6b7280 !important;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.sa-header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Actions buttons styling */
+.sa-header-actions .button {
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  padding: 8px 16px;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.sa-header-actions .button:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.sa-header-actions .button2 {
+  background: #5b4fe8;
+  border-radius: 6px;
+  padding: 8px 16px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.sa-header-actions .button2:hover {
+  background-color: #4b3fd3;
+}
+
+/* Filters Bar */
+.sa-filters-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background-color: #f8f9fc;
+  border: 1px solid #e5e7eb;
+  border-bottom: none;
+  padding: 12px 16px;
+  border-radius: 10px 10px 0 0;
+}
+
+@media (max-width: 768px) {
+  .sa-filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.search-input-wrapper {
+  flex: 1;
+}
+
+.sa-search-input {
+  width: 100%;
+  max-width: 320px;
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: #111827;
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.sa-search-input:focus {
+  border-color: #5b4fe8;
+  box-shadow: 0 0 0 2px rgba(91, 79, 232, 0.1);
+}
+
+.sa-select-dropdown {
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  padding: 6px 24px 6px 12px;
+  font-size: 13px;
+  color: #111827;
+  outline: none;
+  cursor: pointer;
+}
+
+.button3 {
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  padding: 6px 14px;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.button3:hover {
+  background-color: #f9fafb;
+}
+
+/* Super Admin Table Wrapper */
+.sa-users-table-container {
+  border-radius: 0 0 10px 10px !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.sa-table {
+  border-collapse: collapse;
+}
+
+.sa-table th {
+  padding: 12px 20px;
+}
+
+.sa-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid #eff1f7;
+}
+
+/* User Card cell inside table */
+.container10 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family-title);
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.bg-avatar-blue {
+  background: linear-gradient(135deg, #5b4fe8 0%, #7b72ee 100%);
+}
+.bg-avatar-green {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+}
+.bg-avatar-gold {
+  background: linear-gradient(135deg, #fbbf24 0%, #fcd34d 100%);
+}
+.bg-avatar-grey {
+  background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+}
+
+.container11 {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name-title {
+  color: #111827 !important;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.user-email-subtitle {
+  color: #6b7280 !important;
+  font-size: 11.5px;
+}
+
+/* Role badges colors */
+.role-superadmin {
+  background-color: #eef0ff;
+  color: #5b4fe8;
+  border: 1px solid rgba(91, 79, 232, 0.2);
+}
+
+/* Status Indicators */
+.status-indicator.indicator-active .status-dot {
+  background-color: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+.status-indicator.indicator-active .status-label {
+  color: #059669 !important;
+  font-weight: 500;
+}
+
+.status-indicator.indicator-inactive .status-dot {
+  background-color: #dc2626;
+  box-shadow: 0 0 6px #dc2626;
+}
+
+.status-indicator.indicator-inactive .status-label {
+  color: #dc2626 !important;
+  font-weight: 500;
+}
+
+/* Table actions */
+.sa-table .actions-cell {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sa-table .edit-btn {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+  font-size: 12px;
+  width: 28px;
+  height: 28px;
+}
+
+.sa-table .edit-btn:hover {
+  background-color: #f9fafb;
+  border-color: #cbd5e1;
+}
+
+.sa-table .deactivate-btn {
+  background: #fee2e2;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+  font-size: 12px;
+  width: 28px;
+  height: 28px;
+}
+
+.sa-table .deactivate-btn:hover {
+  background-color: #fecaca;
+}
+
+.btn-reactivate {
+  background: #d1fae5;
+  border-radius: 6px;
+  padding: 4px 10px;
+  color: #059669;
+  border: none;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-reactivate:hover {
+  background-color: #a7f3d0;
+}
+
+/* Pagination Footer */
+.sa-pagination-footer {
+  border-top: 1px solid #eff1f7;
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fc;
+}
+
+.showing-text {
+  color: #6b7280 !important;
+  font-size: 12px;
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.page-btn {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.page-btn:hover {
+  background-color: #f9fafb;
+}
+
+.page-btn.active {
+  background-color: #5b4fe8;
+  border-color: #5b4fe8;
+  color: #ffffff;
+}
+

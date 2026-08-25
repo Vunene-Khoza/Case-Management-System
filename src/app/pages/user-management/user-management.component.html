@@ -1,74 +1,200 @@
 <div class="user-management-page">
   <!-- Role security fallback check -->
   <ng-container *ngIf="isAdmin; else accessDenied">
-    <!-- Header -->
-    <header class="page-header">
-      <div>
-        <h1 class="page-title">User Account Management</h1>
-        <p class="page-subtitle">Add new authorized personnel, configure system roles, and audit access statuses.</p>
+    
+    <!-- ==================== SUPER ADMIN VIEW ==================== -->
+    <ng-container *ngIf="isSuperAdmin; else standardAdminUserManagement">
+      <div class="sa-users-header">
+        <div class="sa-header-text">
+          <h1 class="all-users">All Users</h1>
+          <p class="create-edit-activate-or-deactivate">
+            Create, edit, activate or deactivate accounts across all roles
+          </p>
+        </div>
+        <div class="sa-header-actions">
+          <button class="button" (click)="exportUsers()">
+            <span class="export">Export</span>
+          </button>
+          <button class="button2" (click)="openAddModal()">
+            <span class="create-user">Create User</span>
+          </button>
+        </div>
       </div>
-      <div class="header-actions">
-        <button (click)="openAddModal()" class="btn btn-primary">
-          <svg lucidePlus class="btn-icon"></svg>
-          <span>Add User Account</span>
+
+      <div class="sa-filters-bar">
+        <div class="search-input-wrapper">
+          <input 
+            type="text" 
+            class="sa-search-input" 
+            placeholder="Search name, email, staff number..." 
+            [(ngModel)]="searchQuery"
+          />
+        </div>
+        
+        <select class="sa-select-dropdown" [(ngModel)]="selectedRole">
+          <option value="all">All Roles</option>
+          <option value="SUPER_ADMIN">Super Admin</option>
+          <option value="ADMIN">Admin</option>
+          <option value="LEGAL_OFFICER">Legal Officer</option>
+          <option value="VIEWER">Viewer</option>
+        </select>
+
+        <select class="sa-select-dropdown" [(ngModel)]="selectedStatus">
+          <option value="all">All Status</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+
+        <button class="button3" (click)="clearFilters()">
+          <span class="clear">Clear</span>
         </button>
       </div>
-    </header>
 
-    <!-- User Accounts Table Grid -->
-    <section class="users-table-section glass-card">
-      <div class="table-container">
-        <table class="custom-table">
-          <thead>
-            <tr>
-              <th>User Name</th>
-              <th>Email Address</th>
-              <th>System Role</th>
-              <th>Account Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let user of users">
-              <td>
-                <div class="user-cell">
-                  <div class="user-avatar-sm">{{ getInitials(user.name) }}</div>
-                  <span class="user-name">{{ user.name }}</span>
-                </div>
-              </td>
-              <td>
-                <div class="email-cell">
-                  <svg lucideMail class="inline-icon"></svg>
-                  <span>{{ user.email }}</span>
-                </div>
-              </td>
-              <td>
-                <span class="role-badge" [ngClass]="getRoleClass(user.role)">
-                  {{ getRoleLabel(user.role) }}
-                </span>
-              </td>
-              <td>
-                <span class="status-indicator">
-                  <span class="status-dot bg-success"></span>
-                  <span class="status-label">Active</span>
-                </span>
-              </td>
-              <td>
-                <div class="actions-cell" *ngIf="user.userId !== currentUserId">
-                  <button (click)="deleteUser(user)" class="action-btn delete-btn" title="Delete User">
-                    <svg lucideTrash2 class="action-icon"></svg>
-                  </button>
-                </div>
-                <span class="current-user-tag" *ngIf="user.userId === currentUserId">(You)</span>
-              </td>
-            </tr>
-            <tr *ngIf="users.length === 0">
-              <td colspan="5" class="empty-row">No users registered in the database.</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="sa-users-table-container glass-card">
+        <div class="table-container">
+          <table class="custom-table sa-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Staff No.</th>
+                <th>Role</th>
+                <th>Department</th>
+                <th>Last Login</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of getFilteredDummyUsers()">
+                <td>
+                  <div class="container10">
+                    <div class="avatar-circle" [ngClass]="getAvatarBgClass(u.name)">
+                      <span>{{ getInitials(u.name) }}</span>
+                    </div>
+                    <div class="container11">
+                      <div class="user-name-title">{{ u.name }}</div>
+                      <div class="user-email-subtitle">{{ u.email }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="font-mono text-slate">{{ u.staffNo }}</td>
+                <td>
+                  <span class="role-badge" [ngClass]="getRoleClass(u.role)">
+                    {{ getRoleLabel(u.role) }}
+                  </span>
+                </td>
+                <td>{{ u.department }}</td>
+                <td>{{ u.lastLogin }}</td>
+                <td>
+                  <span class="status-indicator" [ngClass]="u.status === 'Active' ? 'indicator-active' : 'indicator-inactive'">
+                    <span class="status-dot"></span>
+                    <span class="status-label">{{ u.status }}</span>
+                  </span>
+                </td>
+                <td>
+                  <div class="actions-cell">
+                    <button class="action-btn edit-btn" title="Edit User" *ngIf="u.status === 'Active'">
+                      ✏️
+                    </button>
+                    <button class="action-btn deactivate-btn" title="Deactivate Account" *ngIf="u.status === 'Active'">
+                      🚫
+                    </button>
+                    <button class="btn-reactivate" *ngIf="u.status === 'Inactive'">
+                      Reactivate
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="getFilteredDummyUsers().length === 0">
+                <td colspan="7" class="empty-row">No users match the search criteria.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Pagination Footer -->
+        <div class="sa-pagination-footer">
+          <span class="showing-text">Showing 1–{{ getFilteredDummyUsers().length }} of {{ getFilteredDummyUsers().length }} users</span>
+          <div class="pagination-buttons">
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+          </div>
+        </div>
       </div>
-    </section>
+    </ng-container>
+
+    <!-- ==================== STANDARD ADMIN VIEW ==================== -->
+    <ng-template #standardAdminUserManagement>
+      <!-- Header -->
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">User Account Management</h1>
+          <p class="page-subtitle">Add new authorized personnel, configure system roles, and audit access statuses.</p>
+        </div>
+        <div class="header-actions">
+          <button (click)="openAddModal()" class="btn btn-primary">
+            <svg lucidePlus class="btn-icon"></svg>
+            <span>Add User Account</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- User Accounts Table Grid -->
+      <section class="users-table-section glass-card">
+        <div class="table-container">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>User Name</th>
+                <th>Email Address</th>
+                <th>System Role</th>
+                <th>Account Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of users">
+                <td>
+                  <div class="user-cell">
+                    <div class="user-avatar-sm">{{ getInitials(user.name) }}</div>
+                    <span class="user-name">{{ user.name }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="email-cell">
+                    <svg lucideMail class="inline-icon"></svg>
+                    <span>{{ user.email }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+                    {{ getRoleLabel(user.role) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="status-indicator">
+                    <span class="status-dot bg-success"></span>
+                    <span class="status-label">Active</span>
+                  </span>
+                </td>
+                <td>
+                  <div class="actions-cell" *ngIf="user.userId !== currentUserId">
+                    <button (click)="deleteUser(user)" class="action-btn delete-btn" title="Delete User">
+                      <svg lucideTrash2 class="action-icon"></svg>
+                    </button>
+                  </div>
+                  <span class="current-user-tag" *ngIf="user.userId === currentUserId">(You)</span>
+                </td>
+              </tr>
+              <tr *ngIf="users.length === 0">
+                <td colspan="5" class="empty-row">No users registered in the database.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </ng-template>
 
     <!-- Add User Modal Overlay -->
     <div class="modal-overlay" *ngIf="showAddModal">
@@ -100,7 +226,7 @@
                 type="email" 
                 id="userEmail" 
                 class="form-input" 
-                placeholder="e.g. baloyi@univen.ac.za"
+                placeholder="e.g. baloyi&#64;univen.ac.za"
                 [(ngModel)]="formData.email" 
                 name="userEmail"
                 required
