@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import za.ac.univen.casemanagement.dto.request.CreateAdminRequest;
 import za.ac.univen.casemanagement.dto.request.UserRequest;
 import za.ac.univen.casemanagement.dto.response.ApiResponse;
 import za.ac.univen.casemanagement.dto.response.UserResponse;
@@ -30,6 +31,13 @@ public class UserController {
         UserResponse created = userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(201, "User created successfully", created));
+    }
+
+    @PostMapping("/admin")
+    public ResponseEntity<ApiResponse<UserResponse>> createAdminUser(@Valid @RequestBody CreateAdminRequest request) {
+        UserResponse created = userService.createAdminUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(201, "Administrator account created successfully", created));
     }
 
     @GetMapping("/{userId}")

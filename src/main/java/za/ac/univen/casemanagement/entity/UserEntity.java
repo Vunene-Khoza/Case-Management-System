@@ -23,8 +23,23 @@ public class UserEntity {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Column(name = "surname", length = 100)
+    private String surname;
+
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
+
+    @Column(name = "employee_number", unique = true, length = 50)
+    private String employeeNumber;
+
+    @Column(name = "phone_number", length = 25)
+    private String phoneNumber;
+
+    @Column(name = "id_number", length = 25)
+    private String idNumber;
+
+    @Column(name = "department", length = 100)
+    private String department;
 
     @Column(name = "password", nullable = false)
     private String password;
@@ -35,6 +50,15 @@ public class UserEntity {
 
     @Column(name = "status", nullable = false, length = 50)
     private String status;
+
+    @Column(name = "must_change_password", nullable = false)
+    private boolean mustChangePassword;
+
+    @Column(name = "first_login_completed", nullable = false)
+    private boolean firstLoginCompleted;
+
+    @Column(name = "last_login")
+    private Instant lastLogin;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

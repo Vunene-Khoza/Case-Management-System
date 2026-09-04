@@ -53,15 +53,22 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints: login only
+                // Public endpoints: login and first-time password change
                 .requestMatchers("/api/v1/auth/login").permitAll()
+                .requestMatchers("/api/v1/auth/change-first-time-password").permitAll()
                 .requestMatchers("/error").permitAll()
 
-                // Restrict user creation and deletion to ADMIN role
-                .requestMatchers(HttpMethod.POST, "/api/v1/users").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasRole("ADMIN")
+                // Employee lookup for staff verification
+                .requestMatchers("/api/v1/employees/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
 
-                // All other endpoints require the user to be logged in (authenticated)
+                // Super Admin user management and admin provisioning
+                .requestMatchers(HttpMethod.POST, "/api/v1/users/admin").hasRole("SUPER_ADMIN")
+
+                // User management endpoints
+                .requestMatchers(HttpMethod.POST, "/api/v1/users").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+
+                // All other endpoints require the user to be authenticated
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
