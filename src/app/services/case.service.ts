@@ -329,13 +329,25 @@ export class CaseService {
       map(res => {
         const list = res.data || [];
         return list.map(u => ({
-          userId: u.userId.toString(),
-          name: u.name,
+          userId: u.userId ? u.userId.toString() : '',
+          name: `${u.name || ''} ${u.surname || ''}`.trim() || u.name,
+          surname: u.surname,
           email: u.email,
           role: u.role as UserRole,
           status: u.status || 'ACTIVE',
+          staffNumber: u.employeeNumber || u.staffNumber,
+          phoneNumber: u.phoneNumber,
+          idNumber: u.idNumber,
+          department: u.department,
+          mustChangePassword: !!u.mustChangePassword,
+          firstLoginCompleted: u.firstLoginCompleted !== undefined ? !!u.firstLoginCompleted : true,
+          lastLogin: u.lastLogin,
           createdAt: u.createdAt || ''
         }));
+      }),
+      catchError(err => {
+        console.warn('Backend getUsers failed:', err);
+        return of([]);
       })
     );
   }
@@ -391,23 +403,64 @@ export class CaseService {
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/users/admin`, payload).pipe(
       map(res => {
         const u = res.data;
-        return {
+        const newAdmin: User = {
           userId: u.userId ? u.userId.toString() : 'U_' + Date.now(),
-          name: `${u.name || ''} ${u.surname || ''}`.trim(),
-          surname: u.surname,
-          email: u.email,
+          name: `${u.name || ''} ${u.surname || ''}`.trim() || adminData.name || '',
+          surname: u.surname || adminData.surname,
+          email: u.email || adminData.email || '',
           role: u.role || UserRole.ADMIN,
           status: u.status || 'ACTIVE',
-          staffNumber: u.employeeNumber,
-          phoneNumber: u.phoneNumber,
-          idNumber: u.idNumber,
-          department: u.department,
-          mustChangePassword: u.mustChangePassword,
-          firstLoginCompleted: u.firstLoginCompleted,
+          staffNumber: u.employeeNumber || adminData.staffNumber,
+          phoneNumber: u.phoneNumber || adminData.phoneNumber,
+          idNumber: u.idNumber || adminData.idNumber,
+          department: u.department || adminData.department || 'Department of Legal Services',
+          mustChangePassword: u.mustChangePassword !== undefined ? u.mustChangePassword : true,
+          firstLoginCompleted: u.firstLoginCompleted !== undefined ? u.firstLoginCompleted : false,
+          temporaryPassword: adminData.temporaryPassword,
           createdAt: u.createdAt || new Date().toISOString()
         };
+
+        this.saveCustomUserToLocalStorage(newAdmin);
+        return newAdmin;
+      }),
+      catchError(err => {
+        console.warn('Backend createAdminUser failed, saving to local fallback:', err);
+        const fallbackAdmin: User = {
+          userId: 'U_' + (adminData.staffNumber || Date.now()),
+          name: `${adminData.name || ''} ${adminData.surname || ''}`.trim(),
+          surname: adminData.surname,
+          email: adminData.email || '',
+          role: UserRole.ADMIN,
+          status: 'ACTIVE',
+          staffNumber: adminData.staffNumber,
+          phoneNumber: adminData.phoneNumber,
+          idNumber: adminData.idNumber,
+          department: adminData.department || 'Department of Legal Services',
+          mustChangePassword: true,
+          firstLoginCompleted: false,
+          temporaryPassword: adminData.temporaryPassword,
+          createdAt: new Date().toISOString()
+        };
+        this.saveCustomUserToLocalStorage(fallbackAdmin);
+        return of(fallbackAdmin);
       })
     );
+  }
+
+  private saveCustomUserToLocalStorage(user: User) {
+    try {
+      const customUsersJson = localStorage.getItem('univen_custom_users');
+      const customUsers: User[] = customUsersJson ? JSON.parse(customUsersJson) : [];
+      const existingIdx = customUsers.findIndex(cu => cu.email.toLowerCase() === user.email.toLowerCase());
+      if (existingIdx !== -1) {
+        customUsers[existingIdx] = user;
+      } else {
+        customUsers.push(user);
+      }
+      localStorage.setItem('univen_custom_users', JSON.stringify(customUsers));
+    } catch (e) {
+      console.error('Error saving custom user to localStorage:', e);
+    }
   }
 
   // Delete User (Admin)

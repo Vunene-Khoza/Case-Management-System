@@ -103,9 +103,11 @@ export class UserManagementComponent implements OnInit {
 
   loadSuperAdminUsers() {
     this.caseService.getUsers().subscribe({
-      next: (users: User[]) => {
-        if (users && users.length > 0) {
-          this.dummyUsers = users
+      next: (backendUsers: User[]) => {
+        let allUsersList: any[] = [];
+
+        if (backendUsers && backendUsers.length > 0) {
+          allUsersList = backendUsers
             .filter(u => u.role !== UserRole.ADMIN || u.firstLoginCompleted)
             .map(u => ({
               name: u.name,
@@ -113,17 +115,97 @@ export class UserManagementComponent implements OnInit {
               staffNo: u.staffNumber || '00000',
               role: u.role,
               department: u.department || 'Department of Legal Services',
-              lastLogin: u.lastLogin ? (typeof u.lastLogin === 'string' && u.lastLogin.includes('T') ? new Date(u.lastLogin).toLocaleDateString() : u.lastLogin) : 'Never logged in',
+              lastLogin: this.formatLastLogin(u.lastLogin),
               status: u.status === 'ACTIVE' ? 'Active' : 'Inactive'
             }));
-        } else {
+        }
+
+        // Merge any custom created Admins from localStorage that completed first login
+        const customUsersJson = localStorage.getItem('univen_custom_users');
+        if (customUsersJson) {
+          try {
+            const customUsers: User[] = JSON.parse(customUsersJson);
+            customUsers.forEach(u => {
+              if (u.role === UserRole.ADMIN && u.firstLoginCompleted) {
+                const idx = allUsersList.findIndex(existing => existing.email.toLowerCase() === u.email.toLowerCase());
+                const userObj = {
+                  name: u.name,
+                  email: u.email,
+                  staffNo: u.staffNumber || '10012',
+                  role: 'ADMIN',
+                  department: u.department || 'Department of Legal Services',
+                  lastLogin: this.formatLastLogin(u.lastLogin) || 'Today · Just now',
+                  status: u.status === 'ACTIVE' ? 'Active' : 'Inactive'
+                };
+                if (idx !== -1) {
+                  allUsersList[idx] = userObj;
+                } else {
+                  allUsersList.push(userObj);
+                }
+              }
+            });
+          } catch (e) {
+            console.error('Error reading custom users from localStorage:', e);
+          }
+        }
+
+        if (allUsersList.length === 0) {
           this.dummyUsers = [...this.baseUsers];
+        } else {
+          this.dummyUsers = allUsersList;
         }
       },
       error: () => {
-        this.dummyUsers = [...this.baseUsers];
+        this.fallbackToLocalStorageAndBase();
       }
     });
+  }
+
+  private fallbackToLocalStorageAndBase() {
+    let list = [...this.baseUsers];
+    const customUsersJson = localStorage.getItem('univen_custom_users');
+    if (customUsersJson) {
+      try {
+        const customUsers: User[] = JSON.parse(customUsersJson);
+        customUsers.forEach(u => {
+          if (u.role === UserRole.ADMIN && u.firstLoginCompleted) {
+            const idx = list.findIndex(existing => existing.email.toLowerCase() === u.email.toLowerCase());
+            const userObj = {
+              name: u.name,
+              email: u.email,
+              staffNo: u.staffNumber || '10012',
+              role: 'ADMIN',
+              department: u.department || 'Department of Legal Services',
+              lastLogin: this.formatLastLogin(u.lastLogin) || 'Today · Just now',
+              status: u.status === 'ACTIVE' ? 'Active' : 'Inactive'
+            };
+            if (idx !== -1) {
+              list[idx] = userObj;
+            } else {
+              list.push(userObj);
+            }
+          }
+        });
+      } catch (e) {
+        console.error('Error reading custom users from localStorage:', e);
+      }
+    }
+    this.dummyUsers = list;
+  }
+
+  formatLastLogin(lastLogin?: string): string {
+    if (!lastLogin) return 'Never logged in';
+    if (!lastLogin.includes('T') && !lastLogin.includes('-')) return lastLogin;
+    try {
+      const d = new Date(lastLogin);
+      if (isNaN(d.getTime())) return lastLogin;
+      const now = new Date();
+      const isToday = d.toDateString() === now.toDateString();
+      const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return isToday ? `Today · ${time}` : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    } catch {
+      return lastLogin;
+    }
   }
 
   loadUsers() {
