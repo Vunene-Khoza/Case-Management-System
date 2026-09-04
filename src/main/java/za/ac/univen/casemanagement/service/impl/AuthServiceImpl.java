@@ -3,6 +3,7 @@ package za.ac.univen.casemanagement.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import za.ac.univen.casemanagement.dto.request.ChangeFirstTimePasswordRequest;
 import za.ac.univen.casemanagement.dto.request.LoginRequest;
 import za.ac.univen.casemanagement.dto.response.AuthResponse;
@@ -16,6 +17,7 @@ import za.ac.univen.casemanagement.service.AuthService;
 import java.time.Instant;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
