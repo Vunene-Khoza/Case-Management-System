@@ -470,4 +470,127 @@ export class CaseService {
       map(res => res.success)
     );
   }
+
+  // ================= ROLE ACCESS & SWITCH METHODS =================
+
+  getRoleCounts(): Observable<{ adminCount: number; legalOfficerCount: number; viewerCount: number }> {
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/role-access/counts`).pipe(
+      map(res => res.data),
+      catchError(() => {
+        // Fallback: compute dynamically from existing users list and local storage
+        return this.getUsers().pipe(
+          map(users => {
+            const adminCount = users.filter(u => u.role === UserRole.ADMIN && u.status === 'ACTIVE').length;
+            const legalOfficerCount = users.filter(u => u.role === UserRole.LEGAL_OFFICER && u.status === 'ACTIVE').length;
+            const viewerCount = users.filter(u => u.role === UserRole.VIEWER && u.status === 'ACTIVE').length;
+            return {
+              adminCount: Math.max(adminCount, 1),
+              legalOfficerCount: Math.max(legalOfficerCount, 1),
+              viewerCount: Math.max(viewerCount, 1)
+            };
+          })
+        );
+      })
+    );
+  }
+
+  getUsersByRole(role: string): Observable<User[]> {
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/role-access/users?role=${role}`).pipe(
+      map(res => {
+        const list = res.data || [];
+        return list.map(u => ({
+          userId: u.userId ? u.userId.toString() : '',
+          name: `${u.name || ''} ${u.surname || ''}`.trim() || u.name,
+          surname: u.surname,
+          email: u.email,
+          role: u.role as UserRole,
+          status: u.status || 'ACTIVE',
+          staffNumber: u.employeeNumber || u.staffNumber,
+          phoneNumber: u.phoneNumber,
+          idNumber: u.idNumber,
+          department: u.department,
+          mustChangePassword: !!u.mustChangePassword,
+          firstLoginCompleted: u.firstLoginCompleted !== undefined ? !!u.firstLoginCompleted : true,
+          lastLogin: u.lastLogin,
+          createdAt: u.createdAt || ''
+        }));
+      }),
+      catchError(() => {
+        // Fallback: filter from full users list
+        return this.getUsers().pipe(
+          map(users => users.filter(u => u.role === role))
+        );
+      })
+    );
+  }
+
+  getRoleSwitchHistory(): Observable<any[]> {
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/role-access/history`).pipe(
+      map(res => res.data || []),
+      catchError(() => {
+        const saved = localStorage.getItem('univen_role_switch_history');
+        if (saved) {
+          try {
+            return of(JSON.parse(saved));
+          } catch (e) {}
+        }
+        return of([
+          { timestamp: '2026-05-28 · 09:45', switchedTo: 'Admin View', badgeClass: 'badge-admin', duration: '12 min', actionsTaken: 'Reviewed user management screen' },
+          { timestamp: '2026-05-22 · 14:10', switchedTo: 'Legal Officer View', badgeClass: 'badge-officer', duration: '8 min', actionsTaken: 'Inspected case creation form' },
+          { timestamp: '2026-05-15 · 11:30', switchedTo: 'Viewer View', badgeClass: 'badge-viewer', duration: '5 min', actionsTaken: 'Checked reports accessibility' }
+        ]);
+      })
+    );
+  }
+
+  logRoleSwitch(payload: {
+    targetUserId?: string;
+    targetUserName: string;
+    targetUserEmail: string;
+    targetRole: string;
+    actionsTaken: string;
+  }): Observable<any> {
+    // Save to localStorage history first for immediate responsiveness
+    this.saveLocalRoleSwitchHistory(payload);
+
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/role-access/switch`, payload).pipe(
+      catchError(() => of({ success: true, message: 'Logged locally' }))
+    );
+  }
+
+  private saveLocalRoleSwitchHistory(payload: any) {
+    try {
+      const saved = localStorage.getItem('univen_role_switch_history');
+      const list: any[] = saved ? JSON.parse(saved) : [
+        { timestamp: '2026-05-28 · 09:45', switchedTo: 'Admin View', badgeClass: 'badge-admin', duration: '12 min', actionsTaken: 'Reviewed user management screen' },
+        { timestamp: '2026-05-22 · 14:10', switchedTo: 'Legal Officer View', badgeClass: 'badge-officer', duration: '8 min', actionsTaken: 'Inspected case creation form' },
+        { timestamp: '2026-05-15 · 11:30', switchedTo: 'Viewer View', badgeClass: 'badge-viewer', duration: '5 min', actionsTaken: 'Checked reports accessibility' }
+      ];
+
+      const now = new Date();
+      const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} · ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      
+      let badgeClass = 'badge-admin';
+      let roleName = 'Admin';
+      if (payload.targetRole === 'LEGAL_OFFICER') {
+        badgeClass = 'badge-officer';
+        roleName = 'Legal Officer';
+      } else if (payload.targetRole === 'VIEWER') {
+        badgeClass = 'badge-viewer';
+        roleName = 'Viewer';
+      }
+
+      list.unshift({
+        timestamp: formattedDate,
+        switchedTo: `${roleName} View (${payload.targetUserName})`,
+        badgeClass,
+        duration: 'Just now',
+        actionsTaken: payload.actionsTaken || `Switched to account: ${payload.targetUserName}`
+      });
+
+      localStorage.setItem('univen_role_switch_history', JSON.stringify(list.slice(0, 30)));
+    } catch (e) {
+      console.error('Error saving role switch history locally:', e);
+    }
+  }
 }

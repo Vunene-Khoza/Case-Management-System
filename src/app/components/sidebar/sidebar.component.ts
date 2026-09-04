@@ -32,11 +32,24 @@ export class SidebarComponent implements OnInit {
   }
 
   exitPreviewMode() {
-    const orig = localStorage.getItem('original_role');
-    if (orig) {
-      localStorage.setItem('user_role', orig);
+    const origRole = localStorage.getItem('original_role');
+    const origName = localStorage.getItem('original_name');
+    const origEmail = localStorage.getItem('original_email');
+
+    if (origRole) {
+      localStorage.setItem('user_role', origRole);
       localStorage.removeItem('original_role');
     }
+    if (origName) {
+      localStorage.setItem('user_name', origName);
+      localStorage.removeItem('original_name');
+    }
+    if (origEmail) {
+      localStorage.setItem('user_email', origEmail);
+      localStorage.removeItem('original_email');
+    }
+    localStorage.removeItem('preview_user_id');
+
     this.router.navigate(['/role-access']).then(() => {
       window.location.reload();
     });

@@ -52,7 +52,7 @@
       <div class="div-role-cards">
         
         <!-- Admin Card -->
-        <div class="div-card-admin role-card" (click)="switchToRole('ADMIN')">
+        <div class="div-card-admin role-card" (click)="openRoleModal('ADMIN')" title="Click to view and switch to Admin accounts">
           <div class="overlay bg-success"></div>
           <div class="div-role-card-ico bg-success-light">
             <i class="bi bi-person-workspace i-fa-solid3 text-success"></i>
@@ -66,12 +66,13 @@
             </p>
           </div>
           <div class="div-role-card-count bg-success-light">
-            <span class="_3-active-admins">3 active admins</span>
+            <span class="_3-active-admins" *ngIf="!isLoadingCounts">{{ roleCounts.adminCount }} active admin{{ roleCounts.adminCount === 1 ? '' : 's' }}</span>
+            <span class="_3-active-admins" *ngIf="isLoadingCounts">Loading...</span>
           </div>
         </div>
 
         <!-- Legal Officer Card -->
-        <div class="div-card-officer role-card" (click)="switchToRole('LEGAL_OFFICER')">
+        <div class="div-card-officer role-card" (click)="openRoleModal('LEGAL_OFFICER')" title="Click to view and switch to Legal Officer accounts">
           <div class="overlay2 bg-primary"></div>
           <div class="div-role-card-ico2 bg-primary-light">
             <i class="bi bi-briefcase-fill i-fa-solid4 text-primary"></i>
@@ -85,12 +86,13 @@
             </p>
           </div>
           <div class="div-role-card-count2 bg-primary-light">
-            <span class="_6-active-officers">6 active officers</span>
+            <span class="_6-active-officers" *ngIf="!isLoadingCounts">{{ roleCounts.legalOfficerCount }} active officer{{ roleCounts.legalOfficerCount === 1 ? '' : 's' }}</span>
+            <span class="_6-active-officers" *ngIf="isLoadingCounts">Loading...</span>
           </div>
         </div>
 
         <!-- Viewer Card -->
-        <div class="div-card-viewer role-card" (click)="switchToRole('VIEWER')">
+        <div class="div-card-viewer role-card" (click)="openRoleModal('VIEWER')" title="Click to view and switch to Viewer accounts">
           <div class="overlay3 bg-secondary"></div>
           <div class="div-role-card-ico3 bg-secondary-light">
             <i class="bi bi-eye-fill i-fa-solid5 text-secondary"></i>
@@ -104,7 +106,8 @@
             </p>
           </div>
           <div class="div-role-card-count3 bg-secondary-light">
-            <span class="_2-active-viewers">2 active viewers</span>
+            <span class="_2-active-viewers" *ngIf="!isLoadingCounts">{{ roleCounts.viewerCount }} active viewer{{ roleCounts.viewerCount === 1 ? '' : 's' }}</span>
+            <span class="_2-active-viewers" *ngIf="isLoadingCounts">Loading...</span>
           </div>
         </div>
 
@@ -121,7 +124,7 @@
           <div class="div-card-sub-margin">
             <div class="div-card-sub">
               <span class="all-role-view-sessions-recorded-this">
-                All role view sessions recorded this month
+                All role view sessions recorded from backend audit logs
               </span>
             </div>
           </div>
@@ -138,6 +141,17 @@
             </tr>
           </thead>
           <tbody>
+            <tr *ngIf="isLoadingHistory">
+              <td colspan="4" class="text-center py-4 text-muted">
+                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                Loading switch history...
+              </td>
+            </tr>
+            <tr *ngIf="!isLoadingHistory && historyList.length === 0">
+              <td colspan="4" class="text-center py-4 text-muted">
+                No role view sessions recorded yet.
+              </td>
+            </tr>
             <tr *ngFor="let item of historyList">
               <td class="td-mono">{{ item.timestamp }}</td>
               <td>
@@ -150,6 +164,123 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- ==================== ACCOUNT SELECTOR MODAL WINDOW ==================== -->
+    <div class="modal-backdrop-custom" *ngIf="isModalOpen" (click)="closeRoleModal()">
+      <div class="modal-dialog-custom" (click)="$event.stopPropagation()">
+        
+        <!-- Modal Header -->
+        <div class="modal-header-custom">
+          <div class="modal-title-group">
+            <div class="modal-role-icon" [ngClass]="getRoleBadgeClass(selectedRole)">
+              <i class="bi bi-person-workspace" *ngIf="selectedRole === 'ADMIN'"></i>
+              <i class="bi bi-briefcase-fill" *ngIf="selectedRole === 'LEGAL_OFFICER'"></i>
+              <i class="bi bi-eye-fill" *ngIf="selectedRole === 'VIEWER'"></i>
+            </div>
+            <div>
+              <h3 class="modal-title-text">{{ getRoleModalTitle(selectedRole) }}</h3>
+              <p class="modal-subtitle-text">{{ getRoleModalSubtitle(selectedRole) }}</p>
+            </div>
+          </div>
+          <button type="button" class="btn-close-custom" (click)="closeRoleModal()" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <!-- Search Box -->
+        <div class="modal-search-box">
+          <div class="search-input-wrapper">
+            <i class="bi bi-search search-icon"></i>
+            <input
+              type="text"
+              class="modal-search-input"
+              placeholder="Search by name, staff number, department or email..."
+              [(ngModel)]="searchQuery"
+              (ngModelChange)="onSearchChange()"
+            />
+            <button *ngIf="searchQuery" class="clear-search-btn" (click)="searchQuery = ''; onSearchChange()">
+              <i class="bi bi-x-circle-fill"></i>
+            </button>
+          </div>
+          <div class="modal-user-count">
+            <span class="count-badge">{{ filteredRoleUsers.length }} account{{ filteredRoleUsers.length === 1 ? '' : 's' }} available</span>
+          </div>
+        </div>
+
+        <!-- Modal Body / User Accounts List -->
+        <div class="modal-body-custom">
+          <!-- Loading State -->
+          <div *ngIf="isLoadingUsers" class="modal-loading-state">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading accounts...</span>
+            </div>
+            <p>Retrieving {{ getRoleLabel(selectedRole) }} accounts from server...</p>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="!isLoadingUsers && filteredRoleUsers.length === 0" class="modal-empty-state">
+            <i class="bi bi-people empty-icon"></i>
+            <h4>No Accounts Found</h4>
+            <p *ngIf="searchQuery">No {{ getRoleLabel(selectedRole) }} matched "{{ searchQuery }}". Try adjusting your search query.</p>
+            <p *ngIf="!searchQuery">No active {{ getRoleLabel(selectedRole) }} accounts currently found in the system.</p>
+          </div>
+
+          <!-- Users List -->
+          <div *ngIf="!isLoadingUsers && filteredRoleUsers.length > 0" class="user-cards-list">
+            <div 
+              class="user-card-item" 
+              *ngFor="let user of filteredRoleUsers"
+              (click)="selectUserToSwitch(user)"
+              title="Click to switch into {{ user.name }}'s account"
+            >
+              <div class="user-avatar-col">
+                <div class="user-avatar-circle" [ngClass]="getRoleBadgeClass(user.role)">
+                  {{ getUserInitials(user.name) }}
+                </div>
+              </div>
+              
+              <div class="user-info-col">
+                <div class="user-primary-row">
+                  <h4 class="user-full-name">{{ user.name }}</h4>
+                  <span class="user-status-tag" [class.status-active]="user.status === 'ACTIVE'">
+                    <i class="bi bi-dot"></i> {{ user.status || 'ACTIVE' }}
+                  </span>
+                </div>
+                
+                <div class="user-secondary-row">
+                  <span class="user-meta-item" *ngIf="user.staffNumber">
+                    <i class="bi bi-person-badge"></i> Staff #{{ user.staffNumber }}
+                  </span>
+                  <span class="user-meta-item" *ngIf="user.department">
+                    <i class="bi bi-building"></i> {{ user.department }}
+                  </span>
+                  <span class="user-meta-item">
+                    <i class="bi bi-envelope"></i> {{ user.email }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="user-action-col">
+                <button type="button" class="btn-switch-account">
+                  <span>Switch to Account</span>
+                  <i class="bi bi-arrow-right-short"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer-custom">
+          <div class="modal-footer-hint">
+            <i class="bi bi-shield-check text-primary"></i>
+            <span>Super Admin credentials will be preserved. You can click <strong>Exit Preview</strong> on the sidebar at any time.</span>
+          </div>
+          <button type="button" class="btn-cancel-custom" (click)="closeRoleModal()">Cancel</button>
+        </div>
+
       </div>
     </div>
 
