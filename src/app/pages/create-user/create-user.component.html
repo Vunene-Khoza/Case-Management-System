@@ -5,18 +5,18 @@
     <div class="container3">
       <div class="container4">
         <div class="container5">
-          <h1 class="create-new-user">Create New User</h1>
+          <h1 class="create-new-user">Create Admin Account</h1>
         </div>
         <div class="margin">
           <div class="container6">
             <p class="add-a-new-account-to-the-system-and-a">
-              Add a new account to the system and assign their role
+              Search University of Venda staff records by employee number to provision a new Administrator account.
             </p>
           </div>
         </div>
       </div>
       <div class="container7">
-        <button class="button" (click)="onCancel()">
+        <button type="button" class="button" (click)="onCancel()">
           <span class="cancel">Cancel</span>
         </button>
       </div>
@@ -29,47 +29,136 @@
       <form class="container9" (ngSubmit)="onSubmit()">
         <!-- Error & Success Banners -->
         <div class="alert alert-danger mb-3" *ngIf="errorMessage">
-          {{ errorMessage }}
+          <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage }}
         </div>
         <div class="alert alert-success mb-3" *ngIf="successMessage">
-          {{ successMessage }}
+          <i class="bi bi-check-circle-fill me-2"></i> {{ successMessage }}
         </div>
 
-        <!-- 1. Personal Information -->
+        <!-- 1. Employee Search Section -->
         <div class="background card-section">
           <div class="container10 card-header">
             <div class="container11 title-wrapper">
-              <i class="bi bi-person-fill i2"></i>
-              <span class="personal-information">Personal Information</span>
+              <i class="bi bi-search i2"></i>
+              <span class="personal-information">Step 1: Employee Lookup</span>
             </div>
+          </div>
+          <div class="container12 card-body">
+            <div class="search-box-row">
+              <div class="input-group search-input-container">
+                <label class="label">
+                  <span class="staff-employee-number">University Employee Number <span class="required-star">*</span></span>
+                </label>
+                <div class="search-input-wrap">
+                  <input 
+                    type="text" 
+                    class="input form-control search-field" 
+                    placeholder="Enter employee number (e.g. 10012, 12345, 31007)" 
+                    [(ngModel)]="searchEmployeeNumber" 
+                    name="searchEmployeeNumber"
+                    (keyup.enter)="onSearchEmployee()"
+                    required
+                  />
+                  <button type="button" class="btn btn-search-staff" (click)="onSearchEmployee()" [disabled]="isSearching">
+                    <i class="bi bi-search" *ngIf="!isSearching"></i>
+                    <span *ngIf="isSearching" class="spinner-border spinner-border-sm" role="status"></span>
+                    <span>Search Records</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Suggestions for Testing -->
+            <div class="sample-pills-row">
+              <span class="sample-label">Sample staff numbers:</span>
+              <button 
+                type="button" 
+                class="sample-pill" 
+                *ngFor="let sample of sampleStaffNumbers" 
+                (click)="onSearchEmployee(sample)"
+              >
+                {{ sample }}
+              </button>
+            </div>
+
+            <div class="alert-box alert-danger-box" *ngIf="searchError">
+              <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
+              <span class="alert-text">{{ searchError }}</span>
+            </div>
+
+            <div class="alert-box alert-success-box" *ngIf="employeeFound">
+              <i class="bi bi-check-circle-fill alert-icon text-success"></i> 
+              <span class="alert-text">Official record verified for <strong>{{ name }} {{ surname }}</strong> ({{ department }}). Details auto-populated below in read-only mode.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Auto-Populated Personal Information (Read-only) -->
+        <div class="background card-section">
+          <div class="container10 card-header">
+            <div class="container11 title-wrapper">
+              <i class="bi bi-person-badge-fill i2"></i>
+              <span class="personal-information">Step 2: Verified Employee Information (Read-Only)</span>
+            </div>
+            <span class="badge bg-secondary-subtle text-secondary" *ngIf="employeeFound">Official Univen Record</span>
           </div>
           <div class="container12 card-body">
             <div class="margin2">
               <div class="container13 input-row">
                 <div class="container14 input-group">
                   <label class="label">
-                    <span class="full-name">Full Name <span class="required-star">*</span></span>
+                    <span class="full-name">First Name</span>
                   </label>
                   <input 
                     type="text" 
-                    class="input form-control" 
-                    placeholder="e.g. Tshilidzi Avhashoni" 
-                    [(ngModel)]="fullName" 
-                    name="fullName"
-                    required
+                    class="input form-control readonly-input" 
+                    placeholder="Auto-populated from employee search" 
+                    [value]="name" 
+                    readonly
+                    disabled
                   />
                 </div>
                 <div class="container14 input-group">
                   <label class="label">
-                    <span class="staff-employee-number">Staff / Employee Number <span class="required-star">*</span></span>
+                    <span class="full-name">Surname</span>
                   </label>
                   <input 
                     type="text" 
-                    class="input form-control" 
-                    placeholder="e.g. 12345" 
-                    [(ngModel)]="staffNumber" 
-                    name="staffNumber"
-                    required
+                    class="input form-control readonly-input" 
+                    placeholder="Auto-populated from employee search" 
+                    [value]="surname" 
+                    readonly
+                    disabled
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="margin2">
+              <div class="container13 input-row">
+                <div class="container14 input-group">
+                  <label class="label">
+                    <span class="staff-employee-number">Employee Number</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    class="input form-control readonly-input" 
+                    placeholder="Auto-populated" 
+                    [value]="employeeNumber" 
+                    readonly
+                    disabled
+                  />
+                </div>
+                <div class="container14 input-group">
+                  <label class="label">
+                    <span class="institutional-email">Institutional Email (&#64;univen.ac.za)</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    class="input form-control readonly-input" 
+                    placeholder="name&#64;univen.ac.za" 
+                    [value]="email" 
+                    readonly
+                    disabled
                   />
                 </div>
               </div>
@@ -77,39 +166,40 @@
             <div class="container15 input-row">
               <div class="container14 input-group">
                 <label class="label">
-                  <span class="institutional-email">Institutional Email <span class="required-star">*</span></span>
+                  <span class="department-label">Phone Number</span>
                 </label>
                 <input 
-                  type="email" 
-                  class="input form-control" 
-                  placeholder="name&#64;univen.ac.za" 
-                  [(ngModel)]="email" 
-                  name="email"
-                  required
+                  type="text" 
+                  class="input form-control readonly-input" 
+                  placeholder="Auto-populated phone number" 
+                  [value]="phoneNumber" 
+                  readonly
+                  disabled
                 />
               </div>
               <div class="container14 input-group">
                 <label class="label">
-                  <span class="department-label">Department</span>
+                  <span class="department-label">National ID Number</span>
                 </label>
                 <input 
                   type="text" 
-                  class="input form-control" 
-                  placeholder="e.g. Legal and HR Department" 
-                  [(ngModel)]="department" 
-                  name="department"
+                  class="input form-control readonly-input" 
+                  placeholder="Auto-populated ID number" 
+                  [value]="idNumber" 
+                  readonly
+                  disabled
                 />
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 2. Role & Access Assignment -->
+        <!-- 3. Role & Access Assignment (Fixed to ADMIN) -->
         <div class="background2 card-section">
           <div class="container10 card-header">
             <div class="container16 title-wrapper">
               <i class="bi bi-shield-lock-fill i3"></i>
-              <span class="role-access-assignment">Role &amp; Access Assignment</span>
+              <span class="role-access-assignment">Step 3: Role &amp; Access Assignment</span>
             </div>
           </div>
           <div class="container17 card-body">
@@ -117,29 +207,25 @@
               <div class="container13 input-row">
                 <div class="container14 input-group">
                   <label class="label">
-                    <span class="assign-role">Assign Role <span class="required-star">*</span></span>
+                    <span class="assign-role">Assigned Role</span>
                   </label>
-                  <select 
-                    class="select form-select" 
-                    [(ngModel)]="assignedRole" 
-                    name="assignedRole"
-                    required
-                  >
-                    <option value="SUPER_ADMIN">Super Admin</option>
-                    <option value="ADMIN">Admin</option>
-                    <option value="LEGAL_OFFICER">Legal Officer</option>
-                    <option value="VIEWER">Viewer</option>
-                  </select>
+                  <input 
+                    type="text" 
+                    class="input form-control assigned-role-input" 
+                    value="Administrator (Admin)" 
+                    readonly
+                    disabled
+                  />
                 </div>
                 <div class="container14 input-group">
                   <label class="label">
-                    <span class="account-status-label">Account Status <span class="required-star">*</span></span>
+                    <span class="account-status-label">Account Status</span>
                   </label>
                   <select 
                     class="select form-select" 
                     [(ngModel)]="accountStatus" 
                     name="accountStatus"
-                    required
+                    [disabled]="!employeeFound"
                   >
                     <option value="ACTIVE">Active</option>
                     <option value="INACTIVE">Inactive</option>
@@ -157,12 +243,12 @@
           </div>
         </div>
 
-        <!-- 3. Initial Password -->
+        <!-- 4. Initial Temporary Password -->
         <div class="background4 card-section">
           <div class="container10 card-header">
             <div class="container18 title-wrapper">
               <i class="bi bi-key-fill i3"></i>
-              <span class="initial-password">Initial Password</span>
+              <span class="initial-password">Step 4: Initial Temporary Password</span>
             </div>
           </div>
           <div class="container19 card-body">
@@ -174,27 +260,29 @@
                 <input 
                   type="password" 
                   class="input form-control" 
-                  placeholder="Set a temporary password" 
+                  placeholder="Set a temporary password (min 8 characters)" 
                   [(ngModel)]="tempPassword" 
                   name="tempPassword"
+                  [disabled]="!employeeFound"
                   required
                 />
                 <div class="container21 password-hint">
                   <span class="user-will-be-prompted-to-change-on-fi">
-                    User will be prompted to change on first login
+                    <i class="bi bi-info-circle me-1"></i> Admin will be forced to change this password immediately upon first login.
                   </span>
                 </div>
               </div>
               <div class="container20 input-group">
                 <label class="label">
-                  <span class="confirm-password">Confirm Password <span class="required-star">*</span></span>
+                  <span class="confirm-password">Confirm Temporary Password <span class="required-star">*</span></span>
                 </label>
                 <input 
                   type="password" 
                   class="input form-control" 
-                  placeholder="Repeat the password" 
+                  placeholder="Repeat the temporary password" 
                   [(ngModel)]="confirmPassword" 
                   name="confirmPassword"
+                  [disabled]="!employeeFound"
                   required
                 />
               </div>
@@ -203,7 +291,7 @@
         </div>
       </form>
 
-      <!-- Right Column: Sidebar Actions & Info -->
+      <!-- Right Column: Sidebar Actions & Role Permissions Info -->
       <div class="container22 right-sidebar">
         
         <!-- Authority Warning Panel -->
@@ -212,18 +300,18 @@
             <div class="margin3">
               <div class="container24 warning-row">
                 <div class="i-margin">
-                  <i class="bi bi-info-circle-fill i4"></i>
+                  <i class="bi bi-shield-check i4 text-primary"></i>
                 </div>
                 <div class="paragraph">
                   <p class="as-super-admin-you-have-the-authority-t">
                     <span class="as-super-admin-you-have-the-authority-t-span">
-                      As Super Admin, you have the authority to create accounts for all roles including 
+                      As Super Admin, you provision official 
                     </span>
                     <span class="as-super-admin-you-have-the-authority-t-span2">
-                      Admin
+                      Administrator (Admin)
                     </span>
                     <span class="as-super-admin-you-have-the-authority-t-span">
-                      . Role assignments take effect immediately upon account activation.
+                      accounts. Legal Officers and Viewers register through self-service and approval workflows.
                     </span>
                   </p>
                 </div>
@@ -232,45 +320,13 @@
             
             <!-- Bottom Primary Action Buttons -->
             <div class="container25 button-group">
-              <button class="button2 submit-btn" (click)="onSubmit()">
-                <i class="bi bi-person-plus-fill i5"></i>
-                <span class="create-user-account">Create User Account</span>
+              <button type="button" class="button2 submit-btn" (click)="onSubmit()" [disabled]="!employeeFound">
+                <i class="bi bi-person-check-fill i5"></i>
+                <span class="create-user-account">Create Admin Account</span>
               </button>
-              <button class="button3 cancel-btn" (click)="onCancel()">
+              <button type="button" class="button3 cancel-btn" (click)="onCancel()">
                 <span class="cancel">Cancel</span>
               </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Role Permissions Checklist -->
-        <div class="background6 permissions-panel">
-          <div class="container26 card-header">
-            <div class="container27 title-wrapper">
-              <span class="role-permissions">Role Permissions</span>
-            </div>
-          </div>
-          <div class="container28 panel-body">
-            <div class="container29 permissions-wrapper">
-              <div class="container30 sub-title">
-                <span class="legal-officer2">{{ getRoleLabel(assignedRole) }}</span>
-              </div>
-              <div class="container31 checklist-group">
-                <div 
-                  class="background7 checklist-item" 
-                  *ngFor="let perm of getRolePermissions()"
-                >
-                  <i 
-                    class="bi i6" 
-                    [ngClass]="perm.allowed ? 'bi-check-lg text-success' : 'bi-x-lg text-danger'"
-                  ></i>
-                  <div class="container32 label-wrapper">
-                    <span class="create-new-cases" [class.text-muted]="!perm.allowed">
-                      {{ perm.name }}
-                    </span>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

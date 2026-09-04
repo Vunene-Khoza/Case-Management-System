@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CaseService } from '../../services/case.service';
 import { User, UserRole } from '../../models/case.model';
 import { 
@@ -45,12 +45,23 @@ export class UserManagementComponent implements OnInit {
   selectedRole = 'all';
   selectedStatus = 'all';
 
-  dummyUsers = [
-    { name: 'S. Mukosi', email: 'smukosi&#64;univen.ac.za', staffNo: '00001', role: 'SUPER_ADMIN', department: 'IT / Legal', lastLogin: 'Today · 07:45', status: 'Active' },
-    { name: 'R.E. Mukosi', email: 'mukosi&#64;univen.ac.za', staffNo: '10012', role: 'ADMIN', department: 'Legal and HR', lastLogin: 'Today · 08:14', status: 'Active' },
-    { name: 'T. Avhashoni', email: 'usera&#64;univen.ac.za', staffNo: '12345', role: 'LEGAL_OFFICER', department: 'Legal and HR', lastLogin: 'Yesterday · 16:35', status: 'Active' },
-    { name: 'N. Nndivho', email: 'userb&#64;univen.ac.za', staffNo: '22810', role: 'LEGAL_OFFICER', department: 'Legal and HR', lastLogin: '1 Jun · 10:12', status: 'Active' },
-    { name: 'V. Chauke', email: 'viewerc&#64;univen.ac.za', staffNo: '40234', role: 'VIEWER', department: 'Management', lastLogin: '28 May', status: 'Inactive' }
+  dummyUsers: Array<{
+    name: string;
+    email: string;
+    staffNo: string;
+    role: string;
+    department: string;
+    lastLogin: string;
+    status: string;
+  }> = [];
+
+  // Base system users across all roles
+  baseUsers = [
+    { name: 'S. Mukosi', email: 'smukosi@univen.ac.za', staffNo: '00001', role: 'SUPER_ADMIN', department: 'IT / Legal', lastLogin: 'Today · 07:45', status: 'Active' },
+    { name: 'R.E. Mukosi', email: 'mukosi@univen.ac.za', staffNo: '10012', role: 'ADMIN', department: 'Legal and HR', lastLogin: 'Today · 08:14', status: 'Active' },
+    { name: 'T. Avhashoni', email: 'usera@univen.ac.za', staffNo: '12345', role: 'LEGAL_OFFICER', department: 'Legal and HR', lastLogin: 'Yesterday · 16:35', status: 'Active' },
+    { name: 'N. Nndivho', email: 'userb@univen.ac.za', staffNo: '22810', role: 'LEGAL_OFFICER', department: 'Legal and HR', lastLogin: '1 Jun · 10:12', status: 'Active' },
+    { name: 'V. Chauke', email: 'viewerc@univen.ac.za', staffNo: '40234', role: 'VIEWER', department: 'Management', lastLogin: '28 May', status: 'Inactive' }
   ];
 
   // Add User Form controls
@@ -63,7 +74,8 @@ export class UserManagementComponent implements OnInit {
 
   constructor(
     private caseService: CaseService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -72,6 +84,8 @@ export class UserManagementComponent implements OnInit {
     this.isSuperAdmin = cur.role === 'SUPER_ADMIN';
     this.isAdmin = cur.role === UserRole.ADMIN || this.isSuperAdmin;
     
+    this.loadSuperAdminUsers();
+
     if (this.isAdmin && !this.isSuperAdmin) {
       this.loadUsers();
     }
@@ -85,6 +99,37 @@ export class UserManagementComponent implements OnInit {
         this.selectedStatus = 'Inactive';
       }
     });
+  }
+
+  loadSuperAdminUsers() {
+    this.dummyUsers = [...this.baseUsers];
+
+    // Load any custom provisioned Admins that have completed their first-time password setup and login
+    const customUsersJson = localStorage.getItem('univen_custom_users');
+    if (customUsersJson) {
+      try {
+        const customUsers: User[] = JSON.parse(customUsersJson);
+        customUsers.forEach(u => {
+          // Requirement: Admin account appears in User Management list once first-time password change is completed
+          if (u.role === UserRole.ADMIN && u.firstLoginCompleted) {
+            const alreadyExists = this.dummyUsers.some(existing => existing.email.toLowerCase() === u.email.toLowerCase());
+            if (!alreadyExists) {
+              this.dummyUsers.push({
+                name: u.name,
+                email: u.email,
+                staffNo: u.staffNumber || '10099',
+                role: 'ADMIN',
+                department: u.department || 'Legal and HR',
+                lastLogin: u.lastLogin || 'Today · Just now',
+                status: u.status === 'ACTIVE' ? 'Active' : 'Inactive'
+              });
+            }
+          }
+        });
+      } catch (e) {
+        console.error('Error parsing custom users from localStorage', e);
+      }
+    }
   }
 
   loadUsers() {
@@ -158,6 +203,10 @@ export class UserManagementComponent implements OnInit {
 
   // Modal Actions
   openAddModal() {
+    if (this.isSuperAdmin) {
+      this.router.navigate(['/users/create']);
+      return;
+    }
     this.showAddModal = true;
     this.formData = {
       name: '',

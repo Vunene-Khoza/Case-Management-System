@@ -120,7 +120,6 @@
         <a routerLink="/activity-log" routerLinkActive="active" class="menu-item">
           <i class="bi bi-clock-history menu-icon"></i>
           <div class="activity-log">Activity Log</div>
-          <span class="live-badge" *ngIf="!isCollapsed">Live</span>
         </a>
       </div>
 
@@ -133,7 +132,6 @@
             <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
           </svg>
           <div class="all-users">All Users</div>
-          <span class="count-badge" *ngIf="!isCollapsed">{{ totalUsersCount }}</span>
         </a>
 
         <a routerLink="/users/create" routerLinkActive="active" class="menu-item">
@@ -147,7 +145,6 @@
             <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
           </svg>
           <div class="pending-approvals">Pending Approvals</div>
-          <span class="count-badge badge-warning" *ngIf="!isCollapsed">{{ pendingApprovalsCount }}</span>
         </a>
       </div>
     </ng-container>

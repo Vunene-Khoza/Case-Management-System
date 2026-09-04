@@ -26,9 +26,14 @@
 
       <!-- login form -->
       <form #loginForm="ngForm" (ngSubmit)="onLogin()">
+        <!-- success message banner -->
+        <div class="alert alert-success" *ngIf="successMessage" style="color: #065f46; background: #d1fae5; border: 1px solid #a7f3d0; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 16px;">
+          <i class="bi bi-check-circle-fill me-2"></i> {{ successMessage }}
+        </div>
+
         <!-- error message banner -->
         <div class="alert alert-danger" *ngIf="errorMessage" style="color: #ef4444; background: #fef2f2; border: 1px solid #fee2e2; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 16px;">
-          {{ errorMessage }}
+          <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage }}
         </div>
 
         <!-- username / email field -->
@@ -168,6 +173,73 @@
           <div class="d-grid gap-2">
             <button type="submit" class="btn btn-navy w-100 fw-bold" [disabled]="!resetForm.valid">Send Verification Code</button>
             <button type="button" class="btn btn-outline-secondary w-100 mt-2" (click)="closeResetPasswordModal()"> Cancel </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIRST-TIME LOGIN CHANGE PASSWORD MODAL (BLOCKING) -->
+  <div class="modal-overlay" *ngIf="showChangePasswordModal">
+    <div class="modal-content-custom change-password-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header-custom bg-navy text-white">
+        <div class="d-flex align-items-center gap-2">
+          <div class="modal-shield-badge">
+            <i class="bi bi-shield-lock-fill text-warning"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-bold mb-0">First-Time Login Security Setup</h5>
+            <small class="opacity-75">Change Temporary Password</small>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body-custom">
+        <div class="alert alert-info py-2 px-3 mb-3 d-flex align-items-center gap-2" style="font-size: 12.5px; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; border-radius: 6px;">
+          <i class="bi bi-info-circle-fill flex-shrink-0"></i>
+          <span>As a new Administrator, you are required to replace your temporary password before accessing the system.</span>
+        </div>
+
+        <div class="alert alert-danger py-2 px-3 mb-3" *ngIf="changePasswordError" style="font-size: 12.5px; color: #991b1b; background: #fee2e2; border: 1px solid #fecaca; border-radius: 6px;">
+          <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ changePasswordError }}
+        </div>
+
+        <form (ngSubmit)="submitFirstTimePasswordChange()">
+          <!-- Account Email (Read-only) -->
+          <div class="mb-3">
+            <label class="form-label text-dark fw-semibold small">Account Email</label>
+            <input type="text" class="form-control" [value]="changePasswordUserEmail" readonly disabled style="background-color: #f1f5f9; font-size: 13px; font-weight: 500;">
+          </div>
+
+          <!-- Temporary Password -->
+          <div class="mb-3">
+            <label class="form-label text-dark fw-semibold small">Temporary / Current Password <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" placeholder="Enter temporary password provided by Super Admin" [(ngModel)]="firstTimeCurrentPassword" name="firstTimeCurrentPassword" required style="font-size: 13px;">
+          </div>
+
+          <!-- New Password -->
+          <div class="mb-3">
+            <label class="form-label text-dark fw-semibold small">New Password <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" placeholder="Create a secure new password (min 8 characters)" [(ngModel)]="firstTimeNewPassword" name="firstTimeNewPassword" required style="font-size: 13px;">
+            <small class="text-muted" style="font-size: 11px;">Must be at least 8 characters long and different from temporary password.</small>
+          </div>
+
+          <!-- Confirm New Password -->
+          <div class="mb-4">
+            <label class="form-label text-dark fw-semibold small">Confirm New Password <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" placeholder="Repeat your new password" [(ngModel)]="firstTimeConfirmPassword" name="firstTimeConfirmPassword" required style="font-size: 13px;">
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-navy w-100 fw-bold py-2" [disabled]="isChangingPassword">
+              <span *ngIf="isChangingPassword" class="spinner-border spinner-border-sm me-1" role="status"></span>
+              <span>Update Password &amp; Continue</span>
+            </button>
+          </div>
+
+          <div class="text-center mt-3">
+            <small class="text-muted" style="font-size: 11.5px;">
+              <i class="bi bi-shield-check me-1 text-success"></i> You will be automatically redirected to sign in with your new password.
+            </small>
           </div>
         </form>
       </div>

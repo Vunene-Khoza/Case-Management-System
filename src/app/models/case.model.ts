@@ -51,11 +51,30 @@ export interface CaseNote {
   createdAt: string;
 }
 
+export interface UniversityEmployee {
+  employeeNumber: string;
+  name: string;
+  surname: string;
+  email: string;
+  phoneNumber: string;
+  idNumber: string;
+  department: string;
+}
+
 export interface User {
   userId: string;
   name: string;
+  surname?: string;
   email: string;
   role: UserRole;
   status: "ACTIVE" | "INACTIVE";
+  staffNumber?: string;
+  phoneNumber?: string;
+  idNumber?: string;
+  department?: string;
+  lastLogin?: string;
+  mustChangePassword?: boolean;
+  firstLoginCompleted?: boolean;
+  temporaryPassword?: string;
   createdAt: string;
 }
