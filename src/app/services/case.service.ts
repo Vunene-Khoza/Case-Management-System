@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, forkJoin } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, catchError } from 'rxjs/operators';
 import { Case, CaseNote, User, CaseType, CaseClassification, CaseStatus, UserRole, UniversityEmployee } from '../models/case.model';
 
 export interface ApiResponse<T> {
@@ -365,95 +365,49 @@ export class CaseService {
     );
   }
 
-  // University of Venda Employee Directory Dataset
-  private universityEmployees: UniversityEmployee[] = [
-    {
-      employeeNumber: '10012',
-      name: 'Ripfumelo',
-      surname: 'Mukosi',
-      email: 'mukosi@univen.ac.za',
-      phoneNumber: '+27 72 123 4567',
-      idNumber: '8501015021087',
-      department: 'Legal and HR'
-    },
-    {
-      employeeNumber: '12345',
-      name: 'Tshilidzi',
-      surname: 'Avhashoni',
-      email: 'tavhashoni@univen.ac.za',
-      phoneNumber: '+27 73 987 6543',
-      idNumber: '9002145123089',
-      department: 'Legal and HR'
-    },
-    {
-      employeeNumber: '31007',
-      name: 'Vhutshilo',
-      surname: 'Sinthumule',
-      email: 'vs@univen.ac.za',
-      phoneNumber: '+27 81 234 5678',
-      idNumber: '8807125345081',
-      department: 'Legal and HR'
-    },
-    {
-      employeeNumber: '40234',
-      name: 'Ndidzulafhi',
-      surname: 'Baloyi',
-      email: 'nbaloyi@univen.ac.za',
-      phoneNumber: '+27 76 543 2198',
-      idNumber: '9209305678082',
-      department: 'Management'
-    },
-    {
-      employeeNumber: '51923',
-      name: 'Livhuwani',
-      surname: 'Makhuvha',
-      email: 'lmakhuvha@univen.ac.za',
-      phoneNumber: '+27 82 345 6789',
-      idNumber: '8711055890084',
-      department: 'Legal and HR'
-    },
-    {
-      employeeNumber: '60114',
-      name: 'Khathutshelo',
-      surname: 'Nemutanzhela',
-      email: 'knemutanzhela@univen.ac.za',
-      phoneNumber: '+27 79 112 2334',
-      idNumber: '9104185432085',
-      department: 'Audit & Governance'
-    }
-  ];
-
   searchEmployeeByNumber(empNumber: string): Observable<UniversityEmployee | null> {
     const trimmed = (empNumber || '').trim();
-    const found = this.universityEmployees.find(e => e.employeeNumber === trimmed);
-    return of(found || null);
+    if (!trimmed) {
+      return of(null);
+    }
+    return this.http.get<ApiResponse<UniversityEmployee>>(`${this.apiUrl}/employees/${trimmed}`).pipe(
+      map(response => response.data || null),
+      catchError(() => of(null))
+    );
   }
 
   createAdminUser(adminData: Partial<User>): Observable<User> {
-    const newAdmin: User = {
-      userId: 'U_' + (adminData.staffNumber || Date.now()),
-      name: `${adminData.name || ''} ${adminData.surname || ''}`.trim(),
-      surname: adminData.surname,
+    const payload = {
+      employeeNumber: adminData.staffNumber || '',
+      name: adminData.name || '',
+      surname: adminData.surname || '',
       email: adminData.email || '',
-      role: UserRole.ADMIN,
-      status: 'ACTIVE',
-      staffNumber: adminData.staffNumber,
-      phoneNumber: adminData.phoneNumber,
-      idNumber: adminData.idNumber,
-      department: adminData.department || 'Legal and HR',
-      mustChangePassword: true,
-      firstLoginCompleted: false,
-      temporaryPassword: adminData.temporaryPassword,
-      lastLogin: 'Never logged in',
-      createdAt: new Date().toISOString()
+      phoneNumber: adminData.phoneNumber || '',
+      idNumber: adminData.idNumber || '',
+      department: adminData.department || 'Department of Legal Services',
+      temporaryPassword: adminData.temporaryPassword || ''
     };
 
-    const existingCustomUsersJson = localStorage.getItem('univen_custom_users');
-    const existingCustomUsers: User[] = existingCustomUsersJson ? JSON.parse(existingCustomUsersJson) : [];
-    existingCustomUsers.push(newAdmin);
-    localStorage.setItem('univen_custom_users', JSON.stringify(existingCustomUsers));
-
-    return of(newAdmin);
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/users/admin`, payload).pipe(
+      map(res => {
+        const u = res.data;
+        return {
+          userId: u.userId ? u.userId.toString() : 'U_' + Date.now(),
+          name: `${u.name || ''} ${u.surname || ''}`.trim(),
+          surname: u.surname,
+          email: u.email,
+          role: u.role || UserRole.ADMIN,
+          status: u.status || 'ACTIVE',
+          staffNumber: u.employeeNumber,
+          phoneNumber: u.phoneNumber,
+          idNumber: u.idNumber,
+          department: u.department,
+          mustChangePassword: u.mustChangePassword,
+          firstLoginCompleted: u.firstLoginCompleted,
+          createdAt: u.createdAt || new Date().toISOString()
+        };
+      })
+    );
   }
 
   // Delete User (Admin)

@@ -102,34 +102,28 @@ export class UserManagementComponent implements OnInit {
   }
 
   loadSuperAdminUsers() {
-    this.dummyUsers = [...this.baseUsers];
-
-    // Load any custom provisioned Admins that have completed their first-time password setup and login
-    const customUsersJson = localStorage.getItem('univen_custom_users');
-    if (customUsersJson) {
-      try {
-        const customUsers: User[] = JSON.parse(customUsersJson);
-        customUsers.forEach(u => {
-          // Requirement: Admin account appears in User Management list once first-time password change is completed
-          if (u.role === UserRole.ADMIN && u.firstLoginCompleted) {
-            const alreadyExists = this.dummyUsers.some(existing => existing.email.toLowerCase() === u.email.toLowerCase());
-            if (!alreadyExists) {
-              this.dummyUsers.push({
-                name: u.name,
-                email: u.email,
-                staffNo: u.staffNumber || '10099',
-                role: 'ADMIN',
-                department: u.department || 'Legal and HR',
-                lastLogin: u.lastLogin || 'Today · Just now',
-                status: u.status === 'ACTIVE' ? 'Active' : 'Inactive'
-              });
-            }
-          }
-        });
-      } catch (e) {
-        console.error('Error parsing custom users from localStorage', e);
+    this.caseService.getUsers().subscribe({
+      next: (users: User[]) => {
+        if (users && users.length > 0) {
+          this.dummyUsers = users
+            .filter(u => u.role !== UserRole.ADMIN || u.firstLoginCompleted)
+            .map(u => ({
+              name: u.name,
+              email: u.email,
+              staffNo: u.staffNumber || '00000',
+              role: u.role,
+              department: u.department || 'Department of Legal Services',
+              lastLogin: u.lastLogin ? (typeof u.lastLogin === 'string' && u.lastLogin.includes('T') ? new Date(u.lastLogin).toLocaleDateString() : u.lastLogin) : 'Never logged in',
+              status: u.status === 'ACTIVE' ? 'Active' : 'Inactive'
+            }));
+        } else {
+          this.dummyUsers = [...this.baseUsers];
+        }
+      },
+      error: () => {
+        this.dummyUsers = [...this.baseUsers];
       }
-    }
+    });
   }
 
   loadUsers() {
