@@ -64,6 +64,9 @@ public class SecurityConfig {
                 // Super Admin user management and admin provisioning
                 .requestMatchers(HttpMethod.POST, "/api/v1/users/admin").hasRole("SUPER_ADMIN")
 
+                // Role Access & Switch Preview endpoints
+                .requestMatchers("/api/v1/role-access/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+
                 // User management endpoints
                 .requestMatchers(HttpMethod.POST, "/api/v1/users").hasAnyRole("SUPER_ADMIN", "ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAnyRole("SUPER_ADMIN", "ADMIN")

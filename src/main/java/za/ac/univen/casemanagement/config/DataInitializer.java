@@ -6,10 +6,15 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import za.ac.univen.casemanagement.entity.EmployeeEntity;
+import za.ac.univen.casemanagement.entity.RoleSwitchLogEntity;
 import za.ac.univen.casemanagement.entity.UserEntity;
 import za.ac.univen.casemanagement.enums.UserRole;
 import za.ac.univen.casemanagement.repository.EmployeeRepository;
+import za.ac.univen.casemanagement.repository.RoleSwitchLogRepository;
 import za.ac.univen.casemanagement.repository.UserRepository;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -18,12 +23,14 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
+    private final RoleSwitchLogRepository roleSwitchLogRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
         seedEmployees();
         seedUsers();
+        seedRoleSwitchLogs();
     }
 
     private void seedEmployees() {
@@ -52,10 +59,20 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedUsers() {
+        // Super Admin
         seedUserIfNotFound("superadmin@univen.ac.za", "System Super Admin", "Super Admin", "00001", "+27 15 962 8001", "8001015800080", "Office of the Vice-Chancellor", "Super@123", UserRole.SUPER_ADMIN);
+
+        // System Admin
         seedUserIfNotFound("admin@univen.ac.za", "System Admin", "Admin", "00002", "+27 15 962 8002", "8101015800080", "Office of the Registrar", "Admin@123", UserRole.ADMIN);
-        seedUserIfNotFound("officer@univen.ac.za", "D. Blundin", "Blundin", "00003", "+27 15 962 8003", "8201015800080", "Department of Legal Services", "Officer@123", UserRole.LEGAL_OFFICER);
+
+        // Legal Officers
+        seedUserIfNotFound("officer@univen.ac.za", "Adv. D. Blundin", "Blundin", "00003", "+27 15 962 8003", "8201015800080", "Department of Legal Services", "Officer@123", UserRole.LEGAL_OFFICER);
+        seedUserIfNotFound("baloyi.ndidzulafhi@univen.ac.za", "Ndidzulafhi", "Baloyi", "40234", "+27 15 962 8901", "8405125800084", "Faculty of Management & Law", "Officer@123", UserRole.LEGAL_OFFICER);
+        seedUserIfNotFound("sinthumule.vhutshilo@univen.ac.za", "Vhutshilo", "Sinthumule", "31007", "+27 15 962 8452", "9107245800087", "Human Resources Directorate", "Officer@123", UserRole.LEGAL_OFFICER);
+
+        // Viewers
         seedUserIfNotFound("viewer@univen.ac.za", "Standard Viewer", "Viewer", "00004", "+27 15 962 8004", "8301015800080", "Internal Audit", "Viewer@123", UserRole.VIEWER);
+        seedUserIfNotFound("nemutanzhela.k@univen.ac.za", "Khathutshelo", "Nemutanzhela", "60114", "+27 15 962 8776", "8809095800082", "Finance Directorate", "Viewer@123", UserRole.VIEWER);
     }
 
     private void seedUserIfNotFound(String email, String name, String surname, String empNum, String phone, String idNum, String dept, String rawPassword, UserRole role) {
@@ -89,6 +106,47 @@ public class DataInitializer implements CommandLineRunner {
             user.setFirstLoginCompleted(true);
             userRepository.save(user);
             log.info("Updated password & attributes for seeded user: {}", email);
+        }
+    }
+
+    private void seedRoleSwitchLogs() {
+        if (roleSwitchLogRepository.count() == 0) {
+            Instant now = Instant.now();
+
+            RoleSwitchLogEntity log1 = RoleSwitchLogEntity.builder()
+                    .superAdminEmail("superadmin@univen.ac.za")
+                    .targetUserName("System Admin")
+                    .targetUserEmail("admin@univen.ac.za")
+                    .targetRole(UserRole.ADMIN)
+                    .duration("12 min")
+                    .actionsTaken("Reviewed user management screen")
+                    .createdAt(now.minus(2, ChronoUnit.HOURS))
+                    .build();
+
+            RoleSwitchLogEntity log2 = RoleSwitchLogEntity.builder()
+                    .superAdminEmail("superadmin@univen.ac.za")
+                    .targetUserName("Adv. D. Blundin")
+                    .targetUserEmail("officer@univen.ac.za")
+                    .targetRole(UserRole.LEGAL_OFFICER)
+                    .duration("8 min")
+                    .actionsTaken("Inspected case creation form")
+                    .createdAt(now.minus(1, ChronoUnit.DAYS))
+                    .build();
+
+            RoleSwitchLogEntity log3 = RoleSwitchLogEntity.builder()
+                    .superAdminEmail("superadmin@univen.ac.za")
+                    .targetUserName("Standard Viewer")
+                    .targetUserEmail("viewer@univen.ac.za")
+                    .targetRole(UserRole.VIEWER)
+                    .duration("5 min")
+                    .actionsTaken("Checked reports accessibility")
+                    .createdAt(now.minus(3, ChronoUnit.DAYS))
+                    .build();
+
+            roleSwitchLogRepository.save(log1);
+            roleSwitchLogRepository.save(log2);
+            roleSwitchLogRepository.save(log3);
+            log.info("Seeded initial role switch logs for demonstration.");
         }
     }
 }
