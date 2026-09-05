@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.ac.univen.casemanagement.dto.request.CreateAdminRequest;
+import za.ac.univen.casemanagement.dto.request.CreateLegalOfficerRequest;
 import za.ac.univen.casemanagement.dto.request.UserRequest;
 import za.ac.univen.casemanagement.dto.response.UserResponse;
 import za.ac.univen.casemanagement.entity.UserEntity;
@@ -84,6 +85,47 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         UserEntity saved = userRepository.save(adminEntity);
+        return mapToResponse(saved);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse createLegalOfficerUser(CreateLegalOfficerRequest request) {
+        String email = request.getEmail().trim().toLowerCase();
+        String empNum = request.getEmployeeNumber().trim();
+
+        if (!email.endsWith("@univen.ac.za")) {
+            throw new BadRequestException("Legal Officer email must be an official @univen.ac.za institutional address.");
+        }
+
+        if (userRepository.existsByEmail(email)) {
+            throw new BadRequestException("An account with email " + email + " is already registered.");
+        }
+
+        if (userRepository.existsByEmployeeNumber(empNum)) {
+            throw new BadRequestException("An account with Employee Number " + empNum + " is already registered.");
+        }
+
+        if (!employeeRepository.existsByEmployeeNumber(empNum)) {
+            throw new ResourceNotFoundException("No official University of Venda employee found for Staff Number: " + empNum);
+        }
+
+        UserEntity legalOfficerEntity = UserEntity.builder()
+                .name(request.getName().trim())
+                .surname(request.getSurname().trim())
+                .email(email)
+                .employeeNumber(empNum)
+                .phoneNumber(request.getPhoneNumber().trim())
+                .idNumber(request.getIdNumber().trim())
+                .department(request.getDepartment().trim())
+                .password(passwordEncoder.encode(request.getTemporaryPassword()))
+                .role(UserRole.LEGAL_OFFICER)
+                .status("ACTIVE")
+                .mustChangePassword(true)
+                .firstLoginCompleted(false)
+                .build();
+
+        UserEntity saved = userRepository.save(legalOfficerEntity);
         return mapToResponse(saved);
     }
 

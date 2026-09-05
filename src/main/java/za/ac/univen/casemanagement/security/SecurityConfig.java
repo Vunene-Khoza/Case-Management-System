@@ -64,11 +64,14 @@ public class SecurityConfig {
                 // Super Admin user management and admin provisioning
                 .requestMatchers(HttpMethod.POST, "/api/v1/users/admin").hasRole("SUPER_ADMIN")
 
+                // Legal Officer provisioning (Admins and Super Admins)
+                .requestMatchers(HttpMethod.POST, "/api/v1/users/legal-officer").hasAnyRole("SUPER_ADMIN", "ADMIN")
+
                 // Role Access & Switch Preview endpoints
                 .requestMatchers("/api/v1/role-access/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
 
-                // User management endpoints
-                .requestMatchers(HttpMethod.POST, "/api/v1/users").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                // User management endpoints (Admin can only create legal officers, generic user creation restricted to Super Admin)
+                .requestMatchers(HttpMethod.POST, "/api/v1/users").hasRole("SUPER_ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
 
                 // All other endpoints require the user to be authenticated
