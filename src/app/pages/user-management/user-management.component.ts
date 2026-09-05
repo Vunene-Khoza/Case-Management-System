@@ -277,18 +277,9 @@ export class UserManagementComponent implements OnInit {
     alert('User Directory exported successfully as CSV.');
   }
 
-  // Modal Actions
+  // User Creation Action
   openAddModal() {
-    if (this.isSuperAdmin) {
-      this.router.navigate(['/users/create']);
-      return;
-    }
-    this.showAddModal = true;
-    this.formData = {
-      name: '',
-      email: '',
-      role: UserRole.LEGAL_OFFICER
-    };
+    this.router.navigate(['/users/create']);
   }
 
   closeAddModal() {

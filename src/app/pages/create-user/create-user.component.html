@@ -5,12 +5,12 @@
     <div class="container3">
       <div class="container4">
         <div class="container5">
-          <h1 class="create-new-user">Create Admin Account</h1>
+          <h1 class="create-new-user">{{ isSuperAdmin ? 'Create Admin Account' : 'Create Legal Officer Account' }}</h1>
         </div>
         <div class="margin">
           <div class="container6">
             <p class="add-a-new-account-to-the-system-and-a">
-              Search University of Venda staff records by employee number to provision a new Administrator account.
+              {{ isSuperAdmin ? 'Search University of Venda staff records by employee number to provision a new Administrator account.' : 'Search University of Venda staff records by employee number to provision a new Legal Officer account.' }}
             </p>
           </div>
         </div>
@@ -212,7 +212,7 @@
                   <input 
                     type="text" 
                     class="input form-control assigned-role-input" 
-                    value="Administrator (Admin)" 
+                    [value]="isSuperAdmin ? 'Administrator (Admin)' : 'Legal Officer'" 
                     readonly
                     disabled
                   />
@@ -268,7 +268,7 @@
                 />
                 <div class="container21 password-hint">
                   <span class="user-will-be-prompted-to-change-on-fi">
-                    <i class="bi bi-info-circle me-1"></i> Admin will be forced to change this password immediately upon first login.
+                    <i class="bi bi-info-circle me-1"></i> {{ isSuperAdmin ? 'Admin' : 'Legal Officer' }} will be forced to change this password immediately upon first login.
                   </span>
                 </div>
               </div>
@@ -303,7 +303,7 @@
                   <i class="bi bi-shield-check i4 text-primary"></i>
                 </div>
                 <div class="paragraph">
-                  <p class="as-super-admin-you-have-the-authority-t">
+                  <p class="as-super-admin-you-have-the-authority-t" *ngIf="isSuperAdmin">
                     <span class="as-super-admin-you-have-the-authority-t-span">
                       As Super Admin, you provision official 
                     </span>
@@ -311,7 +311,18 @@
                       Administrator (Admin)
                     </span>
                     <span class="as-super-admin-you-have-the-authority-t-span">
-                      accounts. Legal Officers and Viewers register through self-service and approval workflows.
+                      accounts from verified university employee records.
+                    </span>
+                  </p>
+                  <p class="as-super-admin-you-have-the-authority-t" *ngIf="!isSuperAdmin">
+                    <span class="as-super-admin-you-have-the-authority-t-span">
+                      As Administrator, you provision official 
+                    </span>
+                    <span class="as-super-admin-you-have-the-authority-t-span2">
+                      Legal Officer
+                    </span>
+                    <span class="as-super-admin-you-have-the-authority-t-span">
+                      accounts from verified university employee records.
                     </span>
                   </p>
                 </div>
@@ -322,7 +333,7 @@
             <div class="container25 button-group">
               <button type="button" class="button2 submit-btn" (click)="onSubmit()" [disabled]="!employeeFound">
                 <i class="bi bi-person-check-fill i5"></i>
-                <span class="create-user-account">Create Admin Account</span>
+                <span class="create-user-account">{{ isSuperAdmin ? 'Create Admin Account' : 'Create Legal Officer Account' }}</span>
               </button>
               <button type="button" class="button3 cancel-btn" (click)="onCancel()">
                 <span class="cancel">Cancel</span>

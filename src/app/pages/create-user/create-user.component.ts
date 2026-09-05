@@ -19,6 +19,7 @@ interface RolePermission {
 })
 export class CreateUserComponent implements OnInit {
   isSuperAdmin = false;
+  isAdmin = false;
 
   // Search by Employee Number
   searchEmployeeNumber = '';
@@ -36,7 +37,7 @@ export class CreateUserComponent implements OnInit {
   department = '';
 
   // Fixed Role & Account Status
-  assignedRole = UserRole.ADMIN;
+  assignedRole: UserRole = UserRole.ADMIN;
   accountStatus = 'ACTIVE';
 
   // Temporary Password Entry
@@ -58,6 +59,14 @@ export class CreateUserComponent implements OnInit {
   ngOnInit() {
     const cur = this.caseService.getCurrentUser();
     this.isSuperAdmin = cur.role === 'SUPER_ADMIN';
+    this.isAdmin = cur.role === 'ADMIN';
+
+    // If caller is Admin, lock role strictly to LEGAL_OFFICER (cannot create Viewers or Admins)
+    if (this.isAdmin) {
+      this.assignedRole = UserRole.LEGAL_OFFICER;
+    } else {
+      this.assignedRole = UserRole.ADMIN;
+    }
   }
 
   onSearchEmployee(sampleNumber?: string) {
@@ -113,19 +122,36 @@ export class CreateUserComponent implements OnInit {
     this.department = '';
   }
 
+  getRoleTitle(): string {
+    return this.isSuperAdmin ? 'Administrator' : 'Legal Officer';
+  }
+
   getRoleDescription(): string {
-    return 'Admins manage university cases, view institutional reports, and support operational workflows. Admins must be verified Univen staff with an official @univen.ac.za email.';
+    if (this.isSuperAdmin) {
+      return 'Admins manage university cases, view institutional reports, and support operational workflows. Admins must be verified Univen staff with an official @univen.ac.za email.';
+    }
+    return 'Legal Officers manage active cases, track trial dates, record official notes, and submit matters for closure. Legal Officers must be verified Univen staff with an official @univen.ac.za email.';
   }
 
   getRolePermissions(): RolePermission[] {
+    if (this.isSuperAdmin) {
+      return [
+        { name: 'Full system case visibility', allowed: true },
+        { name: 'Update & edit registered cases', allowed: true },
+        { name: 'Add official case notes', allowed: true },
+        { name: 'Update trial & reminder dates', allowed: true },
+        { name: 'Close resolved cases', allowed: true },
+        { name: 'Access comprehensive reports', allowed: true },
+        { name: 'Global Super Admin configuration', allowed: false }
+      ];
+    }
     return [
-      { name: 'Full system case visibility', allowed: true },
-      { name: 'Update & edit registered cases', allowed: true },
-      { name: 'Add official case notes', allowed: true },
-      { name: 'Update trial & reminder dates', allowed: true },
-      { name: 'Close resolved cases', allowed: true },
-      { name: 'Access comprehensive reports', allowed: true },
-      { name: 'Global Super Admin configuration', allowed: false }
+      { name: 'Create & manage assigned cases', allowed: true },
+      { name: 'Add official case notes & history', allowed: true },
+      { name: 'Schedule hearing & reminder dates', allowed: true },
+      { name: 'Submit matters for administrative closure', allowed: true },
+      { name: 'Access case reports & summaries', allowed: true },
+      { name: 'User management & system provisioning', allowed: false }
     ];
   }
 
@@ -133,13 +159,15 @@ export class CreateUserComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
+    const targetRoleName = this.isSuperAdmin ? 'Admin' : 'Legal Officer';
+
     if (!this.employeeFound) {
-      this.errorMessage = 'Please search and select a valid University employee before creating the Admin account.';
+      this.errorMessage = `Please search and select a valid University employee before creating the ${targetRoleName} account.`;
       return;
     }
 
     if (!this.tempPassword || !this.confirmPassword) {
-      this.errorMessage = 'Please provide and confirm a temporary password for the new Admin.';
+      this.errorMessage = `Please provide and confirm a temporary password for the new ${targetRoleName}.`;
       return;
     }
 
@@ -153,7 +181,7 @@ export class CreateUserComponent implements OnInit {
       return;
     }
 
-    this.caseService.createAdminUser({
+    const payload = {
       name: this.name,
       surname: this.surname,
       email: this.email,
@@ -161,17 +189,23 @@ export class CreateUserComponent implements OnInit {
       phoneNumber: this.phoneNumber,
       idNumber: this.idNumber,
       department: this.department,
-      role: UserRole.ADMIN,
+      role: this.assignedRole,
       temporaryPassword: this.tempPassword
-    }).subscribe({
+    };
+
+    const creationObservable = this.isSuperAdmin
+      ? this.caseService.createAdminUser(payload)
+      : this.caseService.createLegalOfficerUser(payload);
+
+    creationObservable.subscribe({
       next: () => {
-        this.successMessage = `Admin account for ${this.name} ${this.surname} (${this.email}) created successfully! The user must complete their first-time password setup upon login.`;
+        this.successMessage = `${targetRoleName} account for ${this.name} ${this.surname} (${this.email}) created successfully! The user must complete their first-time password setup upon login.`;
         setTimeout(() => {
           this.router.navigate(['/users']);
         }, 2000);
       },
       error: (err: any) => {
-        this.errorMessage = err?.message || 'Failed to create Admin account.';
+        this.errorMessage = err?.message || `Failed to create ${targetRoleName} account.`;
       }
     });
   }

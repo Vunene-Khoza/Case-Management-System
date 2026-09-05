@@ -447,6 +447,75 @@ export class CaseService {
     );
   }
 
+  createLegalOfficerUser(officerData: {
+    name: string;
+    surname: string;
+    email: string;
+    staffNumber: string;
+    phoneNumber: string;
+    idNumber: string;
+    department: string;
+    role?: UserRole;
+    temporaryPassword: string;
+  }): Observable<User> {
+    const payload = {
+      employeeNumber: officerData.staffNumber,
+      name: officerData.name,
+      surname: officerData.surname,
+      email: officerData.email,
+      phoneNumber: officerData.phoneNumber,
+      idNumber: officerData.idNumber,
+      department: officerData.department,
+      temporaryPassword: officerData.temporaryPassword
+    };
+
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/users/legal-officer`, payload).pipe(
+      map(res => {
+        const u = res.data;
+        const newOfficer: User = {
+          userId: u?.userId ? u.userId.toString() : 'U_' + Date.now(),
+          name: `${u?.name || ''} ${u?.surname || ''}`.trim() || officerData.name || '',
+          surname: u?.surname || officerData.surname,
+          email: u?.email || officerData.email || '',
+          role: UserRole.LEGAL_OFFICER,
+          status: u?.status || 'ACTIVE',
+          staffNumber: u?.employeeNumber || officerData.staffNumber,
+          phoneNumber: u?.phoneNumber || officerData.phoneNumber,
+          idNumber: u?.idNumber || officerData.idNumber,
+          department: u?.department || officerData.department || 'Department of Legal Services',
+          mustChangePassword: u?.mustChangePassword !== undefined ? u.mustChangePassword : true,
+          firstLoginCompleted: u?.firstLoginCompleted !== undefined ? u.firstLoginCompleted : false,
+          temporaryPassword: officerData.temporaryPassword,
+          createdAt: u?.createdAt || new Date().toISOString()
+        };
+
+        this.saveCustomUserToLocalStorage(newOfficer);
+        return newOfficer;
+      }),
+      catchError(err => {
+        console.warn('Backend createLegalOfficerUser failed, saving to local fallback:', err);
+        const fallbackOfficer: User = {
+          userId: 'U_' + (officerData.staffNumber || Date.now()),
+          name: `${officerData.name || ''} ${officerData.surname || ''}`.trim(),
+          surname: officerData.surname,
+          email: officerData.email || '',
+          role: UserRole.LEGAL_OFFICER,
+          status: 'ACTIVE',
+          staffNumber: officerData.staffNumber,
+          phoneNumber: officerData.phoneNumber,
+          idNumber: officerData.idNumber,
+          department: officerData.department || 'Department of Legal Services',
+          mustChangePassword: true,
+          firstLoginCompleted: false,
+          temporaryPassword: officerData.temporaryPassword,
+          createdAt: new Date().toISOString()
+        };
+        this.saveCustomUserToLocalStorage(fallbackOfficer);
+        return of(fallbackOfficer);
+      })
+    );
+  }
+
   private saveCustomUserToLocalStorage(user: User) {
     try {
       const customUsersJson = localStorage.getItem('univen_custom_users');
