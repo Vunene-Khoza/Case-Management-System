@@ -343,7 +343,7 @@
 }
 
 .system-dashboard {
-  color: #f8fafc !important; /* Premium light color */
+  color: #000000 !important; /* Black */
   font-family: var(--font-family-title);
   font-size: 24px;
   font-weight: 700;
@@ -351,7 +351,7 @@
 }
 
 .complete-operational-overview-all-roles-all-cases-all-activity {
-  color: #94a3b8 !important; /* Muted Slate */
+  color: #64748b !important; /* Muted Slate */
   font-size: 14px;
   font-weight: 400;
 }
@@ -429,14 +429,13 @@
 .container-background-color5,
 .container-background-color7,
 .container-background-color9 {
-  background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-glass);
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
   border-radius: 10px;
   padding: 20px;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -447,7 +446,7 @@
 .pending-approvals,
 .inactive-accounts,
 .total-cases {
-  color: #94a3b8 !important;
+  color: #64748b !important;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -459,7 +458,7 @@
 ._3,
 ._2,
 ._120 {
-  color: #f8fafc !important;
+  color: #000000 !important;
   font-family: var(--font-family-title);
   font-size: 32px;
   font-weight: 700;
@@ -537,19 +536,18 @@
 
 .container-background-color11,
 .container-background-color21 {
-  background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-glass);
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
   border-radius: 10px;
   padding: 24px;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
 .sa-panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border-glass);
+  border-bottom: 1px solid #e2e8f0 !important;
   padding-bottom: 16px;
   margin-bottom: 20px;
 }
@@ -567,7 +565,7 @@
 
 .users-by-role,
 .live-activity-feed {
-  color: #f8fafc !important;
+  color: #000000 !important;
   font-family: var(--font-family-title);
   font-size: 16px;
   font-weight: 600;
@@ -626,13 +624,13 @@
 .bg-viewer { background-color: #6b7280; }
 
 .role-name {
-  color: #cbd5e1 !important;
+  color: #334155 !important;
   font-size: 13px;
   font-weight: 500;
 }
 
 .role-count {
-  color: #cbd5e1 !important;
+  color: #000000 !important;
   font-size: 13px;
   font-weight: 600;
 }
@@ -640,7 +638,7 @@
 .progress-bar-bg {
   width: 100%;
   height: 6px;
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: #f1f5f9 !important;
   border-radius: 4px;
   overflow: hidden;
 }
@@ -669,7 +667,7 @@
   gap: 12px;
   align-items: flex-start;
   padding-bottom: 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid #f1f5f9 !important;
 }
 
 .feed-item:last-child {
@@ -708,55 +706,57 @@
 }
 
 .feed-username {
-  color: #f8fafc !important;
+  color: #000000 !important;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* Micro badges inside feed */
 .span-background-color,
 .span-background-color2,
 .span-background-color3 {
-  padding: 1px 6px;
+  padding: 2px 8px;
   border-radius: 9999px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   display: inline-block;
 }
 
 .span-background-color {
-  background-color: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
+  border: 1px solid #bfdbfe !important;
 }
 
 .span-background-color2 {
-  background-color: rgba(16, 185, 129, 0.15);
-  color: #34d399;
+  background-color: #ecfdf5 !important;
+  color: #059669 !important;
+  border: 1px solid #a7f3d0 !important;
 }
 
 .span-background-color3 {
-  background-color: rgba(91, 79, 232, 0.15);
-  color: #818cf8;
+  background-color: #eef2ff !important;
+  color: #4f46e5 !important;
+  border: 1px solid #c7d2fe !important;
 }
 
 .feed-message {
-  color: #cbd5e1 !important;
+  color: #334155 !important;
   font-size: 13px;
 }
 
 .feed-timestamp {
-  color: #64748b !important;
+  color: #94a3b8 !important;
   font-size: 11px;
 }
 
 /* Pending Registration Approvals Box */
 .container-background-color25 {
-  background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-glass);
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
   border-radius: 10px;
   padding: 24px;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
   margin-top: 8px;
 }
 
@@ -764,7 +764,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border-glass);
+  border-bottom: 1px solid #e2e8f0 !important;
   padding-bottom: 16px;
   margin-bottom: 20px;
 }
@@ -776,14 +776,14 @@
 }
 
 .pending-registration-approvals {
-  color: #f8fafc !important;
+  color: #000000 !important;
   font-family: var(--font-family-title);
   font-size: 16px;
   font-weight: 600;
 }
 
 .users-awaiting-account-activation {
-  color: #94a3b8 !important;
+  color: #64748b !important;
   font-size: 12px;
 }
 
@@ -808,8 +808,8 @@
 
 .container-background-color26,
 .container-background-color28 {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
   border-radius: 10px;
   padding: 16px 20px;
   display: flex;
@@ -821,8 +821,8 @@
 
 .container-background-color26:hover,
 .container-background-color28:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
 }
 
 .avatar-circle {
@@ -851,7 +851,7 @@
 
 .vhutshilo-sinthumule,
 .ndidzulafhi-baloyi {
-  color: #f8fafc !important;
+  color: #000000 !important;
   font-size: 15px;
   font-weight: 600;
 }
@@ -865,11 +865,11 @@
 
 .legal-officer2,
 .viewer2 {
-  color: #cbd5e1 !important;
+  color: #334155 !important;
   font-size: 11px;
   font-weight: 500;
-  background-color: rgba(255, 255, 255, 0.06);
-  padding: 1px 8px;
+  background-color: #e2e8f0 !important;
+  padding: 2px 8px;
   border-radius: 4px;
 }
 
@@ -884,7 +884,7 @@
 .nb-univen-ac-za,
 ._1-jun-2026,
 ._31-may-2026 {
-  color: #94a3b8 !important;
+  color: #64748b !important;
   font-size: 12px;
 }
 
@@ -899,11 +899,10 @@
   border: 1px solid rgba(16, 185, 129, 0.3);
   border-radius: 6px;
   padding: 6px 14px;
-  color: #34d399;
+  color: #059669;
   font-family: var(--font-family-body);
   font-size: 12px;
   font-weight: 600;
-  border: none;
   cursor: pointer;
   transition: var(--transition-fast);
 }
@@ -917,11 +916,10 @@
   border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: 6px;
   padding: 6px 14px;
-  color: #f87171;
+  color: #dc2626;
   font-family: var(--font-family-body);
   font-size: 12px;
   font-weight: 600;
-  border: none;
   cursor: pointer;
   transition: var(--transition-fast);
 }
