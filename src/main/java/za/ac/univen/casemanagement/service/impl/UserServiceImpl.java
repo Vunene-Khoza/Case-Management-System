@@ -1,6 +1,7 @@
 package za.ac.univen.casemanagement.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +51,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse createAdminUser(CreateAdminRequest request) {
+        return createAdminUser(request, "SYSTEM");
+    }
+
+    @Override
+    @Transactional
+    public UserResponse createAdminUser(CreateAdminRequest request, String creatorUsername) {
         String email = request.getEmail().trim().toLowerCase();
         String empNum = request.getEmployeeNumber().trim();
 
@@ -82,6 +89,7 @@ public class UserServiceImpl implements UserService {
                 .status("ACTIVE")
                 .mustChangePassword(true)
                 .firstLoginCompleted(false)
+                .createdBy(creatorUsername != null ? creatorUsername.trim().toLowerCase() : "SYSTEM")
                 .build();
 
         UserEntity saved = userRepository.save(adminEntity);
@@ -91,6 +99,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse createLegalOfficerUser(CreateLegalOfficerRequest request) {
+        return createLegalOfficerUser(request, "SYSTEM");
+    }
+
+    @Override
+    @Transactional
+    public UserResponse createLegalOfficerUser(CreateLegalOfficerRequest request, String creatorUsername) {
         String email = request.getEmail().trim().toLowerCase();
         String empNum = request.getEmployeeNumber().trim();
 
@@ -123,6 +137,7 @@ public class UserServiceImpl implements UserService {
                 .status("ACTIVE")
                 .mustChangePassword(true)
                 .firstLoginCompleted(false)
+                .createdBy(creatorUsername != null ? creatorUsername.trim().toLowerCase() : "SYSTEM")
                 .build();
 
         UserEntity saved = userRepository.save(legalOfficerEntity);
@@ -132,7 +147,22 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public List<UserResponse> getAllUsers() {
-        return userRepository.findAll()
+        return getUsers(null, true);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponse> getUsers(String currentUsername, boolean isSuperAdmin) {
+        if (isSuperAdmin) {
+            return userRepository.findAll()
+                    .stream()
+                    .map(this::mapToResponse)
+                    .toList();
+        }
+        if (currentUsername == null || currentUsername.isBlank()) {
+            return List.of();
+        }
+        return userRepository.findByCreatedByIgnoreCase(currentUsername.trim())
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -141,16 +171,37 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public UserResponse getUserById(Long userId) {
+        return getUserById(userId, null, true);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserResponse getUserById(Long userId, String currentUsername, boolean isSuperAdmin) {
         UserEntity entity = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+
+        if (!isSuperAdmin && (currentUsername == null || entity.getCreatedBy() == null || !entity.getCreatedBy().equalsIgnoreCase(currentUsername.trim()))) {
+            throw new AccessDeniedException("You do not have permission to view this user account.");
+        }
+
         return mapToResponse(entity);
     }
 
     @Override
     @Transactional
     public UserResponse updateUser(Long userId, UserRequest request) {
+        return updateUser(userId, request, null, true);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse updateUser(Long userId, UserRequest request, String currentUsername, boolean isSuperAdmin) {
         UserEntity entity = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+
+        if (!isSuperAdmin && (currentUsername == null || entity.getCreatedBy() == null || !entity.getCreatedBy().equalsIgnoreCase(currentUsername.trim()))) {
+            throw new AccessDeniedException("You do not have permission to modify this user account.");
+        }
 
         if (request.getName() != null) {
             entity.setName(request.getName());
@@ -178,10 +229,20 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new ResourceNotFoundException("User not found with ID: " + userId);
+        deleteUser(userId, null, true);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(Long userId, String currentUsername, boolean isSuperAdmin) {
+        UserEntity entity = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+
+        if (!isSuperAdmin && (currentUsername == null || entity.getCreatedBy() == null || !entity.getCreatedBy().equalsIgnoreCase(currentUsername.trim()))) {
+            throw new AccessDeniedException("You do not have permission to delete this user account.");
         }
-        userRepository.deleteById(userId);
+
+        userRepository.delete(entity);
     }
 
     private UserResponse mapToResponse(UserEntity entity) {
@@ -199,6 +260,7 @@ public class UserServiceImpl implements UserService {
                 .mustChangePassword(entity.isMustChangePassword())
                 .firstLoginCompleted(entity.isFirstLoginCompleted())
                 .lastLogin(entity.getLastLogin())
+                .createdBy(entity.getCreatedBy())
                 .createdAt(entity.getCreatedAt())
                 .build();
     }

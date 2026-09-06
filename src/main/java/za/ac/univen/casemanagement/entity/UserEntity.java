@@ -60,6 +60,9 @@ public class UserEntity {
     @Column(name = "last_login")
     private Instant lastLogin;
 
+    @Column(name = "created_by", length = 100)
+    private String createdBy;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 

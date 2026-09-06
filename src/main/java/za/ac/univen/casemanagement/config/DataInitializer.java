@@ -60,22 +60,22 @@ public class DataInitializer implements CommandLineRunner {
 
     private void seedUsers() {
         // Super Admin
-        seedUserIfNotFound("superadmin@univen.ac.za", "System Super Admin", "Super Admin", "00001", "+27 15 962 8001", "8001015800080", "Office of the Vice-Chancellor", "Super@123", UserRole.SUPER_ADMIN);
+        seedUserIfNotFound("superadmin@univen.ac.za", "System Super Admin", "Super Admin", "00001", "+27 15 962 8001", "8001015800080", "Office of the Vice-Chancellor", "Super@123", UserRole.SUPER_ADMIN, "SYSTEM");
 
-        // System Admin
-        seedUserIfNotFound("admin@univen.ac.za", "System Admin", "Admin", "00002", "+27 15 962 8002", "8101015800080", "Office of the Registrar", "Admin@123", UserRole.ADMIN);
+        // System Admin (created by Super Admin)
+        seedUserIfNotFound("admin@univen.ac.za", "System Admin", "Admin", "00002", "+27 15 962 8002", "8101015800080", "Office of the Registrar", "Admin@123", UserRole.ADMIN, "superadmin@univen.ac.za");
 
-        // Legal Officers
-        seedUserIfNotFound("officer@univen.ac.za", "Adv. D. Blundin", "Blundin", "00003", "+27 15 962 8003", "8201015800080", "Department of Legal Services", "Officer@123", UserRole.LEGAL_OFFICER);
-        seedUserIfNotFound("baloyi.ndidzulafhi@univen.ac.za", "Ndidzulafhi", "Baloyi", "40234", "+27 15 962 8901", "8405125800084", "Faculty of Management & Law", "Officer@123", UserRole.LEGAL_OFFICER);
-        seedUserIfNotFound("sinthumule.vhutshilo@univen.ac.za", "Vhutshilo", "Sinthumule", "31007", "+27 15 962 8452", "9107245800087", "Human Resources Directorate", "Officer@123", UserRole.LEGAL_OFFICER);
+        // Legal Officers (created by admin@univen.ac.za)
+        seedUserIfNotFound("officer@univen.ac.za", "Adv. D. Blundin", "Blundin", "00003", "+27 15 962 8003", "8201015800080", "Department of Legal Services", "Officer@123", UserRole.LEGAL_OFFICER, "admin@univen.ac.za");
+        seedUserIfNotFound("baloyi.ndidzulafhi@univen.ac.za", "Ndidzulafhi", "Baloyi", "40234", "+27 15 962 8901", "8405125800084", "Faculty of Management & Law", "Officer@123", UserRole.LEGAL_OFFICER, "admin@univen.ac.za");
+        seedUserIfNotFound("sinthumule.vhutshilo@univen.ac.za", "Vhutshilo", "Sinthumule", "31007", "+27 15 962 8452", "9107245800087", "Human Resources Directorate", "Officer@123", UserRole.LEGAL_OFFICER, "admin@univen.ac.za");
 
-        // Viewers
-        seedUserIfNotFound("viewer@univen.ac.za", "Standard Viewer", "Viewer", "00004", "+27 15 962 8004", "8301015800080", "Internal Audit", "Viewer@123", UserRole.VIEWER);
-        seedUserIfNotFound("nemutanzhela.k@univen.ac.za", "Khathutshelo", "Nemutanzhela", "60114", "+27 15 962 8776", "8809095800082", "Finance Directorate", "Viewer@123", UserRole.VIEWER);
+        // Viewers (created by superadmin@univen.ac.za)
+        seedUserIfNotFound("viewer@univen.ac.za", "Standard Viewer", "Viewer", "00004", "+27 15 962 8004", "8301015800080", "Internal Audit", "Viewer@123", UserRole.VIEWER, "superadmin@univen.ac.za");
+        seedUserIfNotFound("nemutanzhela.k@univen.ac.za", "Khathutshelo", "Nemutanzhela", "60114", "+27 15 962 8776", "8809095800082", "Finance Directorate", "Viewer@123", UserRole.VIEWER, "superadmin@univen.ac.za");
     }
 
-    private void seedUserIfNotFound(String email, String name, String surname, String empNum, String phone, String idNum, String dept, String rawPassword, UserRole role) {
+    private void seedUserIfNotFound(String email, String name, String surname, String empNum, String phone, String idNum, String dept, String rawPassword, UserRole role, String createdBy) {
         UserEntity user = userRepository.findByEmail(email).orElse(null);
         if (user == null) {
             user = UserEntity.builder()
@@ -91,9 +91,10 @@ public class DataInitializer implements CommandLineRunner {
                     .status("ACTIVE")
                     .mustChangePassword(false)
                     .firstLoginCompleted(true)
+                    .createdBy(createdBy)
                     .build();
             userRepository.save(user);
-            log.info("Seeded initial user: {} with role {}", email, role);
+            log.info("Seeded initial user: {} with role {} (createdBy: {})", email, role, createdBy);
         } else {
             user.setName(name);
             user.setSurname(surname);
@@ -104,6 +105,9 @@ public class DataInitializer implements CommandLineRunner {
             user.setPassword(passwordEncoder.encode(rawPassword));
             user.setMustChangePassword(false);
             user.setFirstLoginCompleted(true);
+            if (user.getCreatedBy() == null) {
+                user.setCreatedBy(createdBy);
+            }
             userRepository.save(user);
             log.info("Updated password & attributes for seeded user: {}", email);
         }

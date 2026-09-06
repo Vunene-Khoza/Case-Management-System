@@ -16,6 +16,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     java.util.List<UserEntity> findByRole(za.ac.univen.casemanagement.enums.UserRole role);
     java.util.List<UserEntity> findByRoleAndStatus(za.ac.univen.casemanagement.enums.UserRole role, String status);
+    java.util.List<UserEntity> findByCreatedByIgnoreCase(String createdBy);
+    boolean existsByUserIdAndCreatedByIgnoreCase(Long userId, String createdBy);
     long countByRoleAndStatus(za.ac.univen.casemanagement.enums.UserRole role, String status);
     long countByRole(za.ac.univen.casemanagement.enums.UserRole role);
 }

@@ -26,5 +26,6 @@ public class UserResponse {
     private boolean mustChangePassword;
     private boolean firstLoginCompleted;
     private Instant lastLogin;
+    private String createdBy;
     private Instant createdAt;
 }
