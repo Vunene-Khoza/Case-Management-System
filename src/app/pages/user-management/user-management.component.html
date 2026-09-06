@@ -129,13 +129,13 @@
       <!-- Header -->
       <header class="page-header">
         <div>
-          <h1 class="page-title">User Account Management</h1>
-          <p class="page-subtitle">Add new authorized personnel, configure system roles, and audit access statuses.</p>
+          <h1 class="page-title">User Management</h1>
+          <p class="page-subtitle">Manage and oversee legal officer accounts created and managed by you.</p>
         </div>
         <div class="header-actions">
           <button (click)="openAddModal()" class="btn btn-primary">
             <svg lucidePlus class="btn-icon"></svg>
-            <span>Add User Account</span>
+            <span>Create Legal Officer</span>
           </button>
         </div>
       </header>
@@ -188,7 +188,7 @@
                 </td>
               </tr>
               <tr *ngIf="users.length === 0">
-                <td colspan="5" class="empty-row">No users registered in the database.</td>
+                <td colspan="5" class="empty-row">You have not created any user accounts yet. Click 'Create Legal Officer' to add one.</td>
               </tr>
             </tbody>
           </table>

@@ -209,9 +209,36 @@ export class UserManagementComponent implements OnInit {
   }
 
   loadUsers() {
-    this.caseService.getUsers().subscribe((list: User[]) => {
-      this.users = list;
+    this.caseService.getUsers().subscribe({
+      next: (list: User[]) => {
+        if (list && list.length > 0) {
+          this.users = list;
+        } else {
+          this.loadAdminFallbackUsers();
+        }
+      },
+      error: () => {
+        this.loadAdminFallbackUsers();
+      }
     });
+  }
+
+  private loadAdminFallbackUsers() {
+    const cur = this.caseService.getCurrentUser();
+    const curEmail = (cur.email || '').toLowerCase();
+    const customUsersJson = localStorage.getItem('univen_custom_users');
+    if (customUsersJson) {
+      try {
+        const customUsers: User[] = JSON.parse(customUsersJson);
+        this.users = customUsers.filter(u => 
+          u.createdBy && u.createdBy.toLowerCase() === curEmail
+        );
+      } catch (e) {
+        this.users = [];
+      }
+    } else {
+      this.users = [];
+    }
   }
 
   getInitials(name: string): string {

@@ -76,5 +76,6 @@ export interface User {
   mustChangePassword?: boolean;
   firstLoginCompleted?: boolean;
   temporaryPassword?: string;
+  createdBy?: string;
   createdAt: string;
 }

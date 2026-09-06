@@ -342,6 +342,7 @@ export class CaseService {
           mustChangePassword: !!u.mustChangePassword,
           firstLoginCompleted: u.firstLoginCompleted !== undefined ? !!u.firstLoginCompleted : true,
           lastLogin: u.lastLogin,
+          createdBy: u.createdBy,
           createdAt: u.createdAt || ''
         }));
       }),
@@ -417,6 +418,7 @@ export class CaseService {
           mustChangePassword: u.mustChangePassword !== undefined ? u.mustChangePassword : true,
           firstLoginCompleted: u.firstLoginCompleted !== undefined ? u.firstLoginCompleted : false,
           temporaryPassword: adminData.temporaryPassword,
+          createdBy: u.createdBy || this.getCurrentUser().email,
           createdAt: u.createdAt || new Date().toISOString()
         };
 
@@ -439,6 +441,7 @@ export class CaseService {
           mustChangePassword: true,
           firstLoginCompleted: false,
           temporaryPassword: adminData.temporaryPassword,
+          createdBy: this.getCurrentUser().email,
           createdAt: new Date().toISOString()
         };
         this.saveCustomUserToLocalStorage(fallbackAdmin);
@@ -486,6 +489,7 @@ export class CaseService {
           mustChangePassword: u?.mustChangePassword !== undefined ? u.mustChangePassword : true,
           firstLoginCompleted: u?.firstLoginCompleted !== undefined ? u.firstLoginCompleted : false,
           temporaryPassword: officerData.temporaryPassword,
+          createdBy: u?.createdBy || this.getCurrentUser().email,
           createdAt: u?.createdAt || new Date().toISOString()
         };
 
@@ -508,6 +512,7 @@ export class CaseService {
           mustChangePassword: true,
           firstLoginCompleted: false,
           temporaryPassword: officerData.temporaryPassword,
+          createdBy: this.getCurrentUser().email,
           createdAt: new Date().toISOString()
         };
         this.saveCustomUserToLocalStorage(fallbackOfficer);
