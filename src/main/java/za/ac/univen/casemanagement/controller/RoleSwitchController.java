@@ -1,15 +1,10 @@
 package za.ac.univen.casemanagement.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import za.ac.univen.casemanagement.dto.request.RoleSwitchLogRequest;
 import za.ac.univen.casemanagement.dto.response.ApiResponse;
 import za.ac.univen.casemanagement.dto.response.RoleCountResponse;
-import za.ac.univen.casemanagement.dto.response.RoleSwitchLogResponse;
 import za.ac.univen.casemanagement.dto.response.UserResponse;
 import za.ac.univen.casemanagement.enums.UserRole;
 import za.ac.univen.casemanagement.service.RoleSwitchService;
@@ -42,22 +37,5 @@ public class RoleSwitchController {
 
         List<UserResponse> users = roleSwitchService.getUsersByRole(userRole);
         return ResponseEntity.ok(ApiResponse.success(200, "Users for role " + userRole + " retrieved successfully", users));
-    }
-
-    @GetMapping("/history")
-    public ResponseEntity<ApiResponse<List<RoleSwitchLogResponse>>> getRoleSwitchHistory() {
-        List<RoleSwitchLogResponse> history = roleSwitchService.getRoleSwitchHistory();
-        return ResponseEntity.ok(ApiResponse.success(200, "Role switch history retrieved successfully", history));
-    }
-
-    @PostMapping("/switch")
-    public ResponseEntity<ApiResponse<RoleSwitchLogResponse>> logRoleSwitch(
-            @Valid @RequestBody RoleSwitchLogRequest request,
-            Authentication authentication
-    ) {
-        String superAdminEmail = authentication != null ? authentication.getName() : "superadmin@univen.ac.za";
-        RoleSwitchLogResponse logResponse = roleSwitchService.logRoleSwitch(request, superAdminEmail);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(201, "Role switch recorded successfully", logResponse));
     }
 }

@@ -20,7 +20,7 @@ public interface ActivityLogRepository extends JpaRepository<ActivityLogEntity, 
            "(:status IS NULL OR a.status = :status) AND " +
            "(:search IS NULL OR " +
            " LOWER(a.userName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           " LOWER(a.action) LIKE LOWER(CONCAT('%', :search, '%'))))")
+           " LOWER(a.action) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<ActivityLogEntity> findScopedLogs(
             @Param("isSuperAdmin") boolean isSuperAdmin,
             @Param("isAdmin") boolean isAdmin,

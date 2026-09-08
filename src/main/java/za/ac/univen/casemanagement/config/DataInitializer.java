@@ -6,11 +6,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import za.ac.univen.casemanagement.entity.EmployeeEntity;
-import za.ac.univen.casemanagement.entity.RoleSwitchLogEntity;
 import za.ac.univen.casemanagement.entity.UserEntity;
 import za.ac.univen.casemanagement.enums.UserRole;
 import za.ac.univen.casemanagement.repository.EmployeeRepository;
-import za.ac.univen.casemanagement.repository.RoleSwitchLogRepository;
 import za.ac.univen.casemanagement.repository.UserRepository;
 
 import java.time.Instant;
@@ -23,14 +21,12 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
-    private final RoleSwitchLogRepository roleSwitchLogRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
         seedEmployees();
         seedUsers();
-        seedRoleSwitchLogs();
     }
 
     private void seedEmployees() {
@@ -110,47 +106,6 @@ public class DataInitializer implements CommandLineRunner {
             }
             userRepository.save(user);
             log.info("Updated password & attributes for seeded user: {}", email);
-        }
-    }
-
-    private void seedRoleSwitchLogs() {
-        if (roleSwitchLogRepository.count() == 0) {
-            Instant now = Instant.now();
-
-            RoleSwitchLogEntity log1 = RoleSwitchLogEntity.builder()
-                    .superAdminEmail("superadmin@univen.ac.za")
-                    .targetUserName("System Admin")
-                    .targetUserEmail("admin@univen.ac.za")
-                    .targetRole(UserRole.ADMIN)
-                    .duration("12 min")
-                    .actionsTaken("Reviewed user management screen")
-                    .createdAt(now.minus(2, ChronoUnit.HOURS))
-                    .build();
-
-            RoleSwitchLogEntity log2 = RoleSwitchLogEntity.builder()
-                    .superAdminEmail("superadmin@univen.ac.za")
-                    .targetUserName("Adv. D. Blundin")
-                    .targetUserEmail("officer@univen.ac.za")
-                    .targetRole(UserRole.LEGAL_OFFICER)
-                    .duration("8 min")
-                    .actionsTaken("Inspected case creation form")
-                    .createdAt(now.minus(1, ChronoUnit.DAYS))
-                    .build();
-
-            RoleSwitchLogEntity log3 = RoleSwitchLogEntity.builder()
-                    .superAdminEmail("superadmin@univen.ac.za")
-                    .targetUserName("Standard Viewer")
-                    .targetUserEmail("viewer@univen.ac.za")
-                    .targetRole(UserRole.VIEWER)
-                    .duration("5 min")
-                    .actionsTaken("Checked reports accessibility")
-                    .createdAt(now.minus(3, ChronoUnit.DAYS))
-                    .build();
-
-            roleSwitchLogRepository.save(log1);
-            roleSwitchLogRepository.save(log2);
-            roleSwitchLogRepository.save(log3);
-            log.info("Seeded initial role switch logs for demonstration.");
         }
     }
 }
