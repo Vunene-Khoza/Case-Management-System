@@ -544,27 +544,18 @@
   align-items: center;
 }
 
-.sa-table .edit-btn {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  color: #374151;
-  font-size: 12px;
-  width: 28px;
-  height: 28px;
-}
-
-.sa-table .edit-btn:hover {
-  background-color: #f9fafb;
-  border-color: #cbd5e1;
-}
-
 .sa-table .deactivate-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: #fee2e2;
   border: 1px solid rgba(239, 68, 68, 0.2);
   color: #dc2626;
-  font-size: 12px;
+  border-radius: 6px;
   width: 28px;
   height: 28px;
+  cursor: pointer;
+  transition: var(--transition-fast);
 }
 
 .sa-table .deactivate-btn:hover {
