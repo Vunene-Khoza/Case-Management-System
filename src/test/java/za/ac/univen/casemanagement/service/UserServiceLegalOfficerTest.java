@@ -33,6 +33,9 @@ class UserServiceLegalOfficerTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private ActivityLogService activityLogService;
+
     @InjectMocks
     private UserServiceImpl userService;
 

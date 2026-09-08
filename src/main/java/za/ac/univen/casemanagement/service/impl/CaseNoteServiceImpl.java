@@ -7,10 +7,12 @@ import za.ac.univen.casemanagement.dto.request.AddNoteRequest;
 import za.ac.univen.casemanagement.dto.response.CaseNoteResponse;
 import za.ac.univen.casemanagement.entity.CaseNoteEntity;
 import za.ac.univen.casemanagement.entity.UserEntity;
+import za.ac.univen.casemanagement.enums.ActivityCategory;
 import za.ac.univen.casemanagement.exception.ResourceNotFoundException;
 import za.ac.univen.casemanagement.repository.CaseNoteRepository;
 import za.ac.univen.casemanagement.repository.CaseRepository;
 import za.ac.univen.casemanagement.repository.UserRepository;
+import za.ac.univen.casemanagement.service.ActivityLogService;
 import za.ac.univen.casemanagement.service.CaseNoteService;
 
 import java.util.List;
@@ -22,6 +24,7 @@ public class CaseNoteServiceImpl implements CaseNoteService {
     private final CaseNoteRepository caseNoteRepository;
     private final CaseRepository caseRepository;
     private final UserRepository userRepository;
+    private final ActivityLogService activityLogService;
 
     @Override
     @Transactional
@@ -41,6 +44,19 @@ public class CaseNoteServiceImpl implements CaseNoteService {
                 .build();
 
         CaseNoteEntity saved = caseNoteRepository.save(note);
+
+        activityLogService.log(
+                currentUserEmail,
+                ActivityCategory.CASE,
+                "NOTE_ADDED",
+                "CaseNote",
+                caseId,
+                "Added formal case note on case " + caseId,
+                "SUCCESS",
+                null,
+                "{\"noteId\":" + saved.getNoteId() + "}"
+        );
+
         return mapToResponse(saved);
     }
 

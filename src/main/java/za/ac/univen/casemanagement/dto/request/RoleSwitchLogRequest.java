@@ -7,21 +7,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class RoleSwitchLogRequest {
-
     private Long targetUserId;
-
-    @NotBlank(message = "Target user name is required")
+    @NotBlank(message = "targetUserName is required")
     private String targetUserName;
-
-    @NotBlank(message = "Target user email is required")
+    @NotBlank(message = "targetUserEmail is required")
     private String targetUserEmail;
-
-    @NotBlank(message = "Target role is required")
+    @NotBlank(message = "targetRole is required")
     private String targetRole;
-
     private String actionsTaken;
 }

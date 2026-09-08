@@ -74,6 +74,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/users").hasRole("SUPER_ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
 
+                // Activity & Audit Log endpoints
+                .requestMatchers("/api/v1/activity-logs/**").authenticated()
+
                 // All other endpoints require the user to be authenticated
                 .anyRequest().authenticated()
             )

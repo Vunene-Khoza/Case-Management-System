@@ -10,11 +10,13 @@ import za.ac.univen.casemanagement.dto.request.CreateLegalOfficerRequest;
 import za.ac.univen.casemanagement.dto.request.UserRequest;
 import za.ac.univen.casemanagement.dto.response.UserResponse;
 import za.ac.univen.casemanagement.entity.UserEntity;
+import za.ac.univen.casemanagement.enums.ActivityCategory;
 import za.ac.univen.casemanagement.enums.UserRole;
 import za.ac.univen.casemanagement.exception.BadRequestException;
 import za.ac.univen.casemanagement.exception.ResourceNotFoundException;
 import za.ac.univen.casemanagement.repository.EmployeeRepository;
 import za.ac.univen.casemanagement.repository.UserRepository;
+import za.ac.univen.casemanagement.service.ActivityLogService;
 import za.ac.univen.casemanagement.service.UserService;
 
 import java.util.List;
@@ -26,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ActivityLogService activityLogService;
 
     @Override
     @Transactional
@@ -93,6 +96,19 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         UserEntity saved = userRepository.save(adminEntity);
+
+        activityLogService.log(
+                creatorUsername != null ? creatorUsername : "SYSTEM",
+                ActivityCategory.USER,
+                "USER_CREATED",
+                "User",
+                "U" + saved.getUserId(),
+                "Created new Administrator account for " + saved.getName() + " (" + saved.getEmail() + ")",
+                "SUCCESS",
+                null,
+                "{\"role\":\"ADMIN\",\"employeeNumber\":\"" + saved.getEmployeeNumber() + "\"}"
+        );
+
         return mapToResponse(saved);
     }
 
@@ -141,6 +157,19 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         UserEntity saved = userRepository.save(legalOfficerEntity);
+
+        activityLogService.log(
+                creatorUsername != null ? creatorUsername : "SYSTEM",
+                ActivityCategory.USER,
+                "USER_CREATED",
+                "User",
+                "U" + saved.getUserId(),
+                "Created new Legal Officer account for " + saved.getName() + " (" + saved.getEmail() + ")",
+                "SUCCESS",
+                null,
+                "{\"role\":\"LEGAL_OFFICER\",\"employeeNumber\":\"" + saved.getEmployeeNumber() + "\"}"
+        );
+
         return mapToResponse(saved);
     }
 
@@ -223,6 +252,19 @@ public class UserServiceImpl implements UserService {
         }
 
         UserEntity updated = userRepository.save(entity);
+
+        activityLogService.log(
+                currentUsername != null ? currentUsername : "SYSTEM",
+                ActivityCategory.USER,
+                "USER_UPDATED",
+                "User",
+                "U" + updated.getUserId(),
+                "Updated account details for " + updated.getEmail(),
+                "SUCCESS",
+                null,
+                "{\"role\":\"" + updated.getRole() + "\",\"status\":\"" + updated.getStatus() + "\"}"
+        );
+
         return mapToResponse(updated);
     }
 
@@ -243,6 +285,18 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.delete(entity);
+
+        activityLogService.log(
+                currentUsername != null ? currentUsername : "SYSTEM",
+                ActivityCategory.USER,
+                "USER_DELETED",
+                "User",
+                "U" + entity.getUserId(),
+                "Deactivated/deleted user account " + entity.getEmail(),
+                "SUCCESS",
+                null,
+                "{\"role\":\"" + entity.getRole() + "\",\"deletedEmail\":\"" + entity.getEmail() + "\"}"
+        );
     }
 
     private UserResponse mapToResponse(UserEntity entity) {

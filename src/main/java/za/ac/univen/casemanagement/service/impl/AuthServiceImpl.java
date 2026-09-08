@@ -8,10 +8,12 @@ import za.ac.univen.casemanagement.dto.request.ChangeFirstTimePasswordRequest;
 import za.ac.univen.casemanagement.dto.request.LoginRequest;
 import za.ac.univen.casemanagement.dto.response.AuthResponse;
 import za.ac.univen.casemanagement.entity.UserEntity;
+import za.ac.univen.casemanagement.enums.ActivityCategory;
 import za.ac.univen.casemanagement.exception.BadRequestException;
 import za.ac.univen.casemanagement.exception.UnauthorizedException;
 import za.ac.univen.casemanagement.repository.UserRepository;
 import za.ac.univen.casemanagement.security.JwtTokenProvider;
+import za.ac.univen.casemanagement.service.ActivityLogService;
 import za.ac.univen.casemanagement.service.AuthService;
 
 import java.time.Instant;
@@ -24,6 +26,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
+    private final ActivityLogService activityLogService;
 
     @Override
     public AuthResponse login(LoginRequest request) {
@@ -40,6 +43,18 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String token = tokenProvider.generateToken(user);
+
+        activityLogService.log(
+                user.getEmail(),
+                ActivityCategory.SECURITY,
+                "LOGIN_SUCCESS",
+                "User",
+                "U" + user.getUserId(),
+                "User " + user.getName() + " logged in successfully",
+                "SUCCESS",
+                null,
+                "{\"role\":\"" + user.getRole() + "\"}"
+        );
 
         return AuthResponse.builder()
                 .token(token)
@@ -76,5 +91,17 @@ public class AuthServiceImpl implements AuthService {
         user.setFirstLoginCompleted(true);
         user.setLastLogin(Instant.now());
         userRepository.save(user);
+
+        activityLogService.log(
+                user.getEmail(),
+                ActivityCategory.SECURITY,
+                "PASSWORD_CHANGED",
+                "Security",
+                "U" + user.getUserId(),
+                "User updated security credentials (first-time password set)",
+                "SUCCESS",
+                null,
+                null
+        );
     }
 }

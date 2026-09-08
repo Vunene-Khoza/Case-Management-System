@@ -5,16 +5,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.context.SecurityContextHolder;
 import za.ac.univen.casemanagement.dto.request.CloseCaseRequest;
 import za.ac.univen.casemanagement.dto.request.CreateCaseRequest;
 import za.ac.univen.casemanagement.dto.request.UpdateCaseRequest;
 import za.ac.univen.casemanagement.dto.response.CaseResponse;
 import za.ac.univen.casemanagement.entity.CaseEntity;
+import za.ac.univen.casemanagement.enums.ActivityCategory;
 import za.ac.univen.casemanagement.enums.CaseStatus;
 import za.ac.univen.casemanagement.enums.CaseType;
 import za.ac.univen.casemanagement.exception.BadRequestException;
 import za.ac.univen.casemanagement.exception.ResourceNotFoundException;
 import za.ac.univen.casemanagement.repository.CaseRepository;
+import za.ac.univen.casemanagement.service.ActivityLogService;
 import za.ac.univen.casemanagement.service.CaseService;
 
 import java.math.BigDecimal;
@@ -25,6 +28,7 @@ import java.time.LocalDate;
 public class CaseServiceImpl implements CaseService {
 
     private final CaseRepository caseRepository;
+    private final ActivityLogService activityLogService;
 
     @Override
     @Transactional(readOnly = true)
@@ -57,6 +61,22 @@ public class CaseServiceImpl implements CaseService {
                 .build();
 
         CaseEntity saved = caseRepository.save(entity);
+
+        String actorEmail = SecurityContextHolder.getContext().getAuthentication() != null
+                ? SecurityContextHolder.getContext().getAuthentication().getName()
+                : "system@univen.ac.za";
+        activityLogService.log(
+                actorEmail,
+                ActivityCategory.CASE,
+                "CASE_CREATED",
+                "Case",
+                saved.getCaseId(),
+                "Registered new " + saved.getCaseType() + " case " + saved.getCaseId() + " for " + saved.getEmployeeName(),
+                "SUCCESS",
+                null,
+                "{\"caseType\":\"" + saved.getCaseType() + "\",\"costing\":" + saved.getCosting() + "}"
+        );
+
         return mapToResponse(saved);
     }
 
@@ -103,6 +123,22 @@ public class CaseServiceImpl implements CaseService {
         }
 
         CaseEntity updated = caseRepository.save(entity);
+
+        String actorEmail = SecurityContextHolder.getContext().getAuthentication() != null
+                ? SecurityContextHolder.getContext().getAuthentication().getName()
+                : "system@univen.ac.za";
+        activityLogService.log(
+                actorEmail,
+                ActivityCategory.CASE,
+                "CASE_UPDATED",
+                "Case",
+                updated.getCaseId(),
+                "Updated case details for " + updated.getCaseId() + " (" + updated.getEmployeeName() + ")",
+                "SUCCESS",
+                null,
+                "{\"status\":\"" + updated.getStatus() + "\"}"
+        );
+
         return mapToResponse(updated);
     }
 
@@ -124,6 +160,22 @@ public class CaseServiceImpl implements CaseService {
         entity.setStatus(CaseStatus.CLOSED);
 
         CaseEntity closed = caseRepository.save(entity);
+
+        String actorEmail = SecurityContextHolder.getContext().getAuthentication() != null
+                ? SecurityContextHolder.getContext().getAuthentication().getName()
+                : "system@univen.ac.za";
+        activityLogService.log(
+                actorEmail,
+                ActivityCategory.CASE,
+                "CASE_CLOSED",
+                "Case",
+                closed.getCaseId(),
+                "Closed case " + closed.getCaseId() + " (" + closed.getEmployeeName() + ") with final costing R " + closed.getCosting(),
+                "SUCCESS",
+                null,
+                "{\"closureDate\":\"" + closed.getClosureDate() + "\",\"finalCost\":" + closed.getCosting() + "}"
+        );
+
         return mapToResponse(closed);
     }
 

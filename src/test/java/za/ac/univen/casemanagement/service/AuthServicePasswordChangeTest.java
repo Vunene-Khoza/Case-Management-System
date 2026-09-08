@@ -34,6 +34,9 @@ class AuthServicePasswordChangeTest {
     @Mock
     private JwtTokenProvider tokenProvider;
 
+    @Mock
+    private ActivityLogService activityLogService;
+
     @InjectMocks
     private AuthServiceImpl authService;
 
