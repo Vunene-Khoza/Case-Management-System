@@ -25,4 +25,6 @@ export interface ActivityLog {
   ipAddress: string;
   status: ActivityStatus;
   details?: Record<string, any>; // Arbitrary metadata payload for modal detail viewer
+  detailsJson?: string;
+  actorAdminOwner?: string;
 }

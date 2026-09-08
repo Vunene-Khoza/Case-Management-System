@@ -79,11 +79,11 @@
         <input
           type="text"
           class="search-input"
-          placeholder="Search by user, action, description, case ID, or IP..."
+          placeholder="Search by user, action..."
           [(ngModel)]="searchQuery"
-          (input)="applyFilters()"
+          (input)="onSearchInput()"
         />
-        <button *ngIf="searchQuery" class="clear-search" (click)="searchQuery = ''; applyFilters()">
+        <button *ngIf="searchQuery" class="clear-search" (click)="resetFilters()">
           <svg lucideX class="x-icon"></svg>
         </button>
       </div>
@@ -140,20 +140,32 @@
   <!-- MAIN CONTENT DISPLAY -->
   <main class="log-content-area">
 
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="glass-card empty-state">
+      <svg lucideActivity class="empty-icon text-primary"></svg>
+      <h3>Loading Activity Logs</h3>
+      <p>Retrieving secure audit records from server...</p>
+    </div>
+
     <!-- Empty State -->
-    <div *ngIf="filteredActivities.length === 0" class="glass-card empty-state">
+    <div *ngIf="!isLoading && activities.length === 0" class="glass-card empty-state">
       <svg lucideInfo class="empty-icon"></svg>
       <h3>No Activity Logs Found</h3>
-      <p>No audit trail records match your current search or filter criteria.</p>
-      <button class="btn btn-secondary btn-sm mt-16" (click)="searchQuery = ''; selectedCategory = 'ALL'; selectedStatus = 'ALL'; applyFilters()">
+      <p *ngIf="searchQuery || selectedCategory !== 'ALL' || selectedStatus !== 'ALL'">
+        No audit trail records match your current search or filter criteria.
+      </p>
+      <p *ngIf="!searchQuery && selectedCategory === 'ALL' && selectedStatus === 'ALL'">
+        {{ isSuperAdmin ? 'No system activity logs recorded yet.' : 'No activity logs recorded under your management scope yet.' }}
+      </p>
+      <button *ngIf="searchQuery || selectedCategory !== 'ALL' || selectedStatus !== 'ALL'" class="btn btn-secondary btn-sm mt-16" (click)="resetFilters()">
         Reset Filters
       </button>
     </div>
 
     <!-- 1. TIMELINE VIEW -->
-    <div *ngIf="viewMode === 'timeline' && filteredActivities.length > 0" class="timeline-container">
+    <div *ngIf="!isLoading && viewMode === 'timeline' && activities.length > 0" class="timeline-container">
       <div class="timeline-stream">
-        <div *ngFor="let item of paginatedActivities" class="timeline-item" [ngClass]="getCategoryColorClass(item.category)">
+        <div *ngFor="let item of activities" class="timeline-item" [ngClass]="getCategoryColorClass(item.category)">
 
           <!-- Category Icon Pillar Node -->
           <div class="timeline-node">
@@ -237,7 +249,7 @@
     </div>
 
     <!-- 2. TABLE VIEW -->
-    <div *ngIf="viewMode === 'table' && filteredActivities.length > 0" class="glass-card table-card">
+    <div *ngIf="!isLoading && viewMode === 'table' && activities.length > 0" class="glass-card table-card">
       <div class="table-container">
         <table class="custom-table">
           <thead>
@@ -254,7 +266,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of paginatedActivities">
+            <tr *ngFor="let item of activities">
               <td class="font-mono text-muted">{{ item.id }}</td>
               <td class="text-sm whitespace-nowrap">{{ formatDate(item.timestamp) }}</td>
               <td>
@@ -293,11 +305,11 @@
     </div>
 
     <!-- Pagination Controls -->
-    <div *ngIf="filteredActivities.length > 0" class="glass-card pagination-bar mt-20">
+    <div *ngIf="!isLoading && totalElements > 0" class="glass-card pagination-bar mt-20">
       <div class="pagination-info">
         Showing <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> to
-        <strong>{{ Math.min(currentPage * itemsPerPage, filteredActivities.length) }}</strong> of
-        <strong>{{ filteredActivities.length }}</strong> logs
+        <strong>{{ Math.min(currentPage * itemsPerPage, totalElements) }}</strong> of
+        <strong>{{ totalElements }}</strong> logs
       </div>
 
       <div class="pagination-controls">

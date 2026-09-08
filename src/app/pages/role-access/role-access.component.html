@@ -114,59 +114,6 @@
       </div>
     </div>
 
-    <!-- History Panel -->
-    <div class="div-card history-card">
-      <div class="div-card-hd">
-        <div class="div3">
-          <div class="div-card-title">
-            <h2 class="role-switch-history">Role Switch History</h2>
-          </div>
-          <div class="div-card-sub-margin">
-            <div class="div-card-sub">
-              <span class="all-role-view-sessions-recorded-this">
-                All role view sessions recorded from backend audit logs
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="div4 table-responsive">
-        <table class="table custom-table">
-          <thead>
-            <tr>
-              <th class="th-timestamp">Timestamp</th>
-              <th class="th-switched">Switched To</th>
-              <th class="th-duration">Duration</th>
-              <th class="th-actions">Actions Taken</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngIf="isLoadingHistory">
-              <td colspan="4" class="text-center py-4 text-muted">
-                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                Loading switch history...
-              </td>
-            </tr>
-            <tr *ngIf="!isLoadingHistory && historyList.length === 0">
-              <td colspan="4" class="text-center py-4 text-muted">
-                No role view sessions recorded yet.
-              </td>
-            </tr>
-            <tr *ngFor="let item of historyList">
-              <td class="td-mono">{{ item.timestamp }}</td>
-              <td>
-                <span class="span-badge" [ngClass]="item.badgeClass">
-                  {{ item.switchedTo }}
-                </span>
-              </td>
-              <td class="td-duration">{{ item.duration }}</td>
-              <td class="td-actions">{{ item.actionsTaken }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
     <!-- ==================== ACCOUNT SELECTOR MODAL WINDOW ==================== -->
     <div class="modal-backdrop-custom" *ngIf="isModalOpen" (click)="closeRoleModal()">
       <div class="modal-dialog-custom" (click)="$event.stopPropagation()">

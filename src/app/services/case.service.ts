@@ -598,73 +598,27 @@ export class CaseService {
     );
   }
 
-  getRoleSwitchHistory(): Observable<any[]> {
-    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/role-access/history`).pipe(
-      map(res => res.data || []),
-      catchError(() => {
-        const saved = localStorage.getItem('univen_role_switch_history');
-        if (saved) {
-          try {
-            return of(JSON.parse(saved));
-          } catch (e) {}
-        }
-        return of([
-          { timestamp: '2026-05-28 · 09:45', switchedTo: 'Admin View', badgeClass: 'badge-admin', duration: '12 min', actionsTaken: 'Reviewed user management screen' },
-          { timestamp: '2026-05-22 · 14:10', switchedTo: 'Legal Officer View', badgeClass: 'badge-officer', duration: '8 min', actionsTaken: 'Inspected case creation form' },
-          { timestamp: '2026-05-15 · 11:30', switchedTo: 'Viewer View', badgeClass: 'badge-viewer', duration: '5 min', actionsTaken: 'Checked reports accessibility' }
-        ]);
-      })
-    );
-  }
-
   logRoleSwitch(payload: {
-    targetUserId?: string;
+    targetUserId?: string | number;
     targetUserName: string;
     targetUserEmail: string;
     targetRole: string;
-    actionsTaken: string;
+    actionsTaken?: string;
   }): Observable<any> {
-    // Save to localStorage history first for immediate responsiveness
-    this.saveLocalRoleSwitchHistory(payload);
+    const numericId = payload.targetUserId
+      ? parseInt(payload.targetUserId.toString().replace(/\D/g, ''), 10) || undefined
+      : undefined;
 
-    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/role-access/switch`, payload).pipe(
-      catchError(() => of({ success: true, message: 'Logged locally' }))
+    const body = {
+      targetUserId: numericId,
+      targetUserName: payload.targetUserName,
+      targetUserEmail: payload.targetUserEmail,
+      targetRole: payload.targetRole,
+      actionsTaken: payload.actionsTaken
+    };
+
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/activity-logs/role-switch`, body).pipe(
+      catchError(() => of({ success: true, message: 'Logged' }))
     );
-  }
-
-  private saveLocalRoleSwitchHistory(payload: any) {
-    try {
-      const saved = localStorage.getItem('univen_role_switch_history');
-      const list: any[] = saved ? JSON.parse(saved) : [
-        { timestamp: '2026-05-28 · 09:45', switchedTo: 'Admin View', badgeClass: 'badge-admin', duration: '12 min', actionsTaken: 'Reviewed user management screen' },
-        { timestamp: '2026-05-22 · 14:10', switchedTo: 'Legal Officer View', badgeClass: 'badge-officer', duration: '8 min', actionsTaken: 'Inspected case creation form' },
-        { timestamp: '2026-05-15 · 11:30', switchedTo: 'Viewer View', badgeClass: 'badge-viewer', duration: '5 min', actionsTaken: 'Checked reports accessibility' }
-      ];
-
-      const now = new Date();
-      const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} · ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      
-      let badgeClass = 'badge-admin';
-      let roleName = 'Admin';
-      if (payload.targetRole === 'LEGAL_OFFICER') {
-        badgeClass = 'badge-officer';
-        roleName = 'Legal Officer';
-      } else if (payload.targetRole === 'VIEWER') {
-        badgeClass = 'badge-viewer';
-        roleName = 'Viewer';
-      }
-
-      list.unshift({
-        timestamp: formattedDate,
-        switchedTo: `${roleName} View (${payload.targetUserName})`,
-        badgeClass,
-        duration: 'Just now',
-        actionsTaken: payload.actionsTaken || `Switched to account: ${payload.targetUserName}`
-      });
-
-      localStorage.setItem('univen_role_switch_history', JSON.stringify(list.slice(0, 30)));
-    } catch (e) {
-      console.error('Error saving role switch history locally:', e);
-    }
   }
 }

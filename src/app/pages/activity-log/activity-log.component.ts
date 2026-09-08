@@ -2,8 +2,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ActivityLogService } from '../../services/activity-log.service';
+import { CaseService } from '../../services/case.service';
 import { ActivityLog, ActivityCategory, ActivityStatus } from '../../models/activity-log.model';
 import {
   LucideActivity,
@@ -19,8 +21,6 @@ import {
   LucideXCircle,
   LucideList,
   LucideClock,
-  LucideZap,
-  LucideTrash2,
   LucideX,
   LucideEye,
   LucideInfo
@@ -46,8 +46,6 @@ import {
     LucideXCircle,
     LucideList,
     LucideClock,
-    LucideZap,
-    LucideTrash2,
     LucideX,
     LucideEye,
     LucideInfo
@@ -58,8 +56,12 @@ import {
 export class ActivityLogComponent implements OnInit, OnDestroy {
   Math = Math;
   activities: ActivityLog[] = [];
-  filteredActivities: ActivityLog[] = [];
-  private logSub!: Subscription;
+  isLoading = false;
+
+  // Role info
+  isSuperAdmin = false;
+  isAdmin = false;
+  currentUserEmail = '';
 
   // Filter state
   searchQuery: string = '';
@@ -69,11 +71,17 @@ export class ActivityLogComponent implements OnInit, OnDestroy {
 
   // Pagination
   currentPage: number = 1;
-  itemsPerPage: number = 8;
+  itemsPerPage: number = 10;
+  totalElements: number = 0;
+  totalPages: number = 1;
 
   // Selected Log Modal
   selectedLogModal: ActivityLog | null = null;
   toastMessage: string | null = null;
+
+  // Debounce search
+  private searchSubject = new Subject<string>();
+  private searchSub!: Subscription;
 
   // Categories list for filter tabs
   categories = [
@@ -85,24 +93,78 @@ export class ActivityLogComponent implements OnInit, OnDestroy {
     { key: ActivityCategory.REPORT, label: 'Reports & Exports' }
   ];
 
-  constructor(private activityLogService: ActivityLogService) {}
+  constructor(
+    private activityLogService: ActivityLogService,
+    private caseService: CaseService
+  ) {}
 
   ngOnInit(): void {
-    this.logSub = this.activityLogService.logs$.subscribe(logs => {
-      this.activities = logs;
-      this.applyFilters();
+    const cur = this.caseService.getCurrentUser();
+    this.isSuperAdmin = cur.role === 'SUPER_ADMIN';
+    this.isAdmin = cur.role === 'ADMIN';
+    this.currentUserEmail = cur.email || '';
+
+    this.searchSub = this.searchSubject.pipe(
+      debounceTime(350),
+      distinctUntilChanged()
+    ).subscribe(() => {
+      this.currentPage = 1;
+      this.loadLogs();
     });
+
+    this.loadLogs();
   }
 
   ngOnDestroy(): void {
-    if (this.logSub) {
-      this.logSub.unsubscribe();
+    if (this.searchSub) {
+      this.searchSub.unsubscribe();
     }
+  }
+
+  loadLogs(): void {
+    this.isLoading = true;
+    this.activityLogService.getLogs({
+      page: this.currentPage - 1,
+      size: this.itemsPerPage,
+      search: this.searchQuery,
+      category: this.selectedCategory,
+      status: this.selectedStatus
+    }).subscribe({
+      next: (page) => {
+        this.activities = page.content;
+        this.totalElements = page.totalElements;
+        this.totalPages = page.totalPages;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.activities = [];
+        this.totalElements = 0;
+        this.totalPages = 1;
+        this.isLoading = false;
+      }
+    });
+  }
+
+  onSearchInput(): void {
+    this.searchSubject.next(this.searchQuery);
+  }
+
+  applyFilters(): void {
+    this.currentPage = 1;
+    this.loadLogs();
+  }
+
+  resetFilters(): void {
+    this.searchQuery = '';
+    this.selectedCategory = 'ALL';
+    this.selectedStatus = 'ALL';
+    this.currentPage = 1;
+    this.loadLogs();
   }
 
   // Summary Metrics
   get totalLogsCount(): number {
-    return this.activities.length;
+    return this.totalElements;
   }
 
   get caseLogsCount(): number {
@@ -117,55 +179,18 @@ export class ActivityLogComponent implements OnInit, OnDestroy {
     return this.activities.filter(a => a.status === 'FAILED' || a.status === 'WARNING').length;
   }
 
-  // Filter logic
-  applyFilters(): void {
-    let result = [...this.activities];
-
-    // Search query (matches description, user, action, case ID, IP)
-    if (this.searchQuery.trim()) {
-      const q = this.searchQuery.toLowerCase().trim();
-      result = result.filter(a =>
-        a.description.toLowerCase().includes(q) ||
-        a.userName.toLowerCase().includes(q) ||
-        a.action.toLowerCase().includes(q) ||
-        a.ipAddress.includes(q) ||
-        (a.entityId && a.entityId.toLowerCase().includes(q))
-      );
-    }
-
-    // Category Filter
-    if (this.selectedCategory !== 'ALL') {
-      result = result.filter(a => a.category === this.selectedCategory);
-    }
-
-    // Status Filter
-    if (this.selectedStatus !== 'ALL') {
-      result = result.filter(a => a.status === this.selectedStatus);
-    }
-
-    this.filteredActivities = result;
-    this.currentPage = 1; // Reset to page 1 on filter change
-  }
-
-  // Pagination calculation
-  get totalPages(): number {
-    return Math.ceil(this.filteredActivities.length / this.itemsPerPage) || 1;
-  }
-
-  get paginatedActivities(): ActivityLog[] {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.filteredActivities.slice(startIndex, startIndex + this.itemsPerPage);
-  }
-
+  // Pagination navigation
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
+      this.loadLogs();
     }
   }
 
   prevPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
+      this.loadLogs();
     }
   }
 
@@ -217,19 +242,6 @@ export class ActivityLogComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Actions
-  simulateLiveEvent(): void {
-    this.activityLogService.simulateEvent();
-    this.showToast('New live audit log event recorded!');
-  }
-
-  clearLogs(): void {
-    if (confirm('Are you sure you want to clear all current audit log records?')) {
-      this.activityLogService.clearLogs();
-      this.showToast('Audit log history cleared.');
-    }
-  }
-
   openModal(log: ActivityLog): void {
     this.selectedLogModal = log;
   }
@@ -239,13 +251,13 @@ export class ActivityLogComponent implements OnInit, OnDestroy {
   }
 
   exportToCsv(): void {
-    if (this.filteredActivities.length === 0) {
+    if (this.activities.length === 0) {
       this.showToast('No logs available to export.');
       return;
     }
 
     const headers = ['Log ID', 'Timestamp', 'User', 'Role', 'Category', 'Action', 'Entity ID', 'Description', 'IP Address', 'Status'];
-    const rows = this.filteredActivities.map(l => [
+    const rows = this.activities.map(l => [
       l.id,
       `"${l.timestamp}"`,
       `"${l.userName}"`,

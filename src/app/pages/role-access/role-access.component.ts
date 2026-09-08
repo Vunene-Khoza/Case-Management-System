@@ -5,14 +5,6 @@ import { Router } from '@angular/router';
 import { CaseService } from '../../services/case.service';
 import { User } from '../../models/case.model';
 
-export interface SwitchHistory {
-  timestamp: string;
-  switchedTo: string;
-  badgeClass: string;
-  duration: string;
-  actionsTaken: string;
-}
-
 @Component({
   selector: 'app-role-access',
   standalone: true,
@@ -39,10 +31,6 @@ export class RoleAccessComponent implements OnInit {
   isLoadingUsers = false;
   searchQuery = '';
 
-  // History List
-  historyList: SwitchHistory[] = [];
-  isLoadingHistory = false;
-
   constructor(
     private router: Router,
     private caseService: CaseService
@@ -54,7 +42,6 @@ export class RoleAccessComponent implements OnInit {
     this.isSuperAdmin = cur.role === 'SUPER_ADMIN' || original === 'SUPER_ADMIN';
 
     this.loadRoleCounts();
-    this.loadHistory();
   }
 
   loadRoleCounts() {
@@ -68,19 +55,6 @@ export class RoleAccessComponent implements OnInit {
       },
       error: () => {
         this.isLoadingCounts = false;
-      }
-    });
-  }
-
-  loadHistory() {
-    this.isLoadingHistory = true;
-    this.caseService.getRoleSwitchHistory().subscribe({
-      next: (data) => {
-        this.historyList = data || [];
-        this.isLoadingHistory = false;
-      },
-      error: () => {
-        this.isLoadingHistory = false;
       }
     });
   }
