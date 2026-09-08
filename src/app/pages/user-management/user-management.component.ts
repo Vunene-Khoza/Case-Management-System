@@ -45,6 +45,11 @@ export class UserManagementComponent implements OnInit {
   selectedRole = 'all';
   selectedStatus = 'all';
 
+  // Pagination controls
+  Math = Math;
+  currentPage = 1;
+  pageSize = 5;
+
   dummyUsers: Array<{
     name: string;
     email: string;
@@ -294,10 +299,50 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
+  get totalFilteredCount(): number {
+    return this.getFilteredDummyUsers().length;
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.totalFilteredCount / this.pageSize));
+  }
+
+  get paginatedUsers(): any[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.getFilteredDummyUsers().slice(start, start + this.pageSize);
+  }
+
+  get pagesArray(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
+  onFilterChange(): void {
+    this.currentPage = 1;
+  }
+
   clearFilters() {
     this.searchQuery = '';
     this.selectedRole = 'all';
     this.selectedStatus = 'all';
+    this.currentPage = 1;
   }
 
   exportUsers() {

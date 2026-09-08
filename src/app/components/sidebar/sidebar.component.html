@@ -1,16 +1,21 @@
 <aside class="sidebar-container" [class.collapsed]="isCollapsed">
   <div class="section-1">
-    <!-- Logo block -->
-    <div class="univen-logo-1" (click)="toggleSidebar()" style="cursor: pointer;">
-      <img class="logo-image" src="logo/University_of_Venda_logo.svg" alt="University of Venda Logo" />
+    <!-- Header: Logo & Branding -->
+    <div class="sidebar-header">
+      <div class="univen-logo-1" (click)="toggleSidebar()" style="cursor: pointer;">
+        <img class="logo-image" src="logo/University_of_Venda_logo.svg" alt="University of Venda Logo" />
+      </div>
+      <div class="case-management">CASE MANAGEMENT</div>
+      
+      <!-- Preview Banner in Sidebar -->
+      <div *ngIf="isPreviewMode" class="preview-mode-banner" (click)="exitPreviewMode()" style="cursor: pointer; background: #fee2e2; border: 1px solid #f87171; border-radius: 6px; padding: 6px 12px; margin: 10px 20px; display: flex; align-items: center; gap: 8px;">
+        <i class="bi bi-arrow-left-circle-fill text-danger" style="font-size: 14px;"></i>
+        <span *ngIf="!isCollapsed" style="font-size: 11px; font-weight: 700; color: #991b1b; text-transform: uppercase; letter-spacing: 0.05em;">Exit Preview</span>
+      </div>
     </div>
-    <div class="case-management">CASE MANAGEMENT</div>
     
-    <!-- Preview Banner in Sidebar -->
-    <div *ngIf="isPreviewMode" class="preview-mode-banner" (click)="exitPreviewMode()" style="cursor: pointer; background: #fee2e2; border: 1px solid #f87171; border-radius: 6px; padding: 6px 12px; margin: 10px 20px; display: flex; align-items: center; gap: 8px;">
-      <i class="bi bi-arrow-left-circle-fill text-danger" style="font-size: 14px;"></i>
-      <span *ngIf="!isCollapsed" style="font-size: 11px; font-weight: 700; color: #991b1b; text-transform: uppercase; letter-spacing: 0.05em;">Exit Preview</span>
-    </div>
+    <!-- Scrollable Navigation Area -->
+    <div class="sidebar-nav">
     
     <!-- ==================== ADMINISTRATOR / OTHER ROLES SIDEBAR ==================== -->
     <ng-container *ngIf="currentUser.role === 'ADMIN' || currentUser.role === 'VIEWER'">
@@ -225,7 +230,8 @@
         </a>
       </div>
     </ng-container>
-
+    </div>
+    
     <!-- Profile block at the bottom -->
     <div class="profile-section">
       <div class="line-1"></div>

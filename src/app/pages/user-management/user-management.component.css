@@ -624,3 +624,10 @@
   color: #ffffff;
 }
 
+.page-btn:disabled,
+.page-btn.disabled-btn {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+

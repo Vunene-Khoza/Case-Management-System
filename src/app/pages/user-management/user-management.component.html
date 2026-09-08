@@ -28,10 +28,11 @@
             class="sa-search-input" 
             placeholder="Search name, email, staff number..." 
             [(ngModel)]="searchQuery"
+            (ngModelChange)="onFilterChange()"
           />
         </div>
         
-        <select class="sa-select-dropdown" [(ngModel)]="selectedRole">
+        <select class="sa-select-dropdown" [(ngModel)]="selectedRole" (ngModelChange)="onFilterChange()">
           <option value="all">All Roles</option>
           <option value="SUPER_ADMIN">Super Admin</option>
           <option value="ADMIN">Admin</option>
@@ -39,7 +40,7 @@
           <option value="VIEWER">Viewer</option>
         </select>
 
-        <select class="sa-select-dropdown" [(ngModel)]="selectedStatus">
+        <select class="sa-select-dropdown" [(ngModel)]="selectedStatus" (ngModelChange)="onFilterChange()">
           <option value="all">All Status</option>
           <option value="Active">Active</option>
           <option value="Inactive">Inactive</option>
@@ -65,7 +66,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let u of getFilteredDummyUsers()">
+              <tr *ngFor="let u of paginatedUsers">
                 <td>
                   <div class="container10">
                     <div class="avatar-circle" [ngClass]="getAvatarBgClass(u.name)">
@@ -104,7 +105,7 @@
                   </div>
                 </td>
               </tr>
-              <tr *ngIf="getFilteredDummyUsers().length === 0">
+              <tr *ngIf="totalFilteredCount === 0">
                 <td colspan="7" class="empty-row">No users match the search criteria.</td>
               </tr>
             </tbody>
@@ -112,12 +113,37 @@
         </div>
 
         <!-- Table Pagination Footer -->
-        <div class="sa-pagination-footer">
-          <span class="showing-text">Showing 1–{{ getFilteredDummyUsers().length }} of {{ getFilteredDummyUsers().length }} users</span>
+        <div class="sa-pagination-footer" *ngIf="totalFilteredCount > 0">
+          <span class="showing-text">
+            Showing {{ (currentPage - 1) * pageSize + 1 }}–{{ Math.min(currentPage * pageSize, totalFilteredCount) }} of {{ totalFilteredCount }} users
+          </span>
           <div class="pagination-buttons">
-            <button class="page-btn active">1</button>
-            <button class="page-btn">2</button>
-            <button class="page-btn">3</button>
+            <button 
+              class="page-btn" 
+              [disabled]="currentPage === 1" 
+              [class.disabled-btn]="currentPage === 1"
+              (click)="prevPage()" 
+              title="Previous Page"
+            >
+              ‹
+            </button>
+            <button 
+              *ngFor="let p of pagesArray" 
+              class="page-btn" 
+              [class.active]="currentPage === p" 
+              (click)="goToPage(p)"
+            >
+              {{ p }}
+            </button>
+            <button 
+              class="page-btn" 
+              [disabled]="currentPage === totalPages" 
+              [class.disabled-btn]="currentPage === totalPages"
+              (click)="nextPage()" 
+              title="Next Page"
+            >
+              ›
+            </button>
           </div>
         </div>
       </div>
