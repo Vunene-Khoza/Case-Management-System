@@ -562,6 +562,44 @@
   background-color: #fecaca;
 }
 
+.sa-table .delete-sa-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.sa-table .delete-sa-btn:hover {
+  background-color: #fee2e2;
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}
+
+.sa-table .reactivate-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #d1fae5;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #059669;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.sa-table .reactivate-btn:hover {
+  background-color: #a7f3d0;
+}
+
 .btn-reactivate {
   background: #d1fae5;
   border-radius: 6px;

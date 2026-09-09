@@ -401,6 +401,58 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
+  // Super Admin action handlers
+  deactivateSuperAdminUser(user: any) {
+    user.status = 'Inactive';
+    // If user is in custom users in localStorage, update status there too
+    this.updateCustomUserStatus(user.email, 'INACTIVE');
+  }
+
+  reactivateSuperAdminUser(user: any) {
+    user.status = 'Active';
+    this.updateCustomUserStatus(user.email, 'ACTIVE');
+  }
+
+  deleteSuperAdminUser(user: any) {
+    const confirmDelete = confirm(`Are you sure you want to permanently delete ${user.name}'s account? This action cannot be undone.`);
+    if (confirmDelete) {
+      this.dummyUsers = this.dummyUsers.filter(u => u.email.toLowerCase() !== user.email.toLowerCase());
+      
+      // Also remove from custom users in localStorage if present
+      const customUsersJson = localStorage.getItem('univen_custom_users');
+      if (customUsersJson) {
+        try {
+          let customUsers: User[] = JSON.parse(customUsersJson);
+          customUsers = customUsers.filter(u => u.email.toLowerCase() !== user.email.toLowerCase());
+          localStorage.setItem('univen_custom_users', JSON.stringify(customUsers));
+        } catch (e) {
+          console.error('Error removing user from localStorage:', e);
+        }
+      }
+
+      // Adjust current page if current page has no more items after deletion
+      if (this.currentPage > this.totalPages) {
+        this.currentPage = Math.max(1, this.totalPages);
+      }
+    }
+  }
+
+  private updateCustomUserStatus(email: string, status: 'ACTIVE' | 'INACTIVE') {
+    const customUsersJson = localStorage.getItem('univen_custom_users');
+    if (customUsersJson) {
+      try {
+        const customUsers: User[] = JSON.parse(customUsersJson);
+        const target = customUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+        if (target) {
+          target.status = status;
+          localStorage.setItem('univen_custom_users', JSON.stringify(customUsers));
+        }
+      } catch (e) {
+        console.error('Error updating user status in localStorage:', e);
+      }
+    }
+  }
+
   goBack() {
     window.history.back();
   }

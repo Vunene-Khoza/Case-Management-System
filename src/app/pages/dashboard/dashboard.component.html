@@ -23,31 +23,31 @@
     <div class="sa-metrics-grid">
       <div class="container-background-color">
         <div class="total-users">Total Users</div>
-        <div class="_12">12</div>
+        <div class="_12">{{ saMetrics.totalUsers }}</div>
         <div class="all-roles-combined">All roles combined</div>
         <div class="pseudo-after-background-color"></div>
       </div>
       <div class="container-background-color3">
         <div class="active-users">Active Users</div>
-        <div class="_10">10</div>
+        <div class="_10">{{ saMetrics.activeUsers }}</div>
         <div class="currently-enabled">Currently enabled</div>
         <div class="pseudo-after-background-color2"></div>
       </div>
       <div class="container-background-color5">
         <div class="pending-approvals">Pending Approvals</div>
-        <div class="_3">3</div>
+        <div class="_3">{{ saMetrics.pendingApprovals }}</div>
         <div class="awaiting-review">Awaiting review</div>
         <div class="pseudo-after-background-color3"></div>
       </div>
       <div class="container-background-color7">
         <div class="inactive-accounts">Inactive Accounts</div>
-        <div class="_2">2</div>
+        <div class="_2">{{ saMetrics.inactiveUsers }}</div>
         <div class="suspended-access">Suspended access</div>
         <div class="pseudo-after-background-color4"></div>
       </div>
       <div class="container-background-color9">
         <div class="total-cases">Total Cases</div>
-        <div class="_120">120</div>
+        <div class="_120">{{ saMetrics.totalCases }}</div>
         <div class="system-wide">System-wide</div>
         <div class="pseudo-after-background-color5"></div>
       </div>
@@ -59,7 +59,11 @@
       <div class="container-background-color11">
         <div class="sa-panel-header">
           <div class="container8">
-            <span class="panel-icon">📊</span>
+            <span class="panel-icon icon-chart">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bar-chart-line-fill" viewBox="0 0 16 16">
+                <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1z"/>
+              </svg>
+            </span>
             <div class="users-by-role">Users by Role</div>
           </div>
           <a routerLink="/users" class="button">
@@ -75,10 +79,10 @@
                 <span class="role-indicator bg-super-admin"></span>
                 <span class="role-name">Super Admin</span>
               </div>
-              <span class="role-count">1</span>
+              <span class="role-count">{{ roleCounts.SUPER_ADMIN }}</span>
             </div>
             <div class="progress-bar-bg">
-              <div class="progress-bar-fill fill-super-admin" style="width: 8.3%"></div>
+              <div class="progress-bar-fill fill-super-admin" [style.width.%]="getRolePercentage('SUPER_ADMIN')"></div>
             </div>
           </div>
           <!-- Admin -->
@@ -88,10 +92,10 @@
                 <span class="role-indicator bg-admin"></span>
                 <span class="role-name">Admin</span>
               </div>
-              <span class="role-count">3</span>
+              <span class="role-count">{{ roleCounts.ADMIN }}</span>
             </div>
             <div class="progress-bar-bg">
-              <div class="progress-bar-fill fill-admin" style="width: 25%"></div>
+              <div class="progress-bar-fill fill-admin" [style.width.%]="getRolePercentage('ADMIN')"></div>
             </div>
           </div>
           <!-- Legal Officer -->
@@ -101,10 +105,10 @@
                 <span class="role-indicator bg-legal-officer"></span>
                 <span class="role-name">Legal Officer</span>
               </div>
-              <span class="role-count">6</span>
+              <span class="role-count">{{ roleCounts.LEGAL_OFFICER }}</span>
             </div>
             <div class="progress-bar-bg">
-              <div class="progress-bar-fill fill-legal-officer" style="width: 50%"></div>
+              <div class="progress-bar-fill fill-legal-officer" [style.width.%]="getRolePercentage('LEGAL_OFFICER')"></div>
             </div>
           </div>
           <!-- Viewer -->
@@ -114,10 +118,10 @@
                 <span class="role-indicator bg-viewer"></span>
                 <span class="role-name">Viewer</span>
               </div>
-              <span class="role-count">2</span>
+              <span class="role-count">{{ roleCounts.VIEWER }}</span>
             </div>
             <div class="progress-bar-bg">
-              <div class="progress-bar-fill fill-viewer" style="width: 16.7%"></div>
+              <div class="progress-bar-fill fill-viewer" [style.width.%]="getRolePercentage('VIEWER')"></div>
             </div>
           </div>
         </div>
@@ -127,7 +131,11 @@
       <div class="container-background-color21">
         <div class="sa-panel-header">
           <div class="container19">
-            <span class="panel-icon">⚡</span>
+            <span class="panel-icon icon-lightning">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
+                <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
+              </svg>
+            </span>
             <div class="live-activity-feed">Live Activity Feed</div>
           </div>
           <a routerLink="/activity-log" class="button2">
@@ -136,65 +144,25 @@
         </div>
         
         <div class="container20">
-          <!-- Feed Item 1 -->
-          <div class="feed-item">
-            <div class="feed-indicator bg-pulse"></div>
-            <div class="feed-content-wrapper">
-              <div class="feed-meta-row">
-                <span class="feed-username">T. Avhashoni</span>
-                <span class="span-background-color">
-                  <span class="officer">Officer</span>
-                </span>
+          <ng-container *ngIf="recentActivities.length > 0; else noActivities">
+            <div class="feed-item" *ngFor="let item of recentActivities; let idx = index">
+              <div class="feed-indicator" [ngClass]="getActivityIndicatorClass(idx, item.status)"></div>
+              <div class="feed-content-wrapper">
+                <div class="feed-meta-row">
+                  <span class="feed-username">{{ item.userName || 'System' }}</span>
+                  <span [ngClass]="getRoleBadgeClass(item.userRole)">
+                    <span>{{ getRoleBadgeText(item.userRole) }}</span>
+                  </span>
+                </div>
+                <p class="feed-message">{{ item.description }}</p>
+                <span class="feed-timestamp">{{ getRelativeTime(item.timestamp) }}</span>
               </div>
-              <p class="feed-message">Note added to Case C001</p>
-              <span class="feed-timestamp">2026-06-02 · 14:22</span>
             </div>
-          </div>
+          </ng-container>
 
-          <!-- Feed Item 2 -->
-          <div class="feed-item">
-            <div class="feed-indicator bg-gold"></div>
-            <div class="feed-content-wrapper">
-              <div class="feed-meta-row">
-                <span class="feed-username">R.E. Mukosi</span>
-                <span class="span-background-color2">
-                  <span class="admin2">Admin</span>
-                </span>
-              </div>
-              <p class="feed-message">Logged in to system</p>
-              <span class="feed-timestamp">2026-06-02 · 08:14</span>
-            </div>
-          </div>
-
-          <!-- Feed Item 3 -->
-          <div class="feed-item">
-            <div class="feed-indicator bg-green"></div>
-            <div class="feed-content-wrapper">
-              <div class="feed-meta-row">
-                <span class="feed-username">S. Mukosi</span>
-                <span class="span-background-color3">
-                  <span class="super-admin2">Super Admin</span>
-                </span>
-              </div>
-              <p class="feed-message">Approved registration — N. Baloyi (Viewer)</p>
-              <span class="feed-timestamp">2026-06-01 · 17:05</span>
-            </div>
-          </div>
-
-          <!-- Feed Item 4 -->
-          <div class="feed-item">
-            <div class="feed-indicator bg-yellow"></div>
-            <div class="feed-content-wrapper">
-              <div class="feed-meta-row">
-                <span class="feed-username">T. Avhashoni</span>
-                <span class="span-background-color">
-                  <span class="officer">Officer</span>
-                </span>
-              </div>
-              <p class="feed-message">Case C019 closed — Total cost R 8,200</p>
-              <span class="feed-timestamp">2026-05-30 · 13:00</span>
-            </div>
-          </div>
+          <ng-template #noActivities>
+            <div class="feed-empty-message">No recent activity logged.</div>
+          </ng-template>
         </div>
       </div>
     </div>
