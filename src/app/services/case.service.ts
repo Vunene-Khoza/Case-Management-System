@@ -470,6 +470,20 @@ export class CaseService {
     );
   }
 
+  private readonly fallbackEmployees: UniversityEmployee[] = [
+    { employeeNumber: '10012', name: 'Ripfumelo', surname: 'Mukosi', email: 'mukosi@univen.ac.za', phoneNumber: '+27 15 962 8000', idNumber: '8501015800081', department: 'Department of Legal Services' },
+    { employeeNumber: '12345', name: 'Tshilidzi', surname: 'Avhashoni', email: 'avhashoni.tshilidzi@univen.ac.za', phoneNumber: '+27 15 962 8114', idNumber: '8902155800083', department: 'Office of the Registrar' },
+    { employeeNumber: '31007', name: 'Vhutshilo', surname: 'Sinthumule', email: 'sinthumule.vhutshilo@univen.ac.za', phoneNumber: '+27 15 962 8452', idNumber: '9107245800087', department: 'Human Resources Directorate' },
+    { employeeNumber: '40234', name: 'Ndidzulafhi', surname: 'Baloyi', email: 'baloyi.ndidzulafhi@univen.ac.za', phoneNumber: '+27 15 962 8901', idNumber: '8405125800084', department: 'Faculty of Management & Law' },
+    { employeeNumber: '51923', name: 'Livhuwani', surname: 'Makhuvha', email: 'livhuwani.makhuvha@univen.ac.za', phoneNumber: '+27 15 962 8332', idNumber: '9303185800089', department: 'Information & Communication Technology' },
+    { employeeNumber: '60114', name: 'Khathutshelo', surname: 'Nemutanzhela', email: 'nemutanzhela.k@univen.ac.za', phoneNumber: '+27 15 962 8776', idNumber: '8809095800082', department: 'Finance Directorate' },
+    { employeeNumber: '71205', name: 'Rudzani', surname: 'Madzivhandila', email: 'madzivhandila.rudzani@univen.ac.za', phoneNumber: '+27 15 962 8510', idNumber: '9004125800085', department: 'Faculty of Science, Engineering & Agriculture' },
+    { employeeNumber: '82341', name: 'Ndivhuwo', surname: 'Ramabulana', email: 'ramabulana.ndivhuwo@univen.ac.za', phoneNumber: '+27 15 962 8625', idNumber: '8711035800081', department: 'Facilities Management & Campus Security' },
+    { employeeNumber: '93452', name: 'Funanani', surname: 'Netshifhefhe', email: 'netshifhefhe.funanani@univen.ac.za', phoneNumber: '+27 15 962 8734', idNumber: '9408225800086', department: 'Directorate of Research & Innovation' },
+    { employeeNumber: '24563', name: 'Mulatedzi', surname: 'Mudau', email: 'mudau.mulatedzi@univen.ac.za', phoneNumber: '+27 15 962 8840', idNumber: '8606155800082', department: 'Academic Affairs & Examinations' },
+    { employeeNumber: '35674', name: 'Thanyani', surname: 'Khorommbi', email: 'khorommbi.thanyani@univen.ac.za', phoneNumber: '+27 15 962 8955', idNumber: '9212055800088', department: 'Student Affairs & Governance' }
+  ];
+
   searchEmployeeByNumber(empNumber: string): Observable<UniversityEmployee | null> {
     const trimmed = (empNumber || '').trim();
     if (!trimmed) {
@@ -477,7 +491,10 @@ export class CaseService {
     }
     return this.http.get<ApiResponse<UniversityEmployee>>(`${this.apiUrl}/employees/${trimmed}`).pipe(
       map(response => response.data || null),
-      catchError(() => of(null))
+      catchError(() => {
+        const found = this.fallbackEmployees.find(e => e.employeeNumber === trimmed);
+        return of(found || null);
+      })
     );
   }
 

@@ -49,7 +49,7 @@ export class CreateUserComponent implements OnInit {
   successMessage = '';
 
   // Quick suggestions for staff lookup
-  sampleStaffNumbers = ['10012', '12345', '31007', '40234', '51923', '60114'];
+  sampleStaffNumbers = ['10012', '12345', '31007', '40234', '51923', '60114', '71205', '82341', '93452', '24563', '35674'];
 
   constructor(
     private router: Router,
