@@ -25,3 +25,18 @@ VALUES
 ('C001', '2026-04-01'),
 ('C001', '2026-04-05'),
 ('C002', '2026-03-01');
+
+-- Seed university employees
+INSERT IGNORE INTO employees (employee_number, name, surname, email, phone_number, id_number, department, created_at)
+VALUES
+('10012', 'Ripfumelo', 'Mukosi', 'mukosi@univen.ac.za', '+27 15 962 8000', '8501015800081', 'Department of Legal Services', NOW()),
+('12345', 'Tshilidzi', 'Avhashoni', 'avhashoni.tshilidzi@univen.ac.za', '+27 15 962 8114', '8902155800083', 'Office of the Registrar', NOW()),
+('31007', 'Vhutshilo', 'Sinthumule', 'sinthumule.vhutshilo@univen.ac.za', '+27 15 962 8452', '9107245800087', 'Human Resources Directorate', NOW()),
+('40234', 'Ndidzulafhi', 'Baloyi', 'baloyi.ndidzulafhi@univen.ac.za', '+27 15 962 8901', '8405125800084', 'Faculty of Management & Law', NOW()),
+('51923', 'Livhuwani', 'Makhuvha', 'livhuwani.makhuvha@univen.ac.za', '+27 15 962 8332', '9303185800089', 'Information & Communication Technology', NOW()),
+('60114', 'Khathutshelo', 'Nemutanzhela', 'nemutanzhela.k@univen.ac.za', '+27 15 962 8776', '8809095800082', 'Finance Directorate', NOW()),
+('71205', 'Rudzani', 'Madzivhandila', 'madzivhandila.rudzani@univen.ac.za', '+27 15 962 8510', '9004125800085', 'Faculty of Science, Engineering & Agriculture', NOW()),
+('82341', 'Ndivhuwo', 'Ramabulana', 'ramabulana.ndivhuwo@univen.ac.za', '+27 15 962 8625', '8711035800081', 'Facilities Management & Campus Security', NOW()),
+('93452', 'Funanani', 'Netshifhefhe', 'netshifhefhe.funanani@univen.ac.za', '+27 15 962 8734', '9408225800086', 'Directorate of Research & Innovation', NOW()),
+('24563', 'Mulatedzi', 'Mudau', 'mudau.mulatedzi@univen.ac.za', '+27 15 962 8840', '8606155800082', 'Academic Affairs & Examinations', NOW()),
+('35674', 'Thanyani', 'Khorommbi', 'khorommbi.thanyani@univen.ac.za', '+27 15 962 8955', '9212055800088', 'Student Affairs & Governance', NOW());

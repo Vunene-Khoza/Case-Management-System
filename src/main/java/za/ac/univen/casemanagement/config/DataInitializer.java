@@ -36,6 +36,11 @@ public class DataInitializer implements CommandLineRunner {
         seedEmployeeIfNotFound("40234", "Ndidzulafhi", "Baloyi", "baloyi.ndidzulafhi@univen.ac.za", "+27 15 962 8901", "8405125800084", "Faculty of Management & Law");
         seedEmployeeIfNotFound("51923", "Livhuwani", "Makhuvha", "livhuwani.makhuvha@univen.ac.za", "+27 15 962 8332", "9303185800089", "Information & Communication Technology");
         seedEmployeeIfNotFound("60114", "Khathutshelo", "Nemutanzhela", "nemutanzhela.k@univen.ac.za", "+27 15 962 8776", "8809095800082", "Finance Directorate");
+        seedEmployeeIfNotFound("71205", "Rudzani", "Madzivhandila", "madzivhandila.rudzani@univen.ac.za", "+27 15 962 8510", "9004125800085", "Faculty of Science, Engineering & Agriculture");
+        seedEmployeeIfNotFound("82341", "Ndivhuwo", "Ramabulana", "ramabulana.ndivhuwo@univen.ac.za", "+27 15 962 8625", "8711035800081", "Facilities Management & Campus Security");
+        seedEmployeeIfNotFound("93452", "Funanani", "Netshifhefhe", "netshifhefhe.funanani@univen.ac.za", "+27 15 962 8734", "9408225800086", "Directorate of Research & Innovation");
+        seedEmployeeIfNotFound("24563", "Mulatedzi", "Mudau", "mudau.mulatedzi@univen.ac.za", "+27 15 962 8840", "8606155800082", "Academic Affairs & Examinations");
+        seedEmployeeIfNotFound("35674", "Thanyani", "Khorommbi", "khorommbi.thanyani@univen.ac.za", "+27 15 962 8955", "9212055800088", "Student Affairs & Governance");
     }
 
     private void seedEmployeeIfNotFound(String empNum, String name, String surname, String email, String phone, String idNum, String dept) {
