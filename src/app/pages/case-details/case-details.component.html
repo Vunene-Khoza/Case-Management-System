@@ -31,115 +31,125 @@
   <!-- =====================================================
        LOADING STATE
   ====================================================== -->
-
-  <ng-container
-    *ngIf="
-      loading;
-      else detailsContent
-    "
-  >
-
+  <ng-container *ngIf="loading; else detailsContent">
     <div class="loading-container">
-
       <div class="loading-card">
         <div class="skeleton skeleton-small"></div>
         <div class="skeleton skeleton-title"></div>
         <div class="skeleton skeleton-line"></div>
         <div class="skeleton skeleton-line short"></div>
-
         <div class="skeleton-divider"></div>
-
         <div class="skeleton-grid">
-          <div
-            *ngFor="let field of [1,2,3,4]"
-            class="skeleton-field"
-          >
+          <div *ngFor="let field of [1,2,3,4]" class="skeleton-field">
             <div class="skeleton skeleton-label"></div>
             <div class="skeleton skeleton-value"></div>
           </div>
         </div>
       </div>
-
       <div class="loading-hint">
-        Loading case record...
+        Loading 2D case record space...
       </div>
-
     </div>
-
   </ng-container>
 
-
   <!-- =====================================================
-       MAIN CAROUSEL CONTENT
+       MAIN 2D CAROUSEL CONTENT
   ====================================================== -->
-
   <ng-template #detailsContent>
+    <div class="carousel-section" *ngIf="activeCase; else notFound">
 
-    <div
-      class="carousel-section"
-      *ngIf="
-        activeCase;
-        else notFound
-      "
-    >
-
-      <!-- Carousel instruction -->
+      <!-- Navigation Bar / Header Controls -->
       <div class="carousel-heading">
+        <div class="heading-meta">
+          <div class="case-counter-badge">
+            <span class="counter-label">CASE</span>
+            <strong>{{ currentCaseIndex + 1 }}</strong>
+            <span class="counter-divider">/</span>
+            <span>{{ cases.length }}</span>
+          </div>
 
-        <div>
-          <span class="eyebrow">
-            CASE RECORD
-          </span>
-
-          <h1>
-            {{ activeCase.caseId }}
-          </h1>
-
-          <p>
-            Drag or swipe to explore the case record.
-          </p>
+          <div class="case-title-area">
+            <h1>{{ activeCase.employeeName }}</h1>
+            <span class="case-id-sub">{{ activeCase.caseId }}</span>
+          </div>
         </div>
 
-        <div class="carousel-controls">
+        <!-- 2D Directional Navigation Center -->
+        <div class="navigation-hub">
+          <!-- Vertical Layer Indicator Pills -->
+          <div class="vertical-layer-pills">
+            <button 
+              type="button" 
+              class="v-pill" 
+              [class.active]="verticalLayer === -1"
+              (click)="showHistoryNotes()"
+              title="View Case History & Notes (or swipe/drag UP)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5"/>
+              </svg>
+              <span>History & Notes</span>
+            </button>
 
-          <button
-            type="button"
-            class="carousel-arrow"
-            (click)="previousCard()"
-            aria-label="Previous card"
-          >
-            <svg
-              lucideChevronLeft
-              class="arrow-icon"
-            ></svg>
-          </button>
+            <button 
+              type="button" 
+              class="v-pill" 
+              [class.active]="verticalLayer === 0"
+              (click)="showMainCase()"
+              title="Main Case Record"
+            >
+              <span class="center-dot"></span>
+              <span>Main Case</span>
+            </button>
 
-          <button
-            type="button"
-            class="carousel-arrow"
-            (click)="nextCard()"
-            aria-label="Next card"
-          >
-            <svg
-              lucideChevronRight
-              class="arrow-icon"
-            ></svg>
-          </button>
+            <button 
+              type="button" 
+              class="v-pill" 
+              [class.active]="verticalLayer === 1"
+              (click)="showAssignedOfficer()"
+              title="View Assigned Legal Officer (or swipe/drag DOWN)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrow-down" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1"/>
+              </svg>
+              <span>Assigned Officer</span>
+            </button>
+          </div>
 
+          <!-- Horizontal Controls: Previous / Next Case -->
+          <div class="carousel-controls">
+            <button
+              type="button"
+              class="carousel-arrow"
+              (click)="previousCase()"
+              [disabled]="currentCaseIndex === 0"
+              aria-label="Previous case"
+              title="Previous Employee Case (or swipe/drag RIGHT)"
+            >
+              <svg lucideChevronLeft class="arrow-icon"></svg>
+            </button>
+
+            <button
+              type="button"
+              class="carousel-arrow"
+              (click)="nextCase()"
+              [disabled]="currentCaseIndex === cases.length - 1"
+              aria-label="Next case"
+              title="Next Employee Case (or swipe/drag LEFT)"
+            >
+              <svg lucideChevronRight class="arrow-icon"></svg>
+            </button>
+          </div>
         </div>
-
       </div>
 
-
       <!-- =================================================
-           3D CAROUSEL
+           2D INTERACTIVE STAGE & VIEWPORT
       ================================================== -->
-
       <div
         #carouselViewport
         class="carousel-viewport"
         [class.is-dragging]="isDragging"
-
         (pointerdown)="onDragStart($event)"
         (pointermove)="onDragMove($event)"
         (pointerup)="onDragEnd($event)"
@@ -147,759 +157,552 @@
         (lostpointercapture)="onDragCancel()"
       >
 
-        <div class="carousel-track">
+        <!-- Horizontal Track -->
+        <div class="horizontal-track" [style.transform]="'translateX(' + currentDragX + 'px)'">
 
-
-          <!-- =================================================
-               CARD 0 — CASE DETAILS
-          ================================================== -->
-
-          <article
-            class="carousel-card case-card"
-            [class.focused]="isFocusedCard(0)"
-            [class.side-card]="!isFocusedCard(0)"
-
-            [style.transform]="getCardTransform(0)"
-            [style.opacity]="getCardOpacity(0)"
-            [style.filter]="getCardBlur(0)"
-            [style.z-index]="getCardZIndex(0)"
-
-            (click)="onCardClick(0)"
+          <!-- =============================================
+               PREVIOUS CASE PEEK CARD (Left of Active Case)
+          ============================================== -->
+          <div 
+            class="case-peek-card peek-left"
+            *ngIf="currentCaseIndex > 0"
+            (click)="previousCase()"
+            title="Click to view previous employee case"
           >
-
-            <div class="card-top-bar">
-
-              <div>
-                <span class="case-id-tag">
-                  {{ activeCase.caseId }}
-                </span>
-
-                <h2 class="profile-card-title">
-                  {{ activeCase.employeeName }}
-                </h2>
-              </div>
-
-              <div class="status-badges">
-
-                <span
-                  class="badge"
-                  [ngClass]="
-                    getCaseTypeClass(
-                      activeCase.caseType
-                    )
-                  "
-                >
-                  {{ activeCase.caseType }}
-                </span>
-
-                <span
-                  class="badge"
-                  [ngClass]="
-                    getStatusClass(
-                      activeCase.status
-                    )
-                  "
-                >
-                  {{
-                    formatStatusLabel(
-                      activeCase.status
-                    )
-                  }}
-                </span>
-
-              </div>
-
-            </div>
-
-
-            <!-- Subject -->
-            <div class="case-description-block">
-
-              <h4 class="block-title">
-                Subject Matter / Dispute Details
-              </h4>
-
-              <p class="description-text">
-                {{ activeCase.description }}
-              </p>
-
-            </div>
-
-
-            <hr class="card-separator" />
-
-
-            <!-- Metadata -->
-            <div class="details-metadata-grid">
-
-              <div class="meta-item">
-
-                <span class="meta-label">
-                  Employee ID / Code
-                </span>
-
-                <span class="meta-value font-mono">
-                  {{ activeCase.employeeNumber }}
-                </span>
-
-              </div>
-
-
-              <div class="meta-item">
-
-                <span class="meta-label">
-                  Matter Classification
-                </span>
-
-                <span class="meta-value">
-                  {{ activeCase.classification }}
-                </span>
-
-              </div>
-
-
-              <div class="meta-item">
-
-                <span class="meta-label">
-                  Total Costing Allocation
-                </span>
-
-                <span class="meta-value cost-value">
-                  {{
-                    activeCase.costing
-                      ? 'R ' +
-                        formatCost(
-                          activeCase.costing
-                        )
-                      : 'R 0.00'
-                  }}
-                </span>
-
-              </div>
-
-
-              <div class="meta-item">
-
-                <span class="meta-label">
-                  Trial or Proceeding Date
-                </span>
-
-                <span class="meta-value">
-
-                  <svg
-                    lucideCalendar
-                    class="inline-icon"
-                  ></svg>
-
-                  <span>
-                    {{
-                      activeCase.trialDate ||
-                      'Not Scheduled'
-                    }}
-                  </span>
-
-                </span>
-
-              </div>
-
-
-              <div
-                class="meta-item"
-                *ngIf="
-                  activeCase.status ===
-                  CaseStatus.CLOSED
-                "
-              >
-
-                <span class="meta-label">
-                  Resolution / Closure Date
-                </span>
-
-                <span class="meta-value">
-
-                  <svg
-                    lucideClock
-                    class="inline-icon text-success"
-                  ></svg>
-
-                  <span>
-                    {{
-                      activeCase.closureDate ||
-                      'N/A'
-                    }}
-                  </span>
-
-                </span>
-
-              </div>
-
-            </div>
-
-
-            <!-- Reminders -->
-            <div
-              class="reminders-section"
-              *ngIf="
-                activeCase.reminderDates &&
-                activeCase.reminderDates.length > 0
-              "
-            >
-
-              <h4 class="block-title">
-                Important Deadline & Reminder Schedule
-              </h4>
-
-              <div class="reminders-timeline">
-
-                <div
-                  class="reminder-card"
-                  *ngFor="
-                    let date of
-                    activeCase.reminderDates
-                  "
-                >
-
-                  <div class="reminder-icon-wrapper">
-
-                    <svg
-                      lucideCalendar
-                      class="reminder-icon"
-                    ></svg>
-
-                  </div>
-
-                  <div class="reminder-details">
-
-                    <span class="reminder-date">
-                      {{ date }}
-                    </span>
-
-                    <p class="reminder-desc">
-                      Reminder Date Scheduled
-                    </p>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <!-- Closure -->
-            <div
-              class="closure-summary-block"
-              *ngIf="
-                activeCase.status ===
-                CaseStatus.CLOSED
-              "
-            >
-
-              <div class="closure-badge">
-
-                <svg
-                  lucideLock
-                  class="lock-icon"
-                ></svg>
-
-                <span>
-                  Resolved & Closed Matter Summary
-                </span>
-
-              </div>
-
-              <p class="closure-text">
-                {{
-                  activeCase.finalNotes ||
-                  'No summary registered.'
-                }}
-              </p>
-
-            </div>
-
-            <!-- Attached Evidence Section -->
-            <div class="evidence-details-section" *ngIf="evidenceList && evidenceList.length > 0">
-              <h4 class="block-title">
-                Attached Evidence ({{ evidenceList.length }})
-              </h4>
-              <div class="evidence-details-list">
-                <div class="evidence-detail-item" *ngFor="let ev of evidenceList">
-                  <div class="evidence-detail-badge" [ngClass]="'badge-' + ev.fileCategory">
-                    {{ ev.fileCategory | uppercase }}
-                  </div>
-                  <div class="evidence-detail-info">
-                    <span class="evidence-detail-name" [title]="ev.name">{{ ev.name }}</span>
-                    <span class="evidence-detail-size">{{ ev.formattedSize }} · {{ ev.uploadedAt }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card-footer-hint">
-
-              <svg
-                lucideGripHorizontal
-                class="grip-icon"
-              ></svg>
-
-              <span>
-                Drag to explore
+            <div class="peek-badge">← PREVIOUS CASE</div>
+            <div class="peek-title">{{ cases[currentCaseIndex - 1].employeeName }}</div>
+            <div class="peek-id">{{ cases[currentCaseIndex - 1].caseId }}</div>
+            <div class="peek-status">
+              <span class="badge" [ngClass]="getStatusClass(cases[currentCaseIndex - 1].status)">
+                {{ formatStatusLabel(cases[currentCaseIndex - 1].status) }}
               </span>
-
             </div>
+          </div>
 
-          </article>
+          <!-- =============================================
+               ACTIVE CASE CONTAINER (Vertical 3-Layer Stack)
+          ============================================== -->
+          <div class="active-case-container">
 
+            <!-- ===========================================
+                 LAYER -1: CASE HISTORY & NOTES CARD
+                 (Revealed when user drags UP)
+            ============================================ -->
+            <article 
+              class="layer-card history-notes-layer"
+              [class.layer-active]="verticalLayer === -1"
+              [class.layer-hidden-top]="verticalLayer > -1"
+              [style.transform]="'translateY(' + (verticalLayer === -1 ? currentDragY : -108 * (verticalLayer + 1)) + '%)'"
+            >
+              <header class="notes-header">
+                <div>
+                  <span class="card-eyebrow">CASE HISTORY & TIMELINE</span>
+                  <h2>{{ activeCase.employeeName }} — Notes</h2>
+                  <span class="header-case-ref">{{ activeCase.caseId }}</span>
+                </div>
 
-          <!-- =================================================
-               CARD 1 — CASE HISTORY & NOTES
-          ================================================== -->
+                <div class="notes-header-actions">
+                  <button
+                    type="button"
+                    (click)="openNoteModal($event)"
+                    class="btn btn-secondary btn-sm"
+                    [disabled]="activeCase.status === CaseStatus.CLOSED"
+                  >
+                    <svg lucidePlus class="btn-icon"></svg>
+                    <span>Add Note</span>
+                  </button>
 
-          <article
-            class="carousel-card notes-card"
-            [class.focused]="isFocusedCard(1)"
-            [class.side-card]="!isFocusedCard(1)"
+                  <button
+                    type="button"
+                    (click)="showMainCase(); $event.stopPropagation()"
+                    class="btn btn-outline-dark btn-sm"
+                    title="Return down to Main Case Card"
+                  >
+                    <span>↓ Main Case</span>
+                  </button>
+                </div>
+              </header>
 
-            [style.transform]="getCardTransform(1)"
-            [style.opacity]="getCardOpacity(1)"
-            [style.filter]="getCardBlur(1)"
-            [style.z-index]="getCardZIndex(1)"
-
-            (click)="onCardClick(1)"
-          >
-
-            <header class="notes-header">
-
-              <div>
-
-                <span class="card-eyebrow">
-                  ACTIVITY
-                </span>
-
-                <h2>
-                  Case History & Notes
-                </h2>
-
-              </div>
-
-              <button
-                type="button"
-                (click)="openNoteModal(); $event.stopPropagation()"
-                class="btn btn-secondary btn-sm"
-
-                [disabled]="
-                  activeCase.status ===
-                  CaseStatus.CLOSED
-                "
-              >
-
-                <svg
-                  lucidePlus
-                  class="btn-icon"
-                ></svg>
-
-                <span>
-                  Add Note
-                </span>
-
-              </button>
-
-            </header>
-
-
-            <div class="notes-list-container">
-
-              <div
-                class="note-card"
-                *ngFor="let note of notes"
-              >
-
-                <header class="note-card-meta">
-
-                  <div class="note-author">
-
-                    <div class="author-avatar">
-                      {{
-                        getInitials(
-                          note.authorName
-                        )
-                      }}
+              <!-- Notes List / Activity Timeline -->
+              <div class="notes-list-container">
+                <div class="note-card" *ngFor="let note of notes">
+                  <header class="note-card-meta">
+                    <div class="note-author">
+                      <div class="author-avatar">
+                        {{ getInitials(note.authorName) }}
+                      </div>
+                      <span class="author-name">{{ note.authorName }}</span>
                     </div>
+                    <span class="note-date">{{ note.createdAt }}</span>
+                  </header>
+                  <div class="note-content formatted-note" [innerHTML]="note.content"></div>
+                </div>
 
-                    <span class="author-name">
-                      {{ note.authorName }}
-                    </span>
+                <!-- Empty State -->
+                <div class="empty-notes" *ngIf="!notes || notes.length === 0">
+                  <svg lucideMessageSquare class="empty-icon"></svg>
+                  <h3>No Case History Available</h3>
+                  <p>No activity notes or observations have been recorded for this case matter yet.</p>
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    (click)="openNoteModal($event)"
+                    [disabled]="activeCase.status === CaseStatus.CLOSED"
+                  >
+                    <svg lucidePlus class="btn-icon"></svg>
+                    <span>Add First Note</span>
+                  </button>
+                </div>
+              </div>
 
+              <!-- Bottom Indicator: Return to Main Case -->
+              <div class="layer-footer-hint" (click)="showMainCase()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+                </svg>
+                <span>Swipe down or click to return to Main Case</span>
+              </div>
+            </article>
+
+
+            <!-- ===========================================
+                 LAYER 0: MAIN CASE CARD (Center Anchor)
+            ============================================ -->
+            <article 
+              class="layer-card main-case-layer"
+              [class.layer-active]="verticalLayer === 0"
+              [class.layer-above]="verticalLayer === 1"
+              [class.layer-below]="verticalLayer === -1"
+              [style.transform]="'translateY(' + (verticalLayer === 0 ? currentDragY : (verticalLayer === 1 ? -108 : 108)) + '%)'"
+            >
+              <!-- Top Directional Hint (Drag UP for History) -->
+              <div class="directional-strip strip-top" (click)="showHistoryNotes()" title="Click or drag UP to view History & Notes">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-chevron-up strip-icon" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+                </svg>
+                <span>↑ Case History & Notes</span>
+              </div>
+
+              <!-- Card Top Header -->
+              <div class="card-top-bar">
+                <div>
+                  <span class="case-id-tag">{{ activeCase.caseId }}</span>
+                  <h2 class="profile-card-title">{{ activeCase.employeeName }}</h2>
+                </div>
+
+                <div class="status-badges">
+                  <span class="badge" [ngClass]="getCaseTypeClass(activeCase.caseType)">
+                    {{ activeCase.caseType }}
+                  </span>
+                  <span class="badge" [ngClass]="getStatusClass(activeCase.status)">
+                    {{ formatStatusLabel(activeCase.status) }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Subject Matter / Dispute Description -->
+              <div class="case-description-block">
+                <h4 class="block-title">Subject Matter / Dispute Details</h4>
+                <p class="description-text">{{ activeCase.description }}</p>
+              </div>
+
+              <hr class="card-separator" />
+
+              <!-- Metadata Grid -->
+              <div class="details-metadata-grid">
+                <div class="meta-item">
+                  <span class="meta-label">Employee ID / Code</span>
+                  <span class="meta-value font-mono">{{ activeCase.employeeNumber }}</span>
+                </div>
+
+                <div class="meta-item">
+                  <span class="meta-label">Matter Classification</span>
+                  <span class="meta-value">{{ activeCase.classification }}</span>
+                </div>
+
+                <div class="meta-item">
+                  <span class="meta-label">Total Costing Allocation</span>
+                  <span class="meta-value cost-value">
+                    {{ activeCase.costing ? 'R ' + formatCost(activeCase.costing) : 'R 0.00' }}
+                  </span>
+                </div>
+
+                <div class="meta-item">
+                  <span class="meta-label">Date Opened</span>
+                  <span class="meta-value">
+                    <svg lucideCalendar class="inline-icon"></svg>
+                    <span>{{ activeCase.dateOpened || 'N/A' }}</span>
+                  </span>
+                </div>
+
+                <div class="meta-item">
+                  <span class="meta-label">Trial or Proceeding Date</span>
+                  <span class="meta-value">
+                    <svg lucideCalendar class="inline-icon"></svg>
+                    <span>{{ activeCase.trialDate || 'Not Scheduled' }}</span>
+                  </span>
+                </div>
+
+                <div class="meta-item" *ngIf="activeCase.status === CaseStatus.CLOSED">
+                  <span class="meta-label">Resolution / Closure Date</span>
+                  <span class="meta-value">
+                    <svg lucideClock class="inline-icon text-success"></svg>
+                    <span>{{ activeCase.closureDate || 'N/A' }}</span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Important Reminders (if any) -->
+              <div class="reminders-section" *ngIf="activeCase.reminderDates && activeCase.reminderDates.length > 0">
+                <h4 class="block-title">Important Deadline & Reminder Schedule</h4>
+                <div class="reminders-timeline">
+                  <div class="reminder-card" *ngFor="let date of activeCase.reminderDates">
+                    <div class="reminder-icon-wrapper">
+                      <svg lucideCalendar class="reminder-icon"></svg>
+                    </div>
+                    <div class="reminder-details">
+                      <span class="reminder-date">{{ date }}</span>
+                      <p class="reminder-desc">Reminder Scheduled</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Attached Evidence Section -->
+              <div class="evidence-details-section" *ngIf="evidenceList && evidenceList.length > 0">
+                <h4 class="block-title">Attached Evidence ({{ evidenceList.length }})</h4>
+                <div class="evidence-details-list">
+                  <div class="evidence-detail-item" *ngFor="let ev of evidenceList">
+                    <div class="evidence-detail-badge" [ngClass]="'badge-' + ev.fileCategory">
+                      {{ ev.fileCategory | uppercase }}
+                    </div>
+                    <div class="evidence-detail-info">
+                      <span class="evidence-detail-name" [title]="ev.name">{{ ev.name }}</span>
+                      <span class="evidence-detail-size">{{ ev.formattedSize }} · {{ ev.uploadedAt }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Resolved / Closure Summary Block -->
+              <div class="closure-summary-block" *ngIf="activeCase.status === CaseStatus.CLOSED">
+                <div class="closure-badge">
+                  <svg lucideLock class="lock-icon"></svg>
+                  <span>Resolved & Closed Matter Summary</span>
+                </div>
+                <p class="closure-text">{{ activeCase.finalNotes || 'No summary registered.' }}</p>
+              </div>
+
+              <!-- Bottom Directional Hint (Drag DOWN for Officer) -->
+              <div class="directional-strip strip-bottom" (click)="showAssignedOfficer()" title="Click or drag DOWN to view Assigned Legal Officer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-chevron-down strip-icon" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+                </svg>
+                <span>↓ Assigned Legal Officer</span>
+              </div>
+            </article>
+
+
+            <!-- ===========================================
+                 LAYER +1: ASSIGNED LEGAL OFFICER CARD
+                 (Revealed when user drags DOWN)
+            ============================================ -->
+            <article 
+              class="layer-card officer-layer"
+              [class.layer-active]="verticalLayer === 1"
+              [class.layer-hidden-bottom]="verticalLayer < 1"
+              [style.transform]="'translateY(' + (verticalLayer === 1 ? currentDragY : 108 * (1 - verticalLayer)) + '%)'"
+            >
+              <!-- Top Indicator: Return to Main Case -->
+              <div class="layer-header-hint" (click)="showMainCase()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+                </svg>
+                <span>Swipe up or click to return to Main Case</span>
+              </div>
+
+              <div class="officer-card-content">
+                <div class="officer-icon">
+                  <svg lucideUser class="officer-user-icon"></svg>
+                </div>
+
+                <span class="card-eyebrow">CASE ASSIGNMENT</span>
+                <h2>Assigned Legal Officer</h2>
+                <div class="officer-divider"></div>
+
+                <!-- Assigned Officer State -->
+                <ng-container *ngIf="activeCase.assignedOfficer; else noOfficerState">
+                  <div class="officer-information">
+                    <span class="officer-name">{{ activeCase.assignedOfficer }}</span>
+                    <span class="officer-role">{{ activeCase.assignedRole || 'Legal Officer' }}</span>
                   </div>
 
-                  <span class="note-date">
-                    {{ note.createdAt }}
-                  </span>
+                  <div class="officer-profile-meta" *ngIf="officerDetails">
+                    <div class="officer-meta-row" *ngIf="officerDetails.email">
+                      <span class="meta-tag">Email:</span>
+                      <span class="meta-val">{{ officerDetails.email }}</span>
+                    </div>
+                    <div class="officer-meta-row" *ngIf="officerDetails.staffNumber">
+                      <span class="meta-tag">Staff Number:</span>
+                      <span class="meta-val">{{ officerDetails.staffNumber }}</span>
+                    </div>
+                    <div class="officer-meta-row">
+                      <span class="meta-tag">Department:</span>
+                      <span class="meta-val">{{ officerDetails.department || 'Department of Legal Services' }}</span>
+                    </div>
+                  </div>
 
-                </header>
+                  <div class="officer-case-summary">
+                    <div class="summary-row">
+                      <span>Case Reference</span>
+                      <strong>{{ activeCase.caseId }}</strong>
+                    </div>
+                    <div class="summary-row">
+                      <span>Employee</span>
+                      <strong>{{ activeCase.employeeName }}</strong>
+                    </div>
+                    <div class="summary-row">
+                      <span>Classification</span>
+                      <strong>{{ activeCase.classification }}</strong>
+                    </div>
+                  </div>
+                </ng-container>
 
-                <p class="note-content">
-                  {{ note.content }}
-                </p>
-
+                <!-- Empty State: No Officer Assigned -->
+                <ng-template #noOfficerState>
+                  <div class="empty-officer-state">
+                    <div class="empty-officer-icon">!</div>
+                    <h3>No Legal Officer Assigned</h3>
+                    <p>This case matter currently has no legal officer designated to manage proceedings.</p>
+                    <a [routerLink]="['/cases', activeCase.caseId, 'edit']" class="btn btn-secondary btn-sm">
+                      Assign Legal Officer
+                    </a>
+                  </div>
+                </ng-template>
               </div>
 
-
-              <!-- Empty -->
-              <div
-                class="empty-notes"
-                *ngIf="
-                  !notes ||
-                  notes.length === 0
-                "
-              >
-
-                <svg
-                  lucideMessageSquare
-                  class="empty-icon"
-                ></svg>
-
-                <h3>
-                  No activity yet
-                </h3>
-
-                <p>
-                  No logged notes or case activities
-                  recorded for this matter yet.
-                </p>
-
-                <button
-                  type="button"
-                  class="btn btn-primary"
-                  (click)="openNoteModal(); $event.stopPropagation()"
-                  [disabled]="
-                    activeCase.status ===
-                    CaseStatus.CLOSED
-                  "
-                >
-                  Add First Note
+              <!-- Return Button -->
+              <div class="layer-footer-action">
+                <button type="button" class="btn btn-outline-dark btn-sm" (click)="showMainCase()">
+                  ↑ Return to Main Case Card
                 </button>
-
               </div>
+            </article>
 
-            </div>
-
-
-            <div class="card-footer-hint">
-
-              <svg
-                lucideGripHorizontal
-                class="grip-icon"
-              ></svg>
-
-              <span>
-                Drag to explore
-              </span>
-
-            </div>
-
-          </article>
+          </div>
 
 
-          <!-- =================================================
-               CARD 2 — ASSIGNED OFFICER
-          ================================================== -->
-
-          <article
-            class="carousel-card officer-card"
-            [class.focused]="isFocusedCard(2)"
-            [class.side-card]="!isFocusedCard(2)"
-
-            [style.transform]="getCardTransform(2)"
-            [style.opacity]="getCardOpacity(2)"
-            [style.filter]="getCardBlur(2)"
-            [style.z-index]="getCardZIndex(2)"
-
-            (click)="onCardClick(2)"
+          <!-- =============================================
+               NEXT CASE PEEK CARD (Right of Active Case)
+          ============================================== -->
+          <div 
+            class="case-peek-card peek-right"
+            *ngIf="currentCaseIndex < cases.length - 1"
+            (click)="nextCase()"
+            title="Click to view next employee case"
           >
-
-            <div class="officer-card-content">
-
-              <div class="officer-icon">
-
-                <svg
-                  lucideUser
-                  class="officer-user-icon"
-                ></svg>
-
-              </div>
-
-              <span class="card-eyebrow">
-                CASE ASSIGNMENT
+            <div class="peek-badge">NEXT CASE →</div>
+            <div class="peek-title">{{ cases[currentCaseIndex + 1].employeeName }}</div>
+            <div class="peek-id">{{ cases[currentCaseIndex + 1].caseId }}</div>
+            <div class="peek-status">
+              <span class="badge" [ngClass]="getStatusClass(cases[currentCaseIndex + 1].status)">
+                {{ formatStatusLabel(cases[currentCaseIndex + 1].status) }}
               </span>
-
-              <h2>
-                Assigned Officer
-              </h2>
-
-              <div class="officer-divider"></div>
-
-              <div class="officer-information">
-
-                <span class="officer-name">
-                  {{
-                    activeCase.assignedOfficer ||
-                    'David Blundin'
-                  }}
-                </span>
-
-                <span class="officer-role">
-                  {{
-                    activeCase.assignedRole ||
-                    'Legal Officer'
-                  }}
-                </span>
-
-              </div>
-
-
-              <div class="officer-case-summary">
-
-                <div class="summary-row">
-
-                  <span>
-                    Case
-                  </span>
-
-                  <strong>
-                    {{ activeCase.caseId }}
-                  </strong>
-
-                </div>
-
-                <div class="summary-row">
-
-                  <span>
-                    Employee
-                  </span>
-
-                  <strong>
-                    {{ activeCase.employeeName }}
-                  </strong>
-
-                </div>
-
-                <div class="summary-row">
-
-                  <span>
-                    Classification
-                  </span>
-
-                  <strong>
-                    {{ activeCase.classification }}
-                  </strong>
-
-                </div>
-
-              </div>
-
             </div>
-
-
-            <div class="card-footer-hint">
-
-              <svg
-                lucideGripHorizontal
-                class="grip-icon"
-              ></svg>
-
-              <span>
-                Drag to explore
-              </span>
-
-            </div>
-
-          </article>
-
-
-        </div>
-
-
-        <!-- Carousel navigation indicators -->
-
-        <div class="carousel-indicators">
-
-          <button
-            type="button"
-            class="indicator"
-            [class.active]="
-              getActiveCardIndex() === 0
-            "
-            (click)="goToCard(0); $event.stopPropagation()"
-            aria-label="Show case details"
-          ></button>
-
-          <button
-            type="button"
-            class="indicator"
-            [class.active]="
-              getActiveCardIndex() === 1
-            "
-            (click)="goToCard(1); $event.stopPropagation()"
-            aria-label="Show case history"
-          ></button>
-
-          <button
-            type="button"
-            class="indicator"
-            [class.active]="
-              getActiveCardIndex() === 2
-            "
-            (click)="goToCard(2); $event.stopPropagation()"
-            aria-label="Show assigned officer"
-          ></button>
-
-        </div>
-
-
-        <div class="carousel-instruction">
-
-          <span>
-            <strong>Drag</strong>
-            to move
-          </span>
-
-          <span class="instruction-divider">
-            •
-          </span>
-
-          <span>
-            <strong>Click</strong>
-            a side card to focus
-          </span>
-
-          <span class="instruction-divider">
-            •
-          </span>
-
-          <span>
-            <strong>← →</strong>
-            to navigate
-          </span>
+          </div>
 
         </div>
 
       </div>
 
+      <!-- Navigation Legend Guide -->
+      <footer class="carousel-footer-legend">
+        <div class="legend-item">
+          <span class="legend-badge">Horizontal (← / →)</span>
+          <span>Drag left/right to navigate between different employees/cases</span>
+        </div>
+        <div class="legend-divider">·</div>
+        <div class="legend-item">
+          <span class="legend-badge">Vertical (↑ / ↓)</span>
+          <span>Drag up for History & Notes · Drag down for Assigned Legal Officer</span>
+        </div>
+      </footer>
+
     </div>
 
+    <!-- Case Not Found State -->
+    <ng-template #notFound>
+      <div class="not-found-container">
+        <h2>Case Record Not Located</h2>
+        <p>The requested matter reference could not be retrieved from the ledger.</p>
+        <a routerLink="/cases" class="btn btn-primary">Return to Cases Ledger</a>
+      </div>
+    </ng-template>
   </ng-template>
 
-  <!-- Case Closure Modal Overlay -->
-  <div class="modal-overlay" *ngIf="showCloseModal">
-    <div class="modal-content glass-card">
-      <header class="modal-header">
-        <h3>Close Case Matter</h3>
-        <button class="close-modal-btn" (click)="closeCloseModal()">
-          <svg lucideX class="close-icon"></svg>
+  <!-- =====================================================
+       ADD NOTE MODAL (WITH WYSIWYG EDITOR)
+  ====================================================== -->
+  <div class="modal-backdrop" *ngIf="showNoteModal" (click)="closeNoteModal()">
+    <div class="modal-card modal-wysiwyg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h3>Add Case Activity Note</h3>
+          <span class="modal-case-badge">Case {{ activeCase?.caseId }}</span>
+        </div>
+        <button type="button" class="close-btn" (click)="closeNoteModal()">
+          <svg lucideX class="icon-sm"></svg>
         </button>
-      </header>
-      <form (ngSubmit)="submitCloseCase()">
-        <div class="modal-body">
-          <p class="modal-instruction">
-            Please register the final costing metrics and closure resolution notes to audit-log and lock this dispute.
-          </p>
-          
-          <div class="form-group">
-            <label class="form-label" for="closureDate">Resolution / Closure Date *</label>
-            <input 
-              type="date" 
-              id="closureDate" 
-              class="form-input" 
-              [(ngModel)]="closeFormData.date" 
-              name="closureDate"
-              required
-            />
-          </div>
+      </div>
 
-          <div class="form-group">
-            <label class="form-label" for="finalCost">Final Costing Allocation (ZAR) *</label>
-            <div class="cost-input-wrapper">
-              <span class="currency-indicator">R</span>
-              <input 
-                type="number" 
-                id="finalCost" 
-                class="form-input padding-currency" 
-                placeholder="0.00"
-                [(ngModel)]="closeFormData.cost" 
-                name="finalCost"
-                required
-              />
+      <div class="modal-body">
+        <p class="modal-subtitle">Format and document important observations, correspondence, or timeline updates.</p>
+
+        <!-- WYSIWYG Container -->
+        <div class="wysiwyg-container">
+          <!-- Toolbar -->
+          <div class="wysiwyg-toolbar">
+            <!-- Headings -->
+            <div class="toolbar-group">
+              <select class="toolbar-select" (change)="formatBlock($event)" title="Heading Format">
+                <option value="p">Paragraph</option>
+                <option value="h2">Heading 2</option>
+                <option value="h3">Heading 3</option>
+                <option value="blockquote">Quote</option>
+              </select>
+            </div>
+
+            <div class="toolbar-sep"></div>
+
+            <!-- Inline Styles -->
+            <div class="toolbar-group">
+              <button type="button" class="toolbar-btn" (click)="execCmd('bold')" title="Bold (Ctrl+B)">
+                <strong>B</strong>
+              </button>
+              <button type="button" class="toolbar-btn" (click)="execCmd('italic')" title="Italic (Ctrl+I)">
+                <em>I</em>
+              </button>
+              <button type="button" class="toolbar-btn" (click)="execCmd('underline')" title="Underline (Ctrl+U)">
+                <u>U</u>
+              </button>
+            </div>
+
+            <div class="toolbar-sep"></div>
+
+            <!-- Lists -->
+            <div class="toolbar-group">
+              <button type="button" class="toolbar-btn" (click)="execCmd('insertUnorderedList')" title="Bullet List">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
+                </svg>
+              </button>
+              <button type="button" class="toolbar-btn" (click)="execCmd('insertOrderedList')" title="Numbered List">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M1.5 2.5a.5.5 0 0 0 0 1h.5v2a.5.5 0 0 0 1 0V2a.5.5 0 0 0-.5-.5zM1 8.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5c0 .76-.6 1.4-1.2 1.9l-.3.2h1.5a.5.5 0 0 1 0 1H1a.5.5 0 0 1-.4-.8l1.4-1.4c.3-.3.5-.6.5-.9 0-.3-.2-.5-.5-.5H1.5a.5.5 0 0 1-.5-.5m.5 4a.5.5 0 0 0-.5.5v.5a.5.5 0 0 0 .5.5H3a.5.5 0 0 0 0-1H2v-.5a.5.5 0 0 0-.5-.5"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="toolbar-sep"></div>
+
+            <!-- Alignment -->
+            <div class="toolbar-group">
+              <button type="button" class="toolbar-btn" (click)="execCmd('justifyLeft')" title="Align Left">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M2 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"/>
+                </svg>
+              </button>
+              <button type="button" class="toolbar-btn" (click)="execCmd('justifyCenter')" title="Align Center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M4 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"/>
+                </svg>
+              </button>
+              <button type="button" class="toolbar-btn" (click)="execCmd('justifyRight')" title="Align Right">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-4-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5m4-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-4-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="toolbar-sep"></div>
+
+            <!-- Links -->
+            <div class="toolbar-group">
+              <button type="button" class="toolbar-btn" (click)="insertLink()" title="Insert Link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+                  <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 0 0-4.243-4.243z"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="toolbar-sep"></div>
+
+            <!-- Undo / Redo -->
+            <div class="toolbar-group">
+              <button type="button" class="toolbar-btn" (click)="execCmd('undo')" title="Undo (Ctrl+Z)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"/>
+                  <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"/>
+                </svg>
+              </button>
+              <button type="button" class="toolbar-btn" (click)="execCmd('redo')" title="Redo (Ctrl+Y)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+                  <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+                </svg>
+              </button>
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="closureSummary">Closure & Resolution Summary *</label>
-            <textarea 
-              id="closureSummary" 
-              class="form-textarea" 
-              rows="4" 
-              placeholder="Summarize the final outcome, settlement details, or ruling..."
-              [(ngModel)]="closeFormData.summary"
-              name="closureSummary"
-              required
-            ></textarea>
-          </div>
+          <!-- Contenteditable Editor Area -->
+          <div 
+            #noteEditor
+            class="wysiwyg-content" 
+            contenteditable="true"
+            (input)="onEditorInput()"
+            data-placeholder="Write your note with rich formatting..."
+          ></div>
         </div>
-        <footer class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeCloseModal()">Cancel</button>
-          <button 
-            type="submit" 
-            class="btn btn-primary"
-            [disabled]="!closeFormData.date || !closeFormData.summary || closeFormData.cost === null"
-          >
-            Close Case
-          </button>
-        </footer>
-      </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeNoteModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="submitNote()" [disabled]="!hasNoteContent()">Save Note</button>
+      </div>
     </div>
   </div>
 
-  <!-- Add Note Modal Overlay -->
-  <div class="modal-overlay" *ngIf="showNoteModal">
-    <div class="modal-content glass-card">
-      <header class="modal-header">
-        <h3>Add Case Progress Note</h3>
-        <button class="close-modal-btn" (click)="closeNoteModal()">
-          <svg lucideX class="close-icon"></svg>
+  <!-- =====================================================
+       CLOSE CASE MODAL
+  ====================================================== -->
+  <div class="modal-backdrop" *ngIf="showCloseModal" (click)="closeCloseModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Close Case Matter</h3>
+        <button type="button" class="close-btn" (click)="closeCloseModal()">
+          <svg lucideX class="icon-sm"></svg>
         </button>
-      </header>
-      <form (ngSubmit)="submitNote()">
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label" for="noteContent">Progress Entry Details *</label>
-            <textarea 
-              id="noteContent" 
-              class="form-textarea" 
-              rows="5" 
-              placeholder="Record discussions, hearings outcomes, correspondence updates, or legal insights..."
-              [(ngModel)]="noteContent"
-              name="noteContent"
-              required
-            ></textarea>
-          </div>
+      </div>
+      <div class="modal-body">
+        <p class="modal-subtitle">Permanently mark Case {{ activeCase?.caseId }} as resolved and closed.</p>
+        <div class="form-group mb-3">
+          <label>Resolution Date</label>
+          <input type="date" class="form-control" [(ngModel)]="closeFormData.date" />
         </div>
-        <footer class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeNoteModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary" [disabled]="!noteContent.trim()">
-            Save Entry
-          </button>
-        </footer>
-      </form>
+        <div class="form-group mb-3">
+          <label>Final Costing (ZAR)</label>
+          <input type="number" step="0.01" class="form-control" [(ngModel)]="closeFormData.cost" />
+        </div>
+        <div class="form-group mb-3">
+          <label>Resolution Summary / Notes</label>
+          <textarea class="form-control" rows="3" placeholder="Summary of dispute outcome..." [(ngModel)]="closeFormData.summary"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeCloseModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="submitCloseCase()">Confirm & Close Matter</button>
+      </div>
     </div>
   </div>
-
-  <ng-template #notFound>
-    <div class="glass-card error-card">
-      <h2>Case Record Not Found</h2>
-      <p>The case record requested does not exist in our database ledger.</p>
-      <a routerLink="/cases" class="btn btn-primary">Return to Ledger</a>
-    </div>
-  </ng-template>
 </div>
