@@ -107,24 +107,50 @@
         <div class="date-input-container date-opened-container">
           <input 
             type="date" 
+            #dateOpenedInput
             id="dateOpened" 
             name="dateOpened"
             class="rectangle-322" 
             [(ngModel)]="formData.dateOpened" 
             required
           />
+          <svg 
+            (click)="openDatePicker(dateOpenedInput)"
+            xmlns="http://www.w3.org/2000/svg" 
+            width="16" 
+            height="16" 
+            fill="currentColor" 
+            class="bi bi-calendar calendar" 
+            viewBox="0 0 16 16"
+            title="Open calendar for Date Opened"
+          >
+            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+          </svg>
         </div>
 
         <div class="trial-date">TRIAL DATE *</div>
         <div class="date-input-container trial-date-container">
           <input 
             type="date" 
+            #trialDateInput
             id="trialDate" 
             name="trialDate"
             class="rectangle-313" 
             [(ngModel)]="formData.trialDate" 
             required
           />
+          <svg 
+            (click)="openDatePicker(trialDateInput)"
+            xmlns="http://www.w3.org/2000/svg" 
+            width="16" 
+            height="16" 
+            fill="currentColor" 
+            class="bi bi-calendar calendar2" 
+            viewBox="0 0 16 16"
+            title="Open calendar for Trial Date"
+          >
+            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+          </svg>
         </div>
 
         <div class="reminder-dates">REMINDER DATES</div>
@@ -138,12 +164,27 @@
         </div>
 
         <div class="add-reminder-container">
-          <input 
-            type="date" 
-            class="rectangle-33" 
-            [(ngModel)]="newReminderDate"
-            name="newReminderInput"
-          />
+          <div class="reminder-date-input-wrapper">
+            <input 
+              type="date" 
+              #reminderDateInput
+              class="rectangle-33" 
+              [(ngModel)]="newReminderDate"
+              name="newReminderInput"
+            />
+            <svg 
+              (click)="openDatePicker(reminderDateInput)"
+              xmlns="http://www.w3.org/2000/svg" 
+              width="16" 
+              height="16" 
+              fill="currentColor" 
+              class="bi bi-calendar calendar3" 
+              viewBox="0 0 16 16"
+              title="Open calendar for Reminder Date"
+            >
+              <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+            </svg>
+          </div>
           <button type="button" class="add-reminder-action" (click)="addReminder()" [disabled]="!newReminderDate">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="plus-math" viewBox="0 0 16 16">
               <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>

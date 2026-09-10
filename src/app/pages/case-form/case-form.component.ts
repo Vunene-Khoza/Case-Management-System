@@ -204,6 +204,18 @@ export class CaseFormComponent implements OnInit {
     this.selectedOfficerDetails = found || null;
   }
 
+  openDatePicker(input: HTMLInputElement): void {
+    if (input && typeof input.showPicker === 'function') {
+      try {
+        input.showPicker();
+      } catch {
+        input.focus();
+      }
+    } else if (input) {
+      input.focus();
+    }
+  }
+
   saveCase() {
     // If a reminder date was typed in the input, auto-commit it
     if (this.newReminderDate) {
