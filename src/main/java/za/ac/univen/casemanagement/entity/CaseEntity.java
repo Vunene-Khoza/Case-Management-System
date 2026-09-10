@@ -67,6 +67,12 @@ public class CaseEntity {
     @Column(name = "costing", nullable = false, precision = 15, scale = 2)
     private BigDecimal costing;
 
+    @Column(name = "assigned_officer", length = 150)
+    private String assignedOfficer;
+
+    @Column(name = "assigned_role", length = 50)
+    private String assignedRole;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 

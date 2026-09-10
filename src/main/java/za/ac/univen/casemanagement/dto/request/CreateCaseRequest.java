@@ -41,4 +41,8 @@ public class CreateCaseRequest {
     @DecimalMin(value = "0.00", message = "costing must be non-negative")
     @Digits(integer = 13, fraction = 2, message = "costing must be a valid decimal with up to 2 decimal places")
     private BigDecimal costing;
+
+    private String assignedOfficer;
+
+    private String assignedRole;
 }

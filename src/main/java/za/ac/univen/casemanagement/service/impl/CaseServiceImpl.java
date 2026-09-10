@@ -58,6 +58,8 @@ public class CaseServiceImpl implements CaseService {
                 .reminderDates(request.getReminderDates())
                 .status(CaseStatus.OPEN)
                 .costing(request.getCosting() != null ? request.getCosting() : BigDecimal.ZERO)
+                .assignedOfficer(request.getAssignedOfficer())
+                .assignedRole(request.getAssignedRole() != null ? request.getAssignedRole() : (request.getAssignedOfficer() != null ? "Legal Officer" : null))
                 .build();
 
         CaseEntity saved = caseRepository.save(entity);
@@ -120,6 +122,12 @@ public class CaseServiceImpl implements CaseService {
         }
         if (request.getStatus() != null) {
             entity.setStatus(request.getStatus());
+        }
+        if (request.getAssignedOfficer() != null) {
+            entity.setAssignedOfficer(request.getAssignedOfficer());
+        }
+        if (request.getAssignedRole() != null) {
+            entity.setAssignedRole(request.getAssignedRole());
         }
 
         CaseEntity updated = caseRepository.save(entity);
@@ -207,6 +215,8 @@ public class CaseServiceImpl implements CaseService {
                 .closureDate(entity.getClosureDate())
                 .finalNotes(entity.getFinalNotes())
                 .costing(entity.getCosting())
+                .assignedOfficer(entity.getAssignedOfficer())
+                .assignedRole(entity.getAssignedRole())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();

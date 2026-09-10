@@ -31,6 +31,8 @@ public class CaseResponse {
     private LocalDate closureDate;
     private String finalNotes;
     private BigDecimal costing;
+    private String assignedOfficer;
+    private String assignedRole;
     private Instant createdAt;
     private Instant updatedAt;
 }
