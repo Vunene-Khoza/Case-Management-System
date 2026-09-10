@@ -28,185 +28,767 @@
     </div>
   </header>
 
-  <!-- Skeleton Loading State -->
-  <ng-container *ngIf="loading; else detailsContent">
-    <div class="details-layout">
-      <!-- Left Column Skeleton -->
-      <div class="details-main-col">
-        <div class="glass-card" style="display: flex; flex-direction: column; gap: 20px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="skeleton" style="width: 25%; height: 28px;"></div>
-            <div class="skeleton" style="width: 15%; height: 22px; border-radius: 999px;"></div>
-          </div>
-          <div class="skeleton" style="width: 90%; height: 16px;"></div>
-          <div class="skeleton" style="width: 80%; height: 16px;"></div>
-          <div class="skeleton" style="width: 40%; height: 14px; margin-top: 10px;"></div>
-          
-          <div style="height: 1px; background: var(--border-glass); margin: 10px 0;"></div>
-          
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
-            <div *ngFor="let field of [1, 2, 3, 4]" style="display: flex; flex-direction: column; gap: 8px;">
-              <div class="skeleton" style="width: 40%; height: 10px;"></div>
-              <div class="skeleton" style="width: 80%; height: 16px;"></div>
-            </div>
+  <!-- =====================================================
+       LOADING STATE
+  ====================================================== -->
+
+  <ng-container
+    *ngIf="
+      loading;
+      else detailsContent
+    "
+  >
+
+    <div class="loading-container">
+
+      <div class="loading-card">
+        <div class="skeleton skeleton-small"></div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-line short"></div>
+
+        <div class="skeleton-divider"></div>
+
+        <div class="skeleton-grid">
+          <div
+            *ngFor="let field of [1,2,3,4]"
+            class="skeleton-field"
+          >
+            <div class="skeleton skeleton-label"></div>
+            <div class="skeleton skeleton-value"></div>
           </div>
         </div>
       </div>
 
-      <!-- Right Column Skeleton -->
-      <div class="details-side-col">
-        <div class="glass-card" style="display: flex; flex-direction: column; gap: 20px;">
-          <div class="skeleton" style="width: 50%; height: 18px;"></div>
-          <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 10px;">
-            <div *ngFor="let note of [1, 2, 3]" style="display: flex; gap: 12px;">
-              <div class="skeleton" style="width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;"></div>
-              <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
-                <div class="skeleton" style="width: 80%; height: 12px;"></div>
-                <div class="skeleton" style="width: 50%; height: 10px;"></div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="loading-hint">
+        Loading case record...
       </div>
+
     </div>
+
   </ng-container>
 
-  <!-- Actual Case Profile Detail Content -->
+
+  <!-- =====================================================
+       MAIN CAROUSEL CONTENT
+  ====================================================== -->
+
   <ng-template #detailsContent>
-    <div class="details-layout" *ngIf="activeCase; else notFound">
-      
-      <!-- Left Main Pane: Case Summary & Core details -->
-      <div class="details-main-col">
-        <article class="case-profile-card glass-card">
-          <header class="profile-card-header">
-            <div>
-              <span class="case-id-tag">{{ activeCase.caseId }}</span>
-              <h2 class="profile-card-title">{{ activeCase.employeeName }}</h2>
+
+    <div
+      class="carousel-section"
+      *ngIf="
+        activeCase;
+        else notFound
+      "
+    >
+
+      <!-- Carousel instruction -->
+      <div class="carousel-heading">
+
+        <div>
+          <span class="eyebrow">
+            CASE RECORD
+          </span>
+
+          <h1>
+            {{ activeCase.caseId }}
+          </h1>
+
+          <p>
+            Drag or swipe to explore the case record.
+          </p>
+        </div>
+
+        <div class="carousel-controls">
+
+          <button
+            type="button"
+            class="carousel-arrow"
+            (click)="previousCard()"
+            aria-label="Previous card"
+          >
+            <svg
+              lucideChevronLeft
+              class="arrow-icon"
+            ></svg>
+          </button>
+
+          <button
+            type="button"
+            class="carousel-arrow"
+            (click)="nextCard()"
+            aria-label="Next card"
+          >
+            <svg
+              lucideChevronRight
+              class="arrow-icon"
+            ></svg>
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           3D CAROUSEL
+      ================================================== -->
+
+      <div
+        #carouselViewport
+        class="carousel-viewport"
+        [class.is-dragging]="isDragging"
+
+        (pointerdown)="onDragStart($event)"
+        (pointermove)="onDragMove($event)"
+        (pointerup)="onDragEnd($event)"
+        (pointercancel)="onDragCancel()"
+        (lostpointercapture)="onDragCancel()"
+      >
+
+        <div class="carousel-track">
+
+
+          <!-- =================================================
+               CARD 0 — CASE DETAILS
+          ================================================== -->
+
+          <article
+            class="carousel-card case-card"
+            [class.focused]="isFocusedCard(0)"
+            [class.side-card]="!isFocusedCard(0)"
+
+            [style.transform]="getCardTransform(0)"
+            [style.opacity]="getCardOpacity(0)"
+            [style.filter]="getCardBlur(0)"
+            [style.z-index]="getCardZIndex(0)"
+
+            (click)="onCardClick(0)"
+          >
+
+            <div class="card-top-bar">
+
+              <div>
+                <span class="case-id-tag">
+                  {{ activeCase.caseId }}
+                </span>
+
+                <h2 class="profile-card-title">
+                  {{ activeCase.employeeName }}
+                </h2>
+              </div>
+
+              <div class="status-badges">
+
+                <span
+                  class="badge"
+                  [ngClass]="
+                    getCaseTypeClass(
+                      activeCase.caseType
+                    )
+                  "
+                >
+                  {{ activeCase.caseType }}
+                </span>
+
+                <span
+                  class="badge"
+                  [ngClass]="
+                    getStatusClass(
+                      activeCase.status
+                    )
+                  "
+                >
+                  {{
+                    formatStatusLabel(
+                      activeCase.status
+                    )
+                  }}
+                </span>
+
+              </div>
+
             </div>
-            <div style="display: flex; gap: 8px;">
-              <span class="badge" [ngClass]="getCaseTypeClass(activeCase.caseType)">
-                {{ activeCase.caseType }}
-              </span>
-              <span class="badge" [ngClass]="getStatusClass(activeCase.status)">
-                {{ formatStatusLabel(activeCase.status) }}
-              </span>
-            </div>
-          </header>
 
-          <div class="case-description-block">
-            <h4 class="block-title">Subject Matter / Dispute Details</h4>
-            <p class="description-text">{{ activeCase.description }}</p>
-          </div>
 
-          <hr class="card-separator" />
+            <!-- Subject -->
+            <div class="case-description-block">
 
-          <div class="details-metadata-grid">
-            <div class="meta-item">
-              <span class="meta-label">Employee ID / Code</span>
-              <span class="meta-value font-mono">{{ activeCase.employeeNumber }}</span>
+              <h4 class="block-title">
+                Subject Matter / Dispute Details
+              </h4>
+
+              <p class="description-text">
+                {{ activeCase.description }}
+              </p>
+
             </div>
 
-            <div class="meta-item">
-              <span class="meta-label">Matter Classification</span>
-              <span class="meta-value">{{ activeCase.classification }}</span>
+
+            <hr class="card-separator" />
+
+
+            <!-- Metadata -->
+            <div class="details-metadata-grid">
+
+              <div class="meta-item">
+
+                <span class="meta-label">
+                  Employee ID / Code
+                </span>
+
+                <span class="meta-value font-mono">
+                  {{ activeCase.employeeNumber }}
+                </span>
+
+              </div>
+
+
+              <div class="meta-item">
+
+                <span class="meta-label">
+                  Matter Classification
+                </span>
+
+                <span class="meta-value">
+                  {{ activeCase.classification }}
+                </span>
+
+              </div>
+
+
+              <div class="meta-item">
+
+                <span class="meta-label">
+                  Total Costing Allocation
+                </span>
+
+                <span class="meta-value cost-value">
+                  {{
+                    activeCase.costing
+                      ? 'R ' +
+                        formatCost(
+                          activeCase.costing
+                        )
+                      : 'R 0.00'
+                  }}
+                </span>
+
+              </div>
+
+
+              <div class="meta-item">
+
+                <span class="meta-label">
+                  Trial or Proceeding Date
+                </span>
+
+                <span class="meta-value">
+
+                  <svg
+                    lucideCalendar
+                    class="inline-icon"
+                  ></svg>
+
+                  <span>
+                    {{
+                      activeCase.trialDate ||
+                      'Not Scheduled'
+                    }}
+                  </span>
+
+                </span>
+
+              </div>
+
+
+              <div
+                class="meta-item"
+                *ngIf="
+                  activeCase.status ===
+                  CaseStatus.CLOSED
+                "
+              >
+
+                <span class="meta-label">
+                  Resolution / Closure Date
+                </span>
+
+                <span class="meta-value">
+
+                  <svg
+                    lucideClock
+                    class="inline-icon text-success"
+                  ></svg>
+
+                  <span>
+                    {{
+                      activeCase.closureDate ||
+                      'N/A'
+                    }}
+                  </span>
+
+                </span>
+
+              </div>
+
             </div>
 
-            <div class="meta-item">
-              <span class="meta-label">Total Costing Allocation</span>
-              <span class="meta-value cost-value">
-                {{ activeCase.costing ? 'R ' + formatCost(activeCase.costing) : 'R 0.00' }}
-              </span>
-            </div>
 
-            <div class="meta-item">
-              <span class="meta-label">Trial or Proceeding Date</span>
-              <span class="meta-value">
-                <svg lucideCalendar class="inline-icon"></svg>
-                <span>{{ activeCase.trialDate || 'Not Scheduled' }}</span>
-              </span>
-            </div>
+            <!-- Reminders -->
+            <div
+              class="reminders-section"
+              *ngIf="
+                activeCase.reminderDates &&
+                activeCase.reminderDates.length > 0
+              "
+            >
 
-            <div class="meta-item" *ngIf="activeCase.status === CaseStatus.CLOSED">
-              <span class="meta-label">Resolution / Closure Date</span>
-              <span class="meta-value">
-                <svg lucideClock class="inline-icon text-success"></svg>
-                <span>{{ activeCase.closureDate || 'N/A' }}</span>
-              </span>
-            </div>
-          </div>
+              <h4 class="block-title">
+                Important Deadline & Reminder Schedule
+              </h4>
 
-          <!-- Case Reminders Calendar Section -->
-          <div class="reminders-section" *ngIf="activeCase.reminderDates && activeCase.reminderDates.length > 0">
-            <h4 class="block-title">Important Deadline & Reminder Schedule</h4>
-            <div class="reminders-timeline">
-              <div class="reminder-card" *ngFor="let date of activeCase.reminderDates">
-                <div class="reminder-icon-wrapper">
-                  <svg lucideCalendar class="reminder-icon"></svg>
+              <div class="reminders-timeline">
+
+                <div
+                  class="reminder-card"
+                  *ngFor="
+                    let date of
+                    activeCase.reminderDates
+                  "
+                >
+
+                  <div class="reminder-icon-wrapper">
+
+                    <svg
+                      lucideCalendar
+                      class="reminder-icon"
+                    ></svg>
+
+                  </div>
+
+                  <div class="reminder-details">
+
+                    <span class="reminder-date">
+                      {{ date }}
+                    </span>
+
+                    <p class="reminder-desc">
+                      Reminder Date Scheduled
+                    </p>
+
+                  </div>
+
                 </div>
-                <div class="reminder-details">
-                  <span class="reminder-date">{{ date }}</span>
-                  <p class="reminder-desc">Reminder Date Scheduled</p>
+
+              </div>
+
+            </div>
+
+
+            <!-- Closure -->
+            <div
+              class="closure-summary-block"
+              *ngIf="
+                activeCase.status ===
+                CaseStatus.CLOSED
+              "
+            >
+
+              <div class="closure-badge">
+
+                <svg
+                  lucideLock
+                  class="lock-icon"
+                ></svg>
+
+                <span>
+                  Resolved & Closed Matter Summary
+                </span>
+
+              </div>
+
+              <p class="closure-text">
+                {{
+                  activeCase.finalNotes ||
+                  'No summary registered.'
+                }}
+              </p>
+
+            </div>
+
+            <!-- Attached Evidence Section -->
+            <div class="evidence-details-section" *ngIf="evidenceList && evidenceList.length > 0">
+              <h4 class="block-title">
+                Attached Evidence ({{ evidenceList.length }})
+              </h4>
+              <div class="evidence-details-list">
+                <div class="evidence-detail-item" *ngFor="let ev of evidenceList">
+                  <div class="evidence-detail-badge" [ngClass]="'badge-' + ev.fileCategory">
+                    {{ ev.fileCategory | uppercase }}
+                  </div>
+                  <div class="evidence-detail-info">
+                    <span class="evidence-detail-name" [title]="ev.name">{{ ev.name }}</span>
+                    <span class="evidence-detail-size">{{ ev.formattedSize }} · {{ ev.uploadedAt }}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Closure summary block if closed -->
-          <div class="closure-summary-block" *ngIf="activeCase.status === CaseStatus.CLOSED">
-            <div class="closure-badge">
-              <svg lucideLock class="lock-icon"></svg>
-              <span>Resolved & Closed Matter Summary</span>
+            <div class="card-footer-hint">
+
+              <svg
+                lucideGripHorizontal
+                class="grip-icon"
+              ></svg>
+
+              <span>
+                Drag to explore
+              </span>
+
             </div>
-            <p class="closure-text">{{ activeCase.finalNotes || 'No summary registered.' }}</p>
-          </div>
-        </article>
-      </div>
 
-      <!-- Right Side Pane: Notes / Activity Log Feed -->
-      <div class="details-side-col">
-        <section class="notes-feed-card glass-card">
-          <header class="notes-header">
-            <h3>Case History & Notes</h3>
-            <button 
-              (click)="openNoteModal()" 
-              class="btn btn-secondary btn-sm"
-              [disabled]="activeCase.status === CaseStatus.CLOSED"
-            >
-              <svg lucidePlus class="btn-icon"></svg>
-              <span>Add Note</span>
-            </button>
-          </header>
+          </article>
 
-          <div class="notes-list-container">
-            <div class="note-card" *ngFor="let note of notes">
-              <header class="note-card-meta">
-                <div class="note-author">
-                  <div class="author-avatar">{{ getInitials(note.authorName) }}</div>
-                  <span class="author-name">{{ note.authorName }}</span>
+
+          <!-- =================================================
+               CARD 1 — CASE HISTORY & NOTES
+          ================================================== -->
+
+          <article
+            class="carousel-card notes-card"
+            [class.focused]="isFocusedCard(1)"
+            [class.side-card]="!isFocusedCard(1)"
+
+            [style.transform]="getCardTransform(1)"
+            [style.opacity]="getCardOpacity(1)"
+            [style.filter]="getCardBlur(1)"
+            [style.z-index]="getCardZIndex(1)"
+
+            (click)="onCardClick(1)"
+          >
+
+            <header class="notes-header">
+
+              <div>
+
+                <span class="card-eyebrow">
+                  ACTIVITY
+                </span>
+
+                <h2>
+                  Case History & Notes
+                </h2>
+
+              </div>
+
+              <button
+                type="button"
+                (click)="openNoteModal(); $event.stopPropagation()"
+                class="btn btn-secondary btn-sm"
+
+                [disabled]="
+                  activeCase.status ===
+                  CaseStatus.CLOSED
+                "
+              >
+
+                <svg
+                  lucidePlus
+                  class="btn-icon"
+                ></svg>
+
+                <span>
+                  Add Note
+                </span>
+
+              </button>
+
+            </header>
+
+
+            <div class="notes-list-container">
+
+              <div
+                class="note-card"
+                *ngFor="let note of notes"
+              >
+
+                <header class="note-card-meta">
+
+                  <div class="note-author">
+
+                    <div class="author-avatar">
+                      {{
+                        getInitials(
+                          note.authorName
+                        )
+                      }}
+                    </div>
+
+                    <span class="author-name">
+                      {{ note.authorName }}
+                    </span>
+
+                  </div>
+
+                  <span class="note-date">
+                    {{ note.createdAt }}
+                  </span>
+
+                </header>
+
+                <p class="note-content">
+                  {{ note.content }}
+                </p>
+
+              </div>
+
+
+              <!-- Empty -->
+              <div
+                class="empty-notes"
+                *ngIf="
+                  !notes ||
+                  notes.length === 0
+                "
+              >
+
+                <svg
+                  lucideMessageSquare
+                  class="empty-icon"
+                ></svg>
+
+                <h3>
+                  No activity yet
+                </h3>
+
+                <p>
+                  No logged notes or case activities
+                  recorded for this matter yet.
+                </p>
+
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  (click)="openNoteModal(); $event.stopPropagation()"
+                  [disabled]="
+                    activeCase.status ===
+                    CaseStatus.CLOSED
+                  "
+                >
+                  Add First Note
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <div class="card-footer-hint">
+
+              <svg
+                lucideGripHorizontal
+                class="grip-icon"
+              ></svg>
+
+              <span>
+                Drag to explore
+              </span>
+
+            </div>
+
+          </article>
+
+
+          <!-- =================================================
+               CARD 2 — ASSIGNED OFFICER
+          ================================================== -->
+
+          <article
+            class="carousel-card officer-card"
+            [class.focused]="isFocusedCard(2)"
+            [class.side-card]="!isFocusedCard(2)"
+
+            [style.transform]="getCardTransform(2)"
+            [style.opacity]="getCardOpacity(2)"
+            [style.filter]="getCardBlur(2)"
+            [style.z-index]="getCardZIndex(2)"
+
+            (click)="onCardClick(2)"
+          >
+
+            <div class="officer-card-content">
+
+              <div class="officer-icon">
+
+                <svg
+                  lucideUser
+                  class="officer-user-icon"
+                ></svg>
+
+              </div>
+
+              <span class="card-eyebrow">
+                CASE ASSIGNMENT
+              </span>
+
+              <h2>
+                Assigned Officer
+              </h2>
+
+              <div class="officer-divider"></div>
+
+              <div class="officer-information">
+
+                <span class="officer-name">
+                  {{
+                    activeCase.assignedOfficer ||
+                    'David Blundin'
+                  }}
+                </span>
+
+                <span class="officer-role">
+                  {{
+                    activeCase.assignedRole ||
+                    'Legal Officer'
+                  }}
+                </span>
+
+              </div>
+
+
+              <div class="officer-case-summary">
+
+                <div class="summary-row">
+
+                  <span>
+                    Case
+                  </span>
+
+                  <strong>
+                    {{ activeCase.caseId }}
+                  </strong>
+
                 </div>
-                <span class="note-date">{{ note.createdAt }}</span>
-              </header>
-              <p class="note-content">{{ note.content }}</p>
+
+                <div class="summary-row">
+
+                  <span>
+                    Employee
+                  </span>
+
+                  <strong>
+                    {{ activeCase.employeeName }}
+                  </strong>
+
+                </div>
+
+                <div class="summary-row">
+
+                  <span>
+                    Classification
+                  </span>
+
+                  <strong>
+                    {{ activeCase.classification }}
+                  </strong>
+
+                </div>
+
+              </div>
+
             </div>
 
-            <div class="empty-notes" *ngIf="!notes || notes.length === 0">
-              <svg lucideMessageSquare class="empty-icon"></svg>
-              <p>No logged notes or case activities recorded for this matter yet.</p>
-            </div>
-          </div>
-        </section>
 
-        <!-- Assigned Officer Card -->
-        <div class="frame-25" *ngIf="activeCase">
-          <div class="rectangle-27"></div>
-          <div class="assigned-officer">Assigned Officer</div>
-          <div class="line-11"></div>
-          <div class="david-blundin">{{ activeCase.assignedOfficer || 'David Blundin' }}</div>
-          <div class="legal-officer">{{ activeCase.assignedRole || 'Legal Officer' }}</div>
+            <div class="card-footer-hint">
+
+              <svg
+                lucideGripHorizontal
+                class="grip-icon"
+              ></svg>
+
+              <span>
+                Drag to explore
+              </span>
+
+            </div>
+
+          </article>
+
+
         </div>
+
+
+        <!-- Carousel navigation indicators -->
+
+        <div class="carousel-indicators">
+
+          <button
+            type="button"
+            class="indicator"
+            [class.active]="
+              getActiveCardIndex() === 0
+            "
+            (click)="goToCard(0); $event.stopPropagation()"
+            aria-label="Show case details"
+          ></button>
+
+          <button
+            type="button"
+            class="indicator"
+            [class.active]="
+              getActiveCardIndex() === 1
+            "
+            (click)="goToCard(1); $event.stopPropagation()"
+            aria-label="Show case history"
+          ></button>
+
+          <button
+            type="button"
+            class="indicator"
+            [class.active]="
+              getActiveCardIndex() === 2
+            "
+            (click)="goToCard(2); $event.stopPropagation()"
+            aria-label="Show assigned officer"
+          ></button>
+
+        </div>
+
+
+        <div class="carousel-instruction">
+
+          <span>
+            <strong>Drag</strong>
+            to move
+          </span>
+
+          <span class="instruction-divider">
+            •
+          </span>
+
+          <span>
+            <strong>Click</strong>
+            a side card to focus
+          </span>
+
+          <span class="instruction-divider">
+            •
+          </span>
+
+          <span>
+            <strong>← →</strong>
+            to navigate
+          </span>
+
+        </div>
+
       </div>
 
     </div>
+
   </ng-template>
 
   <!-- Case Closure Modal Overlay -->

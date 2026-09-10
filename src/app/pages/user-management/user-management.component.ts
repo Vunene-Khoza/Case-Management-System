@@ -216,8 +216,38 @@ export class UserManagementComponent implements OnInit {
   loadUsers() {
     this.caseService.getUsers().subscribe({
       next: (list: User[]) => {
+        let combined: User[] = [];
         if (list && list.length > 0) {
-          this.users = list;
+          combined = list.filter(u => u.role === UserRole.LEGAL_OFFICER);
+        }
+
+        // Merge localStorage
+        const customUsersJson = localStorage.getItem('univen_custom_users');
+        if (customUsersJson) {
+          try {
+            const customUsers: User[] = JSON.parse(customUsersJson);
+            const customOfficers = customUsers.filter(u => u.role === UserRole.LEGAL_OFFICER);
+            customOfficers.forEach(co => {
+              const idx = combined.findIndex(ex => ex.email.toLowerCase() === co.email.toLowerCase());
+              if (idx !== -1) {
+                combined[idx] = co;
+              } else {
+                combined.push(co);
+              }
+            });
+          } catch (e) {
+            console.error('Error merging custom users:', e);
+          }
+        }
+
+        const cur = this.caseService.getCurrentUser();
+        const curEmail = (cur.email || '').toLowerCase();
+        const createdByMe = combined.filter(u => u.createdBy && u.createdBy.toLowerCase() === curEmail);
+
+        if (createdByMe.length > 0) {
+          this.users = createdByMe;
+        } else if (combined.length > 0) {
+          this.users = combined;
         } else {
           this.loadAdminFallbackUsers();
         }
@@ -232,18 +262,44 @@ export class UserManagementComponent implements OnInit {
     const cur = this.caseService.getCurrentUser();
     const curEmail = (cur.email || '').toLowerCase();
     const customUsersJson = localStorage.getItem('univen_custom_users');
+    let fallbackOfficers: User[] = [];
     if (customUsersJson) {
       try {
         const customUsers: User[] = JSON.parse(customUsersJson);
-        this.users = customUsers.filter(u => 
-          u.createdBy && u.createdBy.toLowerCase() === curEmail
+        fallbackOfficers = customUsers.filter(u => 
+          u.role === UserRole.LEGAL_OFFICER && (!u.createdBy || u.createdBy.toLowerCase() === curEmail)
         );
       } catch (e) {
-        this.users = [];
+        fallbackOfficers = [];
       }
-    } else {
-      this.users = [];
     }
+    if (fallbackOfficers.length === 0) {
+      fallbackOfficers = [
+        {
+          userId: 'LO_001',
+          name: 'T. Avhashoni',
+          email: 'usera@univen.ac.za',
+          role: UserRole.LEGAL_OFFICER,
+          status: 'ACTIVE',
+          staffNumber: '12345',
+          department: 'Department of Legal Services',
+          firstLoginCompleted: true,
+          createdAt: ''
+        },
+        {
+          userId: 'LO_002',
+          name: 'N. Nndivho',
+          email: 'userb@univen.ac.za',
+          role: UserRole.LEGAL_OFFICER,
+          status: 'ACTIVE',
+          staffNumber: '22810',
+          department: 'Department of Legal Services',
+          firstLoginCompleted: true,
+          createdAt: ''
+        }
+      ];
+    }
+    this.users = fallbackOfficers;
   }
 
   getInitials(name: string): string {

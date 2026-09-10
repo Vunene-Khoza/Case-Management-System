@@ -207,9 +207,9 @@
                   </span>
                 </td>
                 <td>
-                  <span class="status-indicator">
-                    <span class="status-dot bg-success"></span>
-                    <span class="status-label">Active</span>
+                  <span class="status-indicator" [ngClass]="user.firstLoginCompleted ? 'indicator-active' : 'indicator-inactive'">
+                    <span class="status-dot"></span>
+                    <span class="status-label">{{ user.firstLoginCompleted ? 'Active' : 'Pending First Login' }}</span>
                   </span>
                 </td>
                 <td>

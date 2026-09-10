@@ -15,7 +15,7 @@
         <div class="employee-information">Employee Information</div>
         <div class="line-8"></div>
         
-        <div class="employee-number">EMPLOYEE NUMBER</div>
+        <div class="employee-number">EMPLOYEE NUMBER *</div>
         <input 
           type="text" 
           id="employeeNumber" 
@@ -30,7 +30,7 @@
           Enter staff ID to auto-populate name
         </div>
 
-        <div class="employee-name">EMPLOYEE NAME</div>
+        <div class="employee-name">EMPLOYEE NAME *</div>
         <input 
           type="text" 
           id="employeeName" 
@@ -49,7 +49,7 @@
         <div class="case-information">Case Information</div>
         <div class="line-9"></div>
         
-        <div class="case-type">CASE TYPE</div>
+        <div class="case-type">CASE TYPE *</div>
         <div class="select-wrapper select-type-wrapper">
           <select 
             id="caseType" 
@@ -58,7 +58,7 @@
             [(ngModel)]="formData.caseType" 
             required
           >
-            <option value="" disabled selected>Select Case Type</option>
+            <option value="" disabled selected>Select Case Type *</option>
             <option [value]="CaseType.LEGAL">Legal Case</option>
             <option [value]="CaseType.LABOUR">Labour Case</option>
           </select>
@@ -67,7 +67,7 @@
           </svg>
         </div>
 
-        <div class="classification">CLASSIFICATION</div>
+        <div class="classification">CLASSIFICATION *</div>
         <div class="select-wrapper select-classification-wrapper">
           <select 
             id="classification" 
@@ -76,7 +76,7 @@
             [(ngModel)]="formData.classification" 
             required
           >
-            <option value="" disabled selected>Select Classification</option>
+            <option value="" disabled selected>Select Classification *</option>
             <option *ngFor="let class of classifications" [value]="class">
               {{ formatClassificationLabel(class) }}
             </option>
@@ -86,7 +86,7 @@
           </svg>
         </div>
 
-        <div class="case-description">CASE DESCRIPTION</div>
+        <div class="case-description">CASE DESCRIPTION *</div>
         <textarea 
           id="description" 
           name="description"
@@ -103,7 +103,7 @@
         <div class="dates">Dates</div>
         <div class="line-10"></div>
         
-        <div class="date-opened">DATE OPENED</div>
+        <div class="date-opened">DATE OPENED *</div>
         <div class="date-input-container date-opened-container">
           <input 
             type="date" 
@@ -115,7 +115,7 @@
           />
         </div>
 
-        <div class="trial-date">TRIAL DATE</div>
+        <div class="trial-date">TRIAL DATE *</div>
         <div class="date-input-container trial-date-container">
           <input 
             type="date" 
@@ -123,6 +123,7 @@
             name="trialDate"
             class="rectangle-313" 
             [(ngModel)]="formData.trialDate" 
+            required
           />
         </div>
 
@@ -161,7 +162,7 @@
         <div class="costing">Costing</div>
         <div class="line-12"></div>
         
-        <div class="estimated-cost">ESTIMATED COST</div>
+        <div class="estimated-cost">ESTIMATED COST *</div>
         <div class="cost-input-wrapper">
           <span class="r-0-00">R</span>
           <input 
@@ -178,10 +179,62 @@
         </div>
       </div>
 
+      <!-- Frame: Assign Legal Officer -->
+      <div class="frame-officer">
+        <div class="officer-card-title">Assign Legal Officer</div>
+        <div class="line-officer"></div>
+
+        <div class="officer-field-label">LEGAL OFFICER *</div>
+        
+        <div class="select-officer-wrapper">
+          <select 
+            id="assignedOfficer" 
+            name="assignedOfficer"
+            class="officer-select"
+            [(ngModel)]="formData.assignedOfficer" 
+            (ngModelChange)="onOfficerChange()"
+            required
+          >
+            <option value="" disabled selected>Select Legal Officer *</option>
+            <option *ngFor="let officer of legalOfficers" [value]="officer.name">
+              {{ officer.name }} (Staff No: {{ officer.staffNumber || '10012' }})
+            </option>
+          </select>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="sort-down-officer" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+          </svg>
+        </div>
+
+        <div class="officer-helper-text">
+          Select one legal officer to manage this case.
+        </div>
+
+        <!-- Selected Officer Preview Pill/Card -->
+        <div class="officer-preview-card" *ngIf="formData.assignedOfficer">
+          <div class="officer-preview-avatar">
+            {{ (formData.assignedOfficer.charAt(0) || 'L').toUpperCase() }}
+          </div>
+          <div class="officer-preview-info">
+            <div class="officer-preview-name">{{ formData.assignedOfficer }}</div>
+            <div class="officer-preview-email" *ngIf="selectedOfficerDetails?.email">{{ selectedOfficerDetails?.email }}</div>
+            <div class="officer-preview-meta">
+              <span class="officer-preview-dept">{{ selectedOfficerDetails?.department || 'Department of Legal Services' }}</span>
+              <span class="officer-preview-badge">Legal Officer</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guidance when no custom officers created yet -->
+        <div class="officer-empty-hint" *ngIf="!formData.assignedOfficer && legalOfficers.length === 0 && !isLoadingOfficers">
+          <span>No legal officers found.</span>
+          <a routerLink="/users/create" class="create-officer-link">+ Create Officer</a>
+        </div>
+      </div>
+
       <!-- Frame 23: Additional Notes -->
       <div class="frame-23" *ngIf="!isEditMode">
         <div class="rectangle-27"></div>
-        <div class="additional-notes">Additional Notes</div>
+        <div class="additional-notes">Initial Note / Observations *</div>
         <div class="line-11"></div>
         
         <textarea 
@@ -190,6 +243,7 @@
           class="rectangle-272" 
           placeholder="Enter any initial notes or observations..." 
           [(ngModel)]="initialNote"
+          required
         ></textarea>
       </div>
 
@@ -207,13 +261,128 @@
           </div>
         </div>
 
-        <button type="submit" class="rectangle-312" [disabled]="!formData.employeeNumber || !formData.employeeName || !formData.description || !formData.caseType || !formData.classification">
+        <button 
+          type="submit" 
+          class="rectangle-312" 
+          [disabled]="!isFormValid()" 
+          [title]="!isFormValid() ? 'Please fill in all required fields' : ''"
+        >
           <span class="save-case">{{ isEditMode ? 'Save Changes' : 'Save Case' }}</span>
         </button>
 
         <button type="button" class="rectangle-32" (click)="goBack()">
           <span class="cancel">Cancel</span>
         </button>
+
+        <div class="form-validation-hint" *ngIf="!isFormValid()">
+          * All fields must be completed
+        </div>
+      </div>
+    </div>
+
+    <!-- Frame: Evidence Card (At Bottom of Page) -->
+    <div class="frame-evidence">
+      <div class="evidence-card-header">
+        <div class="evidence-title-group">
+          <div class="evidence-card-title">Evidence & Supporting Documents</div>
+          <div class="evidence-card-subtitle">Upload and attach files to support this case (PDF, Word, Video, JPEG, PNG)</div>
+        </div>
+        <div class="evidence-count-badge" *ngIf="evidenceList.length > 0">
+          {{ evidenceList.length }} {{ evidenceList.length === 1 ? 'file' : 'files' }} attached ({{ getTotalEvidenceSize() }})
+        </div>
+      </div>
+      <div class="line-evidence"></div>
+
+      <!-- Drag & Drop Upload Zone -->
+      <div 
+        class="evidence-dropzone" 
+        [class.dragging]="isDraggingFile"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onFileDrop($event)"
+        (click)="fileInput.click()"
+      >
+        <input 
+          type="file" 
+          #fileInput 
+          multiple 
+          (change)="onFilesSelected($event)" 
+          accept=".pdf,.doc,.docx,.mp4,.mov,.avi,.mkv,.webm,.jpg,.jpeg,.png,.webp" 
+          style="display: none;"
+        />
+        <div class="dropzone-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-cloud-arrow-up" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M7.646 5.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 6.707V10.5a.5.5 0 0 1-1 0V6.707L6.354 7.854a.5.5 0 1 1-.708-.708z"/>
+            <path d="M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383m.653.757c-.579.495-.972 1.11-1.096 1.776l-.15.803-.807.126C1.796 6.945 1 8.04 1 9.318 1 10.79 2.235 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z"/>
+          </svg>
+        </div>
+        <div class="dropzone-text">
+          <span class="dropzone-title">Drag & drop evidence files here, or <span class="browse-link">browse files</span></span>
+          <span class="dropzone-hint">Supports PDF, Word (.doc, .docx), Video (.mp4, .mov), Images (.jpeg, .png) up to 50MB</span>
+        </div>
+        <div class="format-pills">
+          <span class="format-pill pill-pdf">PDF</span>
+          <span class="format-pill pill-word">Word</span>
+          <span class="format-pill pill-video">Video</span>
+          <span class="format-pill pill-image">JPEG / PNG</span>
+        </div>
+      </div>
+
+      <!-- Upload Error Notification -->
+      <div class="upload-error-banner" *ngIf="uploadErrorMessage">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+          <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.15.15 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.2.2 0 0 1-.054.06.1.1 0 0 1-.066.017H1.146a.1.1 0 0 1-.066-.017.2.2 0 0 1-.054-.06.18.18 0 0 1 .002-.183L7.884 2.073a.15.15 0 0 1 .054-.057m1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767z"/>
+          <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+        </svg>
+        <span>{{ uploadErrorMessage }}</span>
+        <button type="button" class="close-err-btn" (click)="uploadErrorMessage = ''">×</button>
+      </div>
+
+      <!-- Uploaded Evidence Files List / Grid -->
+      <div class="evidence-grid" *ngIf="evidenceList.length > 0">
+        <div class="evidence-item-card" *ngFor="let ev of evidenceList; let i = index">
+          <!-- Thumbnail / Icon -->
+          <div class="evidence-thumb" [ngClass]="'thumb-' + ev.fileCategory">
+            <img *ngIf="ev.fileCategory === 'image' && ev.dataUrl" [src]="ev.dataUrl" alt="{{ ev.name }}" class="img-preview"/>
+            <svg *ngIf="ev.fileCategory === 'pdf'" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-file-earmark-pdf" viewBox="0 0 16 16">
+              <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+              <path d="M4.603 14.087a.8.8 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.185.175-.34.45-.634.82-.876.37-.243.834-.44 1.39-.59a16.5 16.5 0 0 1 1.096-.242 17 17 0 0 0 1.258-2.673A6.8 6.8 0 0 0 9.07 6.77c.07-.34.098-.675.083-.986a1.7 1.7 0 0 0-.256-.84c-.168-.266-.4-.41-.69-.41-.4 0-.7.25-.8.67-.1.4-.04.9.15 1.48.18.57.48 1.22.88 1.9a38 38 0 0 1-1.33 3.03 20 20 0 0 0-1.84 1.1c-.5.35-.9.7-1.17 1.05-.27.35-.38.7-.31 1.03.07.33.32.55.67.62.35.07.76-.05 1.2-.34.44-.3.9-.76 1.34-1.34.44-.58.82-1.25 1.12-1.99.3-.74.49-1.52.56-2.31.07-.79.02-1.56-.15-2.27-.17-.7-.45-1.32-.82-1.83-.37-.5-.8-.85-1.29-1.02-.49-.17-1-.18-1.5-.03-.5.15-.92.45-1.24.88-.32.43-.49.98-.49 1.63 0 .65.17 1.36.5 2.1.33.74.8 1.52 1.38 2.3z"/>
+            </svg>
+            <svg *ngIf="ev.fileCategory === 'word'" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-file-earmark-word" viewBox="0 0 16 16">
+              <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+              <path d="M5.485 6.879l1.036 4.33h.85l1.107-3.415 1.107 3.415h.85l1.036-4.33h-.84l-.68 3.32-1.04-3.32h-.87l-1.04 3.32-.68-3.32z"/>
+            </svg>
+            <svg *ngIf="ev.fileCategory === 'video'" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-file-earmark-play" viewBox="0 0 16 16">
+              <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+              <path d="M6 6.883v4.234a.5.5 0 0 0 .757.429l3.528-2.117a.5.5 0 0 0 0-.858L6.757 6.454a.5.5 0 0 0-.757.43"/>
+            </svg>
+            <svg *ngIf="ev.fileCategory === 'image' && !ev.dataUrl" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-file-earmark-image" viewBox="0 0 16 16">
+              <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+              <path d="M8.002 5a1 1 0 1 0 0 2 1 1 0 0 0 0-2"/>
+              <path d="m4.664 12.04 2.802-3.803a.5.5 0 0 1 .798.007L10.5 11.5l1-1.5a.5.5 0 0 1 .8-.05l1.7 2.05z"/>
+            </svg>
+          </div>
+
+          <!-- Item Details -->
+          <div class="evidence-item-info">
+            <div class="evidence-item-name" [title]="ev.name">{{ ev.name }}</div>
+            <div class="evidence-item-meta">
+              <span class="evidence-meta-size">{{ ev.formattedSize }}</span>
+              <span class="evidence-meta-dot">·</span>
+              <span class="evidence-meta-tag" [ngClass]="'tag-' + ev.fileCategory">{{ ev.fileCategory | uppercase }}</span>
+              <span class="evidence-meta-dot">·</span>
+              <span class="evidence-meta-date">{{ ev.uploadedAt }}</span>
+            </div>
+          </div>
+
+          <!-- Remove Action -->
+          <button type="button" class="evidence-remove-btn" (click)="removeEvidence(i)" title="Remove this file">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+              <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </form>

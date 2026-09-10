@@ -38,8 +38,20 @@ export interface Case {
   costing: number;
   assignedOfficer?: string;
   assignedRole?: string;
+  evidence?: CaseEvidence[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CaseEvidence {
+  id: string;
+  name: string;
+  size: number;
+  formattedSize: string;
+  fileCategory: 'pdf' | 'word' | 'video' | 'image' | 'other';
+  mimeType: string;
+  uploadedAt: string;
+  dataUrl?: string;
 }
 
 export interface CaseNote {

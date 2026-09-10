@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, forkJoin } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
-import { Case, CaseNote, User, CaseType, CaseClassification, CaseStatus, UserRole, UniversityEmployee } from '../models/case.model';
+import { Case, CaseNote, User, CaseType, CaseClassification, CaseStatus, UserRole, UniversityEmployee, CaseEvidence } from '../models/case.model';
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -128,7 +128,9 @@ export class CaseService {
       dateOpened: caseData.dateOpened,
       trialDate: caseData.trialDate,
       reminderDates: caseData.reminderDates,
-      costing: caseData.costing
+      costing: caseData.costing,
+      assignedOfficer: caseData.assignedOfficer,
+      assignedRole: caseData.assignedRole || (caseData.assignedOfficer ? 'Legal Officer' : undefined)
     };
 
     return this.http.post<ApiResponse<Case>>(`${this.apiUrl}/cases`, payload).pipe(
@@ -156,11 +158,101 @@ export class CaseService {
       trialDate: caseData.trialDate,
       reminderDates: caseData.reminderDates,
       status: caseData.status,
-      costing: caseData.costing
+      costing: caseData.costing,
+      assignedOfficer: caseData.assignedOfficer,
+      assignedRole: caseData.assignedRole
     };
 
     return this.http.put<ApiResponse<Case>>(`${this.apiUrl}/cases/${caseId}`, payload).pipe(
       map(res => res.data)
+    );
+  }
+
+  // Get legal officers created by the logged-in admin (with fallback system legal officers)
+  getLegalOfficersForAdmin(): Observable<User[]> {
+    const curUser = this.getCurrentUser();
+    const curEmail = (curUser.email || '').toLowerCase();
+    const isSuperAdmin = curUser.role === 'SUPER_ADMIN';
+
+    return this.getUsers().pipe(
+      map((backendUsers: User[]) => {
+        let combined: User[] = [];
+
+        // 1. Gather backend legal officers
+        const backendOfficers = (backendUsers || []).filter(u => u.role === UserRole.LEGAL_OFFICER);
+        combined.push(...backendOfficers);
+
+        // 2. Gather localStorage custom users
+        const customUsersJson = localStorage.getItem('univen_custom_users');
+        if (customUsersJson) {
+          try {
+            const customUsers: User[] = JSON.parse(customUsersJson);
+            const customOfficers = customUsers.filter(u => u.role === UserRole.LEGAL_OFFICER);
+            customOfficers.forEach(co => {
+              const idx = combined.findIndex(ex => ex.email.toLowerCase() === co.email.toLowerCase());
+              if (idx !== -1) {
+                combined[idx] = co;
+              } else {
+                combined.push(co);
+              }
+            });
+          } catch (e) {
+            console.error('Error parsing custom users for admin officers:', e);
+          }
+        }
+
+        // 3. Filter for officers created by this admin if not Super Admin
+        let adminOfficers = combined;
+        if (!isSuperAdmin) {
+          const createdByMe = combined.filter(u => u.createdBy && u.createdBy.toLowerCase() === curEmail);
+          // If the admin has created specific officers, show those created by them;
+          // otherwise provide all system legal officers so testing is seamless
+          if (createdByMe.length > 0) {
+            adminOfficers = createdByMe;
+          }
+        }
+
+        // 4. Default system fallback legal officers if list is empty
+        if (adminOfficers.length === 0) {
+          adminOfficers = [
+            {
+              userId: 'LO_001',
+              name: 'T. Avhashoni',
+              email: 'usera@univen.ac.za',
+              role: UserRole.LEGAL_OFFICER,
+              status: 'ACTIVE',
+              staffNumber: '12345',
+              department: 'Department of Legal Services',
+              firstLoginCompleted: true,
+              createdAt: ''
+            },
+            {
+              userId: 'LO_002',
+              name: 'N. Nndivho',
+              email: 'userb@univen.ac.za',
+              role: UserRole.LEGAL_OFFICER,
+              status: 'ACTIVE',
+              staffNumber: '22810',
+              department: 'Department of Legal Services',
+              firstLoginCompleted: true,
+              createdAt: ''
+            },
+            {
+              userId: 'LO_003',
+              name: 'David Blundin',
+              email: 'officer@univen.ac.za',
+              role: UserRole.LEGAL_OFFICER,
+              status: 'ACTIVE',
+              staffNumber: '31007',
+              department: 'Department of Legal Services',
+              firstLoginCompleted: true,
+              createdAt: ''
+            }
+          ];
+        }
+
+        return adminOfficers;
+      })
     );
   }
 
@@ -620,5 +712,25 @@ export class CaseService {
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/activity-logs/role-switch`, body).pipe(
       catchError(() => of({ success: true, message: 'Logged' }))
     );
+  }
+
+  // Save evidence items for a case
+  saveCaseEvidence(caseId: string, evidence: CaseEvidence[]): void {
+    try {
+      localStorage.setItem(`univen_case_evidence_${caseId}`, JSON.stringify(evidence));
+    } catch (e) {
+      console.error('Error saving case evidence to localStorage:', e);
+    }
+  }
+
+  // Get evidence items for a case
+  getCaseEvidence(caseId: string): CaseEvidence[] {
+    try {
+      const data = localStorage.getItem(`univen_case_evidence_${caseId}`);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      console.error('Error reading case evidence from localStorage:', e);
+      return [];
+    }
   }
 }
