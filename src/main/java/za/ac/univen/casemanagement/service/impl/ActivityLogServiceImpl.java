@@ -46,6 +46,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
             String userName = userEmail != null ? userEmail : "System";
             String userRole = "SYSTEM";
             String actorAdminOwner = "SYSTEM";
+            Long adminOwnerId = null;
 
             if (userEmail != null && !userEmail.isBlank()) {
                 Optional<UserEntity> userOpt = userRepository.findByEmailIgnoreCase(userEmail);
@@ -59,12 +60,15 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
                     if (user.getRole() == UserRole.SUPER_ADMIN) {
                         actorAdminOwner = "SYSTEM";
+                        adminOwnerId = null;
                     } else if (user.getRole() == UserRole.ADMIN) {
                         actorAdminOwner = user.getEmail();
+                        adminOwnerId = user.getUserId();
                     } else if (user.getRole() == UserRole.LEGAL_OFFICER || user.getRole() == UserRole.VIEWER) {
                         actorAdminOwner = user.getCreatedBy() != null && !user.getCreatedBy().isBlank()
                                 ? user.getCreatedBy()
                                 : "SYSTEM";
+                        adminOwnerId = user.getAdminOwnerId();
                     }
                 }
             }
@@ -84,6 +88,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
                     .status(status != null ? status : "SUCCESS")
                     .detailsJson(detailsJson)
                     .actorAdminOwner(actorAdminOwner)
+                    .adminOwnerId(adminOwnerId)
                     .build();
 
             activityLogRepository.save(entity);
@@ -134,10 +139,24 @@ public class ActivityLogServiceImpl implements ActivityLogService {
             }
         }
 
+        Long adminOwnerId = null;
+        if (!isSuperAdmin && currentUsername != null && !currentUsername.isBlank()) {
+            Optional<UserEntity> userOpt = userRepository.findByEmailIgnoreCase(currentUsername.trim());
+            if (userOpt.isPresent()) {
+                UserEntity u = userOpt.get();
+                if (u.getRole() == UserRole.ADMIN) {
+                    adminOwnerId = u.getUserId();
+                } else {
+                    adminOwnerId = u.getAdminOwnerId();
+                }
+            }
+        }
+
         Page<ActivityLogEntity> entities = activityLogRepository.findScopedLogs(
                 isSuperAdmin,
                 isAdmin,
                 currentUsername,
+                adminOwnerId,
                 isOfficer,
                 currentUsername,
                 category,
@@ -231,6 +250,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
                 .status(entity.getStatus())
                 .detailsJson(entity.getDetailsJson())
                 .actorAdminOwner(entity.getActorAdminOwner())
+                .adminOwnerId(entity.getAdminOwnerId())
                 .build();
     }
 }

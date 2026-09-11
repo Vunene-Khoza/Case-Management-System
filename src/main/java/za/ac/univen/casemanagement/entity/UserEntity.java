@@ -63,6 +63,9 @@ public class UserEntity {
     @Column(name = "created_by", length = 100)
     private String createdBy;
 
+    @Column(name = "admin_owner_id")
+    private Long adminOwnerId;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 

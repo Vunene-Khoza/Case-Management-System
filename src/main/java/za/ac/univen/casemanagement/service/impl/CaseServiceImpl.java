@@ -29,11 +29,23 @@ public class CaseServiceImpl implements CaseService {
 
     private final CaseRepository caseRepository;
     private final ActivityLogService activityLogService;
+    private final za.ac.univen.casemanagement.security.OwnershipService ownershipService;
 
     @Override
     @Transactional(readOnly = true)
     public Page<CaseResponse> getCases(CaseType caseType, CaseStatus status, String search, Pageable pageable) {
-        Page<CaseEntity> caseEntities = caseRepository.searchCases(caseType, status, search, pageable);
+        za.ac.univen.casemanagement.entity.UserEntity currentUser = ownershipService.getAuthenticatedUser();
+        boolean isSuperAdmin = ownershipService.isSuperAdmin(currentUser);
+        Long adminOwnerId = ownershipService.resolveAdminOwnerId(currentUser);
+
+        Page<CaseEntity> caseEntities = caseRepository.searchScopedCases(
+                isSuperAdmin,
+                adminOwnerId,
+                caseType,
+                status,
+                search,
+                pageable
+        );
         return caseEntities.map(this::mapToResponse);
     }
 
@@ -42,6 +54,13 @@ public class CaseServiceImpl implements CaseService {
     public CaseResponse createCase(CreateCaseRequest request) {
         if (request.getDateOpened() != null && request.getDateOpened().isAfter(LocalDate.now())) {
             throw new BadRequestException("dateOpened cannot be in the future");
+        }
+
+        za.ac.univen.casemanagement.entity.UserEntity currentUser = ownershipService.getAuthenticatedUser();
+        Long adminOwnerId = ownershipService.resolveAdminOwnerId(currentUser);
+
+        if (request.getAssignedOfficer() != null) {
+            ownershipService.validateOfficerAssignment(request.getAssignedOfficer(), adminOwnerId);
         }
 
         String nextCaseId = generateNextCaseId();
@@ -60,13 +79,13 @@ public class CaseServiceImpl implements CaseService {
                 .costing(request.getCosting() != null ? request.getCosting() : BigDecimal.ZERO)
                 .assignedOfficer(request.getAssignedOfficer())
                 .assignedRole(request.getAssignedRole() != null ? request.getAssignedRole() : (request.getAssignedOfficer() != null ? "Legal Officer" : null))
+                .createdBy(currentUser.getEmail())
+                .adminOwnerId(adminOwnerId)
                 .build();
 
         CaseEntity saved = caseRepository.save(entity);
 
-        String actorEmail = SecurityContextHolder.getContext().getAuthentication() != null
-                ? SecurityContextHolder.getContext().getAuthentication().getName()
-                : "system@univen.ac.za";
+        String actorEmail = currentUser.getEmail();
         activityLogService.log(
                 actorEmail,
                 ActivityCategory.CASE,
@@ -85,16 +104,24 @@ public class CaseServiceImpl implements CaseService {
     @Override
     @Transactional(readOnly = true)
     public CaseResponse getCaseById(String caseId) {
+        za.ac.univen.casemanagement.entity.UserEntity currentUser = ownershipService.getAuthenticatedUser();
         CaseEntity entity = caseRepository.findById(caseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Case not found with ID: " + caseId));
+        ownershipService.canAccessCase(entity, currentUser);
         return mapToResponse(entity);
     }
 
     @Override
     @Transactional
     public CaseResponse updateCase(String caseId, UpdateCaseRequest request) {
+        za.ac.univen.casemanagement.entity.UserEntity currentUser = ownershipService.getAuthenticatedUser();
         CaseEntity entity = caseRepository.findById(caseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Case not found with ID: " + caseId));
+        ownershipService.canAccessCase(entity, currentUser);
+
+        if (request.getAssignedOfficer() != null) {
+            ownershipService.validateOfficerAssignment(request.getAssignedOfficer(), entity.getAdminOwnerId());
+        }
 
         if (request.getEmployeeNumber() != null) {
             entity.setEmployeeNumber(request.getEmployeeNumber());
@@ -132,9 +159,7 @@ public class CaseServiceImpl implements CaseService {
 
         CaseEntity updated = caseRepository.save(entity);
 
-        String actorEmail = SecurityContextHolder.getContext().getAuthentication() != null
-                ? SecurityContextHolder.getContext().getAuthentication().getName()
-                : "system@univen.ac.za";
+        String actorEmail = currentUser.getEmail();
         activityLogService.log(
                 actorEmail,
                 ActivityCategory.CASE,
@@ -153,8 +178,10 @@ public class CaseServiceImpl implements CaseService {
     @Override
     @Transactional
     public CaseResponse closeCase(String caseId, CloseCaseRequest request) {
+        za.ac.univen.casemanagement.entity.UserEntity currentUser = ownershipService.getAuthenticatedUser();
         CaseEntity entity = caseRepository.findById(caseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Case not found with ID: " + caseId));
+        ownershipService.canAccessCase(entity, currentUser);
 
         if (request.getClosureDate().isBefore(entity.getDateOpened())) {
             throw new BadRequestException("closureDate must be on or after dateOpened (" + entity.getDateOpened() + ")");
@@ -169,9 +196,7 @@ public class CaseServiceImpl implements CaseService {
 
         CaseEntity closed = caseRepository.save(entity);
 
-        String actorEmail = SecurityContextHolder.getContext().getAuthentication() != null
-                ? SecurityContextHolder.getContext().getAuthentication().getName()
-                : "system@univen.ac.za";
+        String actorEmail = currentUser.getEmail();
         activityLogService.log(
                 actorEmail,
                 ActivityCategory.CASE,
@@ -217,6 +242,8 @@ public class CaseServiceImpl implements CaseService {
                 .costing(entity.getCosting())
                 .assignedOfficer(entity.getAssignedOfficer())
                 .assignedRole(entity.getAssignedRole())
+                .createdBy(entity.getCreatedBy())
+                .adminOwnerId(entity.getAdminOwnerId())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();

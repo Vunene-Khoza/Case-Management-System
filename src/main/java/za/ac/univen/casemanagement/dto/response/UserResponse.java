@@ -27,5 +27,6 @@ public class UserResponse {
     private boolean firstLoginCompleted;
     private Instant lastLogin;
     private String createdBy;
+    private Long adminOwnerId;
     private Instant createdAt;
 }

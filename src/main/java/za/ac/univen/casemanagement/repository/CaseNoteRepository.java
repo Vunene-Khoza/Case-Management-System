@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface CaseNoteRepository extends JpaRepository<CaseNoteEntity, Long> {
     List<CaseNoteEntity> findByCaseIdOrderByCreatedAtDesc(String caseId);
+    List<CaseNoteEntity> findByCaseIdAndAdminOwnerIdOrderByCreatedAtDesc(String caseId, Long adminOwnerId);
 }

@@ -6,7 +6,10 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "case_notes")
+@Table(name = "case_notes", indexes = {
+        @Index(name = "idx_notes_case_id", columnList = "case_id"),
+        @Index(name = "idx_notes_admin_owner_id", columnList = "admin_owner_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,6 +24,9 @@ public class CaseNoteEntity {
 
     @Column(name = "case_id", nullable = false, length = 50)
     private String caseId;
+
+    @Column(name = "admin_owner_id", nullable = false)
+    private Long adminOwnerId;
 
     @Column(name = "author_id", nullable = false)
     private Long authorId;

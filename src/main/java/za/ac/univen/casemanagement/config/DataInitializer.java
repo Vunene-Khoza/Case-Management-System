@@ -21,12 +21,16 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
+    private final za.ac.univen.casemanagement.repository.CaseRepository caseRepository;
+    private final za.ac.univen.casemanagement.repository.CaseNoteRepository caseNoteRepository;
+    private final za.ac.univen.casemanagement.repository.ActivityLogRepository activityLogRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
         seedEmployees();
         seedUsers();
+        backfillExistingRecords();
     }
 
     private void seedEmployees() {
@@ -94,7 +98,11 @@ public class DataInitializer implements CommandLineRunner {
                     .firstLoginCompleted(true)
                     .createdBy(createdBy)
                     .build();
-            userRepository.save(user);
+            user = userRepository.save(user);
+            if (role == UserRole.ADMIN) {
+                user.setAdminOwnerId(user.getUserId());
+                userRepository.save(user);
+            }
             log.info("Seeded initial user: {} with role {} (createdBy: {})", email, role, createdBy);
         } else {
             user.setName(name);
@@ -109,8 +117,80 @@ public class DataInitializer implements CommandLineRunner {
             if (user.getCreatedBy() == null) {
                 user.setCreatedBy(createdBy);
             }
+            if (role == UserRole.ADMIN && user.getAdminOwnerId() == null) {
+                user.setAdminOwnerId(user.getUserId());
+            }
             userRepository.save(user);
             log.info("Updated password & attributes for seeded user: {}", email);
+        }
+    }
+
+    private void backfillExistingRecords() {
+        // 1. Backfill users
+        UserEntity defaultAdmin = userRepository.findByEmailIgnoreCase("admin@univen.ac.za").orElse(null);
+        Long defaultAdminId = defaultAdmin != null ? defaultAdmin.getUserId() : null;
+
+        java.util.List<UserEntity> allUsers = userRepository.findAll();
+        for (UserEntity u : allUsers) {
+            boolean modified = false;
+            if (u.getRole() == UserRole.ADMIN && u.getAdminOwnerId() == null) {
+                u.setAdminOwnerId(u.getUserId());
+                modified = true;
+            } else if ((u.getRole() == UserRole.LEGAL_OFFICER || u.getRole() == UserRole.VIEWER) && u.getAdminOwnerId() == null) {
+                if (u.getCreatedBy() != null && !u.getCreatedBy().isBlank()) {
+                    userRepository.findByEmailIgnoreCase(u.getCreatedBy()).ifPresent(creator -> {
+                        u.setAdminOwnerId(creator.getUserId());
+                    });
+                }
+                if (u.getAdminOwnerId() == null && defaultAdminId != null) {
+                    u.setAdminOwnerId(defaultAdminId);
+                }
+                modified = true;
+            }
+            if (modified) {
+                userRepository.save(u);
+            }
+        }
+
+        // 2. Backfill existing cases
+        if (defaultAdminId != null) {
+            java.util.List<za.ac.univen.casemanagement.entity.CaseEntity> allCases = caseRepository.findAll();
+            for (za.ac.univen.casemanagement.entity.CaseEntity c : allCases) {
+                if (c.getAdminOwnerId() == null) {
+                    c.setAdminOwnerId(defaultAdminId);
+                    if (c.getCreatedBy() == null) {
+                        c.setCreatedBy("admin@univen.ac.za");
+                    }
+                    caseRepository.save(c);
+                    log.info("Backfilled case {} with adminOwnerId {}", c.getCaseId(), defaultAdminId);
+                }
+            }
+        }
+
+        // 3. Backfill case notes
+        java.util.List<za.ac.univen.casemanagement.entity.CaseNoteEntity> allNotes = caseNoteRepository.findAll();
+        for (za.ac.univen.casemanagement.entity.CaseNoteEntity n : allNotes) {
+            if (n.getAdminOwnerId() == null) {
+                caseRepository.findById(n.getCaseId()).ifPresent(c -> {
+                    n.setAdminOwnerId(c.getAdminOwnerId());
+                    caseNoteRepository.save(n);
+                });
+            }
+        }
+
+        // 4. Backfill activity logs
+        java.util.List<za.ac.univen.casemanagement.entity.ActivityLogEntity> allLogs = activityLogRepository.findAll();
+        for (za.ac.univen.casemanagement.entity.ActivityLogEntity l : allLogs) {
+            if (l.getAdminOwnerId() == null && l.getUserEmail() != null) {
+                userRepository.findByEmailIgnoreCase(l.getUserEmail()).ifPresent(u -> {
+                    if (u.getRole() == UserRole.ADMIN) {
+                        l.setAdminOwnerId(u.getUserId());
+                    } else if (u.getAdminOwnerId() != null) {
+                        l.setAdminOwnerId(u.getAdminOwnerId());
+                    }
+                    activityLogRepository.save(l);
+                });
+            }
         }
     }
 }

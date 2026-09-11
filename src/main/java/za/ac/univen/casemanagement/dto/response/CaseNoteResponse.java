@@ -16,6 +16,7 @@ public class CaseNoteResponse {
     private String caseId;
     private Long authorId;
     private String authorName;
+    private Long adminOwnerId;
     private String content;
     private Instant createdAt;
 }

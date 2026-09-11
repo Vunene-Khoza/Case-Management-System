@@ -11,6 +11,7 @@ import java.time.Instant;
         @Index(name = "idx_activity_timestamp", columnList = "timestamp"),
         @Index(name = "idx_activity_user_email", columnList = "user_email"),
         @Index(name = "idx_activity_actor_admin_owner", columnList = "actor_admin_owner"),
+        @Index(name = "idx_activity_admin_owner_id", columnList = "admin_owner_id"),
         @Index(name = "idx_activity_category", columnList = "category")
 })
 @Getter
@@ -73,6 +74,9 @@ public class ActivityLogEntity {
 
     @Column(name = "actor_admin_owner", length = 100)
     private String actorAdminOwner;
+
+    @Column(name = "admin_owner_id")
+    private Long adminOwnerId;
 
     @PrePersist
     public void prePersist() {

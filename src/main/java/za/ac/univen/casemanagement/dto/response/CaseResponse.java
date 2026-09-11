@@ -33,6 +33,8 @@ public class CaseResponse {
     private BigDecimal costing;
     private String assignedOfficer;
     private String assignedRole;
+    private String createdBy;
+    private Long adminOwnerId;
     private Instant createdAt;
     private Instant updatedAt;
 }

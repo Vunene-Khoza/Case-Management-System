@@ -29,4 +29,5 @@ public class ActivityLogResponse {
     private String status;
     private String detailsJson;
     private String actorAdminOwner;
+    private Long adminOwnerId;
 }

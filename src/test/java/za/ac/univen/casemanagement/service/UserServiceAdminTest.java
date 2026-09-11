@@ -77,7 +77,7 @@ class UserServiceAdminTest {
         assertTrue(response.isMustChangePassword());
         assertFalse(response.isFirstLoginCompleted());
         assertEquals("ACTIVE", response.getStatus());
-        verify(userRepository, times(1)).save(any(UserEntity.class));
+        verify(userRepository, atLeastOnce()).save(any(UserEntity.class));
     }
 
     @Test

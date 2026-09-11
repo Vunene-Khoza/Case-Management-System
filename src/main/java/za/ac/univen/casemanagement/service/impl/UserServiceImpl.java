@@ -29,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
     private final ActivityLogService activityLogService;
+    private final za.ac.univen.casemanagement.security.OwnershipService ownershipService;
 
     @Override
     @Transactional
@@ -48,6 +49,10 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         UserEntity saved = userRepository.save(entity);
+        if (saved.getRole() == UserRole.ADMIN && saved.getAdminOwnerId() == null) {
+            saved.setAdminOwnerId(saved.getUserId());
+            saved = userRepository.save(saved);
+        }
         return mapToResponse(saved);
     }
 
@@ -96,6 +101,9 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         UserEntity saved = userRepository.save(adminEntity);
+        // An Admin is the owner of their own administrative workspace
+        saved.setAdminOwnerId(saved.getUserId());
+        saved = userRepository.save(saved);
 
         activityLogService.log(
                 creatorUsername != null ? creatorUsername : "SYSTEM",
@@ -140,6 +148,14 @@ public class UserServiceImpl implements UserService {
             throw new ResourceNotFoundException("No official University of Venda employee found for Staff Number: " + empNum);
         }
 
+        Long adminOwnerId = null;
+        if (creatorUsername != null && !creatorUsername.isBlank() && !"SYSTEM".equalsIgnoreCase(creatorUsername)) {
+            UserEntity creator = userRepository.findByEmailIgnoreCase(creatorUsername.trim()).orElse(null);
+            if (creator != null) {
+                adminOwnerId = ownershipService.resolveAdminOwnerId(creator);
+            }
+        }
+
         UserEntity legalOfficerEntity = UserEntity.builder()
                 .name(request.getName().trim())
                 .surname(request.getSurname().trim())
@@ -154,6 +170,7 @@ public class UserServiceImpl implements UserService {
                 .mustChangePassword(true)
                 .firstLoginCompleted(false)
                 .createdBy(creatorUsername != null ? creatorUsername.trim().toLowerCase() : "SYSTEM")
+                .adminOwnerId(adminOwnerId)
                 .build();
 
         UserEntity saved = userRepository.save(legalOfficerEntity);
@@ -191,7 +208,16 @@ public class UserServiceImpl implements UserService {
         if (currentUsername == null || currentUsername.isBlank()) {
             return List.of();
         }
-        return userRepository.findByCreatedByIgnoreCase(currentUsername.trim())
+        UserEntity currentUser = userRepository.findByEmailIgnoreCase(currentUsername.trim()).orElse(null);
+        if (currentUser == null) {
+            return List.of();
+        }
+        Long currentAdminOwnerId = ownershipService.resolveAdminOwnerId(currentUser);
+        if (currentAdminOwnerId == null) {
+            return List.of();
+        }
+        // Normal Admin: sees only users belonging to their workspace (excluding other ADMIN accounts)
+        return userRepository.findByAdminOwnerIdAndRoleNot(currentAdminOwnerId, UserRole.ADMIN)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -209,8 +235,12 @@ public class UserServiceImpl implements UserService {
         UserEntity entity = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
-        if (!isSuperAdmin && (currentUsername == null || entity.getCreatedBy() == null || !entity.getCreatedBy().equalsIgnoreCase(currentUsername.trim()))) {
-            throw new AccessDeniedException("You do not have permission to view this user account.");
+        if (!isSuperAdmin) {
+            UserEntity currentUser = (currentUsername != null && !currentUsername.isBlank())
+                    ? userRepository.findByEmailIgnoreCase(currentUsername.trim())
+                    .orElseThrow(() -> new AccessDeniedException("You do not have permission to view this user account."))
+                    : ownershipService.getAuthenticatedUser();
+            ownershipService.canAccessUser(entity, currentUser);
         }
 
         return mapToResponse(entity);
@@ -228,8 +258,12 @@ public class UserServiceImpl implements UserService {
         UserEntity entity = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
-        if (!isSuperAdmin && (currentUsername == null || entity.getCreatedBy() == null || !entity.getCreatedBy().equalsIgnoreCase(currentUsername.trim()))) {
-            throw new AccessDeniedException("You do not have permission to modify this user account.");
+        if (!isSuperAdmin) {
+            UserEntity currentUser = (currentUsername != null && !currentUsername.isBlank())
+                    ? userRepository.findByEmailIgnoreCase(currentUsername.trim())
+                    .orElseThrow(() -> new AccessDeniedException("You do not have permission to modify this user account."))
+                    : ownershipService.getAuthenticatedUser();
+            ownershipService.canAccessUser(entity, currentUser);
         }
 
         if (request.getName() != null) {
@@ -280,8 +314,12 @@ public class UserServiceImpl implements UserService {
         UserEntity entity = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
-        if (!isSuperAdmin && (currentUsername == null || entity.getCreatedBy() == null || !entity.getCreatedBy().equalsIgnoreCase(currentUsername.trim()))) {
-            throw new AccessDeniedException("You do not have permission to delete this user account.");
+        if (!isSuperAdmin) {
+            UserEntity currentUser = (currentUsername != null && !currentUsername.isBlank())
+                    ? userRepository.findByEmailIgnoreCase(currentUsername.trim())
+                    .orElseThrow(() -> new AccessDeniedException("You do not have permission to delete this user account."))
+                    : ownershipService.getAuthenticatedUser();
+            ownershipService.canAccessUser(entity, currentUser);
         }
 
         userRepository.delete(entity);
@@ -315,6 +353,7 @@ public class UserServiceImpl implements UserService {
                 .firstLoginCompleted(entity.isFirstLoginCompleted())
                 .lastLogin(entity.getLastLogin())
                 .createdBy(entity.getCreatedBy())
+                .adminOwnerId(entity.getAdminOwnerId())
                 .createdAt(entity.getCreatedAt())
                 .build();
     }

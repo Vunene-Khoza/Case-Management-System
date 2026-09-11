@@ -25,19 +25,23 @@ public class CaseNoteServiceImpl implements CaseNoteService {
     private final CaseRepository caseRepository;
     private final UserRepository userRepository;
     private final ActivityLogService activityLogService;
+    private final za.ac.univen.casemanagement.security.OwnershipService ownershipService;
 
     @Override
     @Transactional
     public CaseNoteResponse addNote(String caseId, AddNoteRequest request, String currentUserEmail) {
-        if (!caseRepository.existsById(caseId)) {
-            throw new ResourceNotFoundException("Case not found with ID: " + caseId);
-        }
+        za.ac.univen.casemanagement.entity.CaseEntity caseEntity = caseRepository.findById(caseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Case not found with ID: " + caseId));
 
-        UserEntity user = userRepository.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + currentUserEmail));
+        UserEntity user = (currentUserEmail != null && !currentUserEmail.isBlank())
+                ? userRepository.findByEmailIgnoreCase(currentUserEmail).orElseGet(ownershipService::getAuthenticatedUser)
+                : ownershipService.getAuthenticatedUser();
+
+        ownershipService.canAccessCase(caseEntity, user);
 
         CaseNoteEntity note = CaseNoteEntity.builder()
                 .caseId(caseId)
+                .adminOwnerId(caseEntity.getAdminOwnerId())
                 .authorId(user.getUserId())
                 .authorName(user.getName())
                 .content(request.getContent())
@@ -46,7 +50,7 @@ public class CaseNoteServiceImpl implements CaseNoteService {
         CaseNoteEntity saved = caseNoteRepository.save(note);
 
         activityLogService.log(
-                currentUserEmail,
+                user.getEmail(),
                 ActivityCategory.CASE,
                 "NOTE_ADDED",
                 "CaseNote",
@@ -63,9 +67,12 @@ public class CaseNoteServiceImpl implements CaseNoteService {
     @Override
     @Transactional(readOnly = true)
     public List<CaseNoteResponse> getNotesByCaseId(String caseId) {
-        if (!caseRepository.existsById(caseId)) {
-            throw new ResourceNotFoundException("Case not found with ID: " + caseId);
-        }
+        za.ac.univen.casemanagement.entity.CaseEntity caseEntity = caseRepository.findById(caseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Case not found with ID: " + caseId));
+
+        UserEntity currentUser = ownershipService.getAuthenticatedUser();
+        ownershipService.canAccessCase(caseEntity, currentUser);
+
         return caseNoteRepository.findByCaseIdOrderByCreatedAtDesc(caseId)
                 .stream()
                 .map(this::mapToResponse)
@@ -76,6 +83,7 @@ public class CaseNoteServiceImpl implements CaseNoteService {
         return CaseNoteResponse.builder()
                 .noteId(entity.getNoteId())
                 .caseId(entity.getCaseId())
+                .adminOwnerId(entity.getAdminOwnerId())
                 .authorId(entity.getAuthorId())
                 .authorName(entity.getAuthorName())
                 .content(entity.getContent())

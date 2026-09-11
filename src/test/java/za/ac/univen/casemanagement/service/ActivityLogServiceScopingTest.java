@@ -65,6 +65,7 @@ class ActivityLogServiceScopingTest {
                 .surname("Alpha")
                 .email("admina@univen.ac.za")
                 .role(UserRole.ADMIN)
+                .adminOwnerId(2L)
                 .createdBy("superadmin@univen.ac.za")
                 .build();
 
@@ -74,6 +75,7 @@ class ActivityLogServiceScopingTest {
                 .surname("Alpha")
                 .email("officera@univen.ac.za")
                 .role(UserRole.LEGAL_OFFICER)
+                .adminOwnerId(2L)
                 .createdBy("admina@univen.ac.za")
                 .build();
     }
@@ -86,7 +88,7 @@ class ActivityLogServiceScopingTest {
                 List.of(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN"))
         );
         Pageable pageable = PageRequest.of(0, 10);
-        when(activityLogRepository.findScopedLogs(eq(true), eq(false), any(), eq(false), any(), isNull(), isNull(), isNull(), eq(pageable)))
+        when(activityLogRepository.findScopedLogs(eq(true), eq(false), any(), isNull(), eq(false), any(), isNull(), isNull(), isNull(), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of(
                         ActivityLogEntity.builder().id(101L).action("CASE_CREATED").category(ActivityCategory.CASE).build()
                 )));
@@ -95,7 +97,7 @@ class ActivityLogServiceScopingTest {
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        verify(activityLogRepository).findScopedLogs(eq(true), eq(false), eq("superadmin@univen.ac.za"), eq(false), eq("superadmin@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable));
+        verify(activityLogRepository).findScopedLogs(eq(true), eq(false), eq("superadmin@univen.ac.za"), isNull(), eq(false), eq("superadmin@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable));
     }
 
     @Test
@@ -106,7 +108,8 @@ class ActivityLogServiceScopingTest {
                 List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
         );
         Pageable pageable = PageRequest.of(0, 10);
-        when(activityLogRepository.findScopedLogs(eq(false), eq(true), eq("admina@univen.ac.za"), eq(false), eq("admina@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable)))
+        when(userRepository.findByEmailIgnoreCase("admina@univen.ac.za")).thenReturn(Optional.of(adminA));
+        when(activityLogRepository.findScopedLogs(eq(false), eq(true), eq("admina@univen.ac.za"), eq(2L), eq(false), eq("admina@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of(
                         ActivityLogEntity.builder().id(102L).action("USER_CREATED").actorAdminOwner("admina@univen.ac.za").category(ActivityCategory.USER).build()
                 )));
@@ -116,7 +119,7 @@ class ActivityLogServiceScopingTest {
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals("USER_CREATED", result.getContent().get(0).getAction());
-        verify(activityLogRepository).findScopedLogs(eq(false), eq(true), eq("admina@univen.ac.za"), eq(false), eq("admina@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable));
+        verify(activityLogRepository).findScopedLogs(eq(false), eq(true), eq("admina@univen.ac.za"), eq(2L), eq(false), eq("admina@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable));
     }
 
     @Test
@@ -127,7 +130,8 @@ class ActivityLogServiceScopingTest {
                 List.of(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN"))
         );
         Pageable pageable = PageRequest.of(0, 10);
-        when(activityLogRepository.findScopedLogs(eq(false), eq(true), eq("admina@univen.ac.za"), eq(false), eq("admina@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable)))
+        when(userRepository.findByEmailIgnoreCase("admina@univen.ac.za")).thenReturn(Optional.of(adminA));
+        when(activityLogRepository.findScopedLogs(eq(false), eq(true), eq("admina@univen.ac.za"), eq(2L), eq(false), eq("admina@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of(
                         ActivityLogEntity.builder().id(102L).action("USER_CREATED").actorAdminOwner("admina@univen.ac.za").category(ActivityCategory.USER).build()
                 )));
@@ -137,7 +141,7 @@ class ActivityLogServiceScopingTest {
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals("USER_CREATED", result.getContent().get(0).getAction());
-        verify(activityLogRepository).findScopedLogs(eq(false), eq(true), eq("admina@univen.ac.za"), eq(false), eq("admina@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable));
+        verify(activityLogRepository).findScopedLogs(eq(false), eq(true), eq("admina@univen.ac.za"), eq(2L), eq(false), eq("admina@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable));
     }
 
     @Test
@@ -148,7 +152,8 @@ class ActivityLogServiceScopingTest {
                 List.of(new SimpleGrantedAuthority("ROLE_LEGAL_OFFICER"))
         );
         Pageable pageable = PageRequest.of(0, 10);
-        when(activityLogRepository.findScopedLogs(eq(false), eq(false), eq("officera@univen.ac.za"), eq(true), eq("officera@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable)))
+        when(userRepository.findByEmailIgnoreCase("officera@univen.ac.za")).thenReturn(Optional.of(officerA));
+        when(activityLogRepository.findScopedLogs(eq(false), eq(false), eq("officera@univen.ac.za"), eq(2L), eq(true), eq("officera@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of(
                         ActivityLogEntity.builder().id(103L).action("NOTE_ADDED").userEmail("officera@univen.ac.za").category(ActivityCategory.CASE).build()
                 )));
@@ -158,7 +163,7 @@ class ActivityLogServiceScopingTest {
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals("NOTE_ADDED", result.getContent().get(0).getAction());
-        verify(activityLogRepository).findScopedLogs(eq(false), eq(false), eq("officera@univen.ac.za"), eq(true), eq("officera@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable));
+        verify(activityLogRepository).findScopedLogs(eq(false), eq(false), eq("officera@univen.ac.za"), eq(2L), eq(true), eq("officera@univen.ac.za"), isNull(), isNull(), isNull(), eq(pageable));
     }
 
     @Test

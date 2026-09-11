@@ -38,21 +38,35 @@ class UserServiceOwnershipTest {
     @Mock
     private ActivityLogService activityLogService;
 
+    @Mock
+    private za.ac.univen.casemanagement.security.OwnershipService ownershipService;
+
     @InjectMocks
     private UserServiceImpl userService;
 
+    private UserEntity adminA;
     private UserEntity userCreatedByAdminA;
     private UserEntity userCreatedByAdminB;
     private UserEntity superAdminUser;
 
     @BeforeEach
     void setUp() {
+        adminA = UserEntity.builder()
+                .userId(10L)
+                .name("Admin A")
+                .email("admina@univen.ac.za")
+                .role(UserRole.ADMIN)
+                .adminOwnerId(10L)
+                .status("ACTIVE")
+                .build();
+
         userCreatedByAdminA = UserEntity.builder()
                 .userId(1L)
                 .name("Officer A")
                 .email("officera@univen.ac.za")
                 .role(UserRole.LEGAL_OFFICER)
                 .status("ACTIVE")
+                .adminOwnerId(10L)
                 .createdBy("admina@univen.ac.za")
                 .build();
 
@@ -62,6 +76,7 @@ class UserServiceOwnershipTest {
                 .email("officerb@univen.ac.za")
                 .role(UserRole.LEGAL_OFFICER)
                 .status("ACTIVE")
+                .adminOwnerId(20L)
                 .createdBy("adminb@univen.ac.za")
                 .build();
 
@@ -83,12 +98,14 @@ class UserServiceOwnershipTest {
 
         assertEquals(3, result.size());
         verify(userRepository, times(1)).findAll();
-        verify(userRepository, never()).findByCreatedByIgnoreCase(anyString());
+        verify(userRepository, never()).findByAdminOwnerIdAndRoleNot(anyLong(), any());
     }
 
     @Test
     void testAdminA_CanOnlySeeOwnedUsers() {
-        when(userRepository.findByCreatedByIgnoreCase("admina@univen.ac.za"))
+        when(userRepository.findByEmailIgnoreCase("admina@univen.ac.za")).thenReturn(Optional.of(adminA));
+        when(ownershipService.resolveAdminOwnerId(adminA)).thenReturn(10L);
+        when(userRepository.findByAdminOwnerIdAndRoleNot(10L, UserRole.ADMIN))
                 .thenReturn(List.of(userCreatedByAdminA));
 
         List<UserResponse> result = userService.getUsers("admina@univen.ac.za", false);
@@ -96,13 +113,15 @@ class UserServiceOwnershipTest {
         assertEquals(1, result.size());
         assertEquals("officera@univen.ac.za", result.get(0).getEmail());
         assertEquals("admina@univen.ac.za", result.get(0).getCreatedBy());
-        verify(userRepository, times(1)).findByCreatedByIgnoreCase("admina@univen.ac.za");
+        verify(userRepository, times(1)).findByAdminOwnerIdAndRoleNot(10L, UserRole.ADMIN);
         verify(userRepository, never()).findAll();
     }
 
     @Test
     void testAdminA_CannotViewUserCreatedByAdminB_ThrowsAccessDenied() {
         when(userRepository.findById(2L)).thenReturn(Optional.of(userCreatedByAdminB));
+        when(userRepository.findByEmailIgnoreCase("admina@univen.ac.za")).thenReturn(Optional.of(adminA));
+        doThrow(new AccessDeniedException("Access denied")).when(ownershipService).canAccessUser(userCreatedByAdminB, adminA);
 
         assertThrows(AccessDeniedException.class, () -> {
             userService.getUserById(2L, "admina@univen.ac.za", false);
@@ -122,6 +141,8 @@ class UserServiceOwnershipTest {
     @Test
     void testAdminA_CannotDeleteUserCreatedByAdminB_ThrowsAccessDenied() {
         when(userRepository.findById(2L)).thenReturn(Optional.of(userCreatedByAdminB));
+        when(userRepository.findByEmailIgnoreCase("admina@univen.ac.za")).thenReturn(Optional.of(adminA));
+        doThrow(new AccessDeniedException("Access denied")).when(ownershipService).canAccessUser(userCreatedByAdminB, adminA);
 
         assertThrows(AccessDeniedException.class, () -> {
             userService.deleteUser(2L, "admina@univen.ac.za", false);
@@ -133,6 +154,8 @@ class UserServiceOwnershipTest {
     @Test
     void testAdminA_CanDeleteOwnedUser() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(userCreatedByAdminA));
+        when(userRepository.findByEmailIgnoreCase("admina@univen.ac.za")).thenReturn(Optional.of(adminA));
+        when(ownershipService.canAccessUser(userCreatedByAdminA, adminA)).thenReturn(true);
 
         userService.deleteUser(1L, "admina@univen.ac.za", false);
 
@@ -152,6 +175,8 @@ class UserServiceOwnershipTest {
                 .temporaryPassword("TempPass2026!")
                 .build();
 
+        when(userRepository.findByEmailIgnoreCase("admina@univen.ac.za")).thenReturn(Optional.of(adminA));
+        when(ownershipService.resolveAdminOwnerId(adminA)).thenReturn(10L);
         when(userRepository.existsByEmail("baloyi@univen.ac.za")).thenReturn(false);
         when(userRepository.existsByEmployeeNumber("40234")).thenReturn(false);
         when(employeeRepository.existsByEmployeeNumber("40234")).thenReturn(true);

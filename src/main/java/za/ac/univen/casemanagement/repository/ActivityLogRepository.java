@@ -14,8 +14,8 @@ public interface ActivityLogRepository extends JpaRepository<ActivityLogEntity, 
 
     @Query("SELECT a FROM ActivityLogEntity a WHERE " +
            "(:isSuperAdmin = true OR " +
-           " (:isAdmin = true AND LOWER(a.actorAdminOwner) = LOWER(:adminEmail)) OR " +
-           " (:isOfficer = true AND LOWER(a.userEmail) = LOWER(:userEmail))) AND " +
+           " (:isAdmin = true AND (a.adminOwnerId = :adminOwnerId OR LOWER(a.actorAdminOwner) = LOWER(:adminEmail))) OR " +
+           " (:isOfficer = true AND (LOWER(a.userEmail) = LOWER(:userEmail) OR (:adminOwnerId IS NOT NULL AND a.adminOwnerId = :adminOwnerId)))) AND " +
            "(:category IS NULL OR a.category = :category) AND " +
            "(:status IS NULL OR a.status = :status) AND " +
            "(:search IS NULL OR " +
@@ -25,6 +25,7 @@ public interface ActivityLogRepository extends JpaRepository<ActivityLogEntity, 
             @Param("isSuperAdmin") boolean isSuperAdmin,
             @Param("isAdmin") boolean isAdmin,
             @Param("adminEmail") String adminEmail,
+            @Param("adminOwnerId") Long adminOwnerId,
             @Param("isOfficer") boolean isOfficer,
             @Param("userEmail") String userEmail,
             @Param("category") ActivityCategory category,
@@ -34,13 +35,14 @@ public interface ActivityLogRepository extends JpaRepository<ActivityLogEntity, 
 
     @Query("SELECT COUNT(a) FROM ActivityLogEntity a WHERE " +
            "(:isSuperAdmin = true OR " +
-           " (:isAdmin = true AND LOWER(a.actorAdminOwner) = LOWER(:adminEmail)) OR " +
-           " (:isOfficer = true AND LOWER(a.userEmail) = LOWER(:userEmail))) AND " +
+           " (:isAdmin = true AND (a.adminOwnerId = :adminOwnerId OR LOWER(a.actorAdminOwner) = LOWER(:adminEmail))) OR " +
+           " (:isOfficer = true AND (LOWER(a.userEmail) = LOWER(:userEmail) OR (:adminOwnerId IS NOT NULL AND a.adminOwnerId = :adminOwnerId)))) AND " +
            "(:category IS NULL OR a.category = :category)")
     long countScopedByCategory(
             @Param("isSuperAdmin") boolean isSuperAdmin,
             @Param("isAdmin") boolean isAdmin,
             @Param("adminEmail") String adminEmail,
+            @Param("adminOwnerId") Long adminOwnerId,
             @Param("isOfficer") boolean isOfficer,
             @Param("userEmail") String userEmail,
             @Param("category") ActivityCategory category);

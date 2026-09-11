@@ -13,7 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "cases")
+@Table(name = "cases", indexes = {
+        @Index(name = "idx_cases_admin_owner_id", columnList = "admin_owner_id"),
+        @Index(name = "idx_cases_status", columnList = "status"),
+        @Index(name = "idx_cases_type", columnList = "case_type")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -72,6 +76,12 @@ public class CaseEntity {
 
     @Column(name = "assigned_role", length = 50)
     private String assignedRole;
+
+    @Column(name = "created_by", length = 100)
+    private String createdBy;
+
+    @Column(name = "admin_owner_id", nullable = false)
+    private Long adminOwnerId;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
