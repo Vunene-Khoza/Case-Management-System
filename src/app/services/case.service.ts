@@ -204,51 +204,7 @@ export class CaseService {
         // 3. Filter for officers created by this admin if not Super Admin
         let adminOfficers = combined;
         if (!isSuperAdmin) {
-          const createdByMe = combined.filter(u => u.createdBy && u.createdBy.toLowerCase() === curEmail);
-          // If the admin has created specific officers, show those created by them;
-          // otherwise provide all system legal officers so testing is seamless
-          if (createdByMe.length > 0) {
-            adminOfficers = createdByMe;
-          }
-        }
-
-        // 4. Default system fallback legal officers if list is empty
-        if (adminOfficers.length === 0) {
-          adminOfficers = [
-            {
-              userId: 'LO_001',
-              name: 'T. Avhashoni',
-              email: 'usera@univen.ac.za',
-              role: UserRole.LEGAL_OFFICER,
-              status: 'ACTIVE',
-              staffNumber: '12345',
-              department: 'Department of Legal Services',
-              firstLoginCompleted: true,
-              createdAt: ''
-            },
-            {
-              userId: 'LO_002',
-              name: 'N. Nndivho',
-              email: 'userb@univen.ac.za',
-              role: UserRole.LEGAL_OFFICER,
-              status: 'ACTIVE',
-              staffNumber: '22810',
-              department: 'Department of Legal Services',
-              firstLoginCompleted: true,
-              createdAt: ''
-            },
-            {
-              userId: 'LO_003',
-              name: 'David Blundin',
-              email: 'officer@univen.ac.za',
-              role: UserRole.LEGAL_OFFICER,
-              status: 'ACTIVE',
-              staffNumber: '31007',
-              department: 'Department of Legal Services',
-              firstLoginCompleted: true,
-              createdAt: ''
-            }
-          ];
+          adminOfficers = combined.filter(u => u.createdBy && u.createdBy.toLowerCase() === curEmail);
         }
 
         return adminOfficers;
@@ -316,11 +272,6 @@ export class CaseService {
             }
           }
         });
-
-        if (notifications.length === 0) {
-          notifications.push("Upcoming trial date for Case C001 on 2026-04-10.");
-          notifications.push("Reminder due today for Case C003 (David Baloyi).");
-        }
 
         return {
           totalCases: sum.totalCases || 0,

@@ -242,15 +242,8 @@ export class UserManagementComponent implements OnInit {
 
         const cur = this.caseService.getCurrentUser();
         const curEmail = (cur.email || '').toLowerCase();
-        const createdByMe = combined.filter(u => u.createdBy && u.createdBy.toLowerCase() === curEmail);
-
-        if (createdByMe.length > 0) {
-          this.users = createdByMe;
-        } else if (combined.length > 0) {
-          this.users = combined;
-        } else {
-          this.loadAdminFallbackUsers();
-        }
+        // Strict isolation: only show users created by this admin
+        this.users = combined.filter(u => u.createdBy && u.createdBy.toLowerCase() === curEmail);
       },
       error: () => {
         this.loadAdminFallbackUsers();
@@ -267,37 +260,11 @@ export class UserManagementComponent implements OnInit {
       try {
         const customUsers: User[] = JSON.parse(customUsersJson);
         fallbackOfficers = customUsers.filter(u => 
-          u.role === UserRole.LEGAL_OFFICER && (!u.createdBy || u.createdBy.toLowerCase() === curEmail)
+          u.role === UserRole.LEGAL_OFFICER && (u.createdBy && u.createdBy.toLowerCase() === curEmail)
         );
       } catch (e) {
         fallbackOfficers = [];
       }
-    }
-    if (fallbackOfficers.length === 0) {
-      fallbackOfficers = [
-        {
-          userId: 'LO_001',
-          name: 'T. Avhashoni',
-          email: 'usera@univen.ac.za',
-          role: UserRole.LEGAL_OFFICER,
-          status: 'ACTIVE',
-          staffNumber: '12345',
-          department: 'Department of Legal Services',
-          firstLoginCompleted: true,
-          createdAt: ''
-        },
-        {
-          userId: 'LO_002',
-          name: 'N. Nndivho',
-          email: 'userb@univen.ac.za',
-          role: UserRole.LEGAL_OFFICER,
-          status: 'ACTIVE',
-          staffNumber: '22810',
-          department: 'Department of Legal Services',
-          firstLoginCompleted: true,
-          createdAt: ''
-        }
-      ];
     }
     this.users = fallbackOfficers;
   }

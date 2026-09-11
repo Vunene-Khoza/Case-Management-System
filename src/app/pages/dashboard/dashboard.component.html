@@ -422,6 +422,9 @@
                 <span class="notif-time">Real-time alert</span>
               </div>
             </div>
+            <div class="notification-empty" *ngIf="metrics.notifications.length === 0" style="padding: 1.5rem; text-align: center; color: #94a3b8; font-size: 0.875rem;">
+              No upcoming deadlines or alerts.
+            </div>
           </div>
         </section>
 
